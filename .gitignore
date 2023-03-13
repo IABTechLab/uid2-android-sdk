@@ -1,0 +1,31 @@
+# Gradle files
+.gradle/
+.buildtrace/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log/OS Files
+*.log
+
+# Android Studio generated files and folders
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.apk.idsig
+output.json
+
+# IntelliJ
+*.iml
+.idea/*
+!.idea/externalDependencies.xml
+
+# Apple
+.DS_Store
+**/.DS_Store
+
+# Lint
+lint/
+
