@@ -1,5 +1,6 @@
 package com.uid2.sdk.network
 
+import com.uid2.sdk.extensions.decodeJsonToMap
 import com.uid2.sdk.network.NetworkRequestType.GET
 import com.uid2.sdk.network.NetworkRequestType.POST
 import java.io.ByteArrayInputStream
@@ -7,7 +8,7 @@ import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import org.json.JSONObject
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,17 +62,13 @@ class DefaultNetworkSessionTest {
     fun `test post data`() {
         val session = buildNetworkSession()
 
-        val data = mapOf<String, Any>(
-            "Key1" to "Value1",
-            "Key2" to 2,
-        )
-
+        val data = "Key1=Value1&Key2=2"
         session.loadData(url, NetworkRequest(POST, mapOf(), data))
 
         // We'll build the expected String representation of the map ourselves, but check that the
         // expected bytes have been written to the output stream. We also want to make sure that
         // the output stream was correctly closed afterwards.
-        val expectedData = "Key1=Value1&Key2=2".toByteArray(Charsets.UTF_8)
+        val expectedData = data.toByteArray(Charsets.UTF_8)
         verify(outputStream).write(expectedData)
         verify(outputStream).close()
     }
@@ -84,7 +81,8 @@ class DefaultNetworkSessionTest {
         val response = session.loadData(url, NetworkRequest(GET))
 
         // Verify that an empty map has been returned.
-        Assert.assertEquals(mapOf<String, String>(), response)
+        assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, response.code)
+        assertEquals("", response.data)
     }
 
     @Test
@@ -107,7 +105,8 @@ class DefaultNetworkSessionTest {
         val response = session.loadData(url, NetworkRequest(GET))
 
         // Verify that the parsed response matches that returned by our fake input stream.
-        Assert.assertEquals(map, response)
+        assertEquals(HttpURLConnection.HTTP_OK, response.code)
+        assertEquals(map, response.data.decodeJsonToMap())
     }
 
     /**

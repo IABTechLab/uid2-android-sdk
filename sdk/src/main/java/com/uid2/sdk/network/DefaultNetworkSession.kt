@@ -1,9 +1,7 @@
 package com.uid2.sdk.network
 
-import com.uid2.sdk.extensions.decodeJsonToMap
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLEncoder
 
 /**
  * A default implementation of NetworkSession that leverages HttpUrlConnection to make the necessary
@@ -11,7 +9,7 @@ import java.net.URLEncoder
  */
 open class DefaultNetworkSession : NetworkSession {
 
-    override fun loadData(url: URL, request: NetworkRequest): Map<String, Any> {
+    override fun loadData(url: URL, request: NetworkRequest): NetworkResponse {
         val connection = openConnection(url).apply {
             requestMethod = request.type.toRequestMethod()
 
@@ -27,7 +25,7 @@ open class DefaultNetworkSession : NetworkSession {
                 doOutput = true
 
                 outputStream.use { outputStream ->
-                    outputStream.write(data.toPostData().toByteArray(Charsets.UTF_8))
+                    outputStream.write(data.toByteArray(Charsets.UTF_8))
                 }
             }
         }
@@ -35,12 +33,12 @@ open class DefaultNetworkSession : NetworkSession {
         // A successful response code should be in the [200-299] range.
         val responseCode = connection.responseCode
         if (responseCode !in SUCCESS_CODE_RANGE_MIN..SUCCESS_CODE_RANGE_MAX) {
-            return mapOf()
+            return NetworkResponse(responseCode)
         }
 
         // Read the response and attempt to convert the returned JSON into a map.
         val responseText = connection.inputStream.bufferedReader().use { it.readText() }
-        return responseText.decodeJsonToMap() ?: mapOf()
+        return NetworkResponse(responseCode, responseText)
     }
 
     /**
@@ -57,15 +55,6 @@ open class DefaultNetworkSession : NetworkSession {
     private fun NetworkRequestType.toRequestMethod() = when (this) {
         NetworkRequestType.GET -> "GET"
         NetworkRequestType.POST -> "POST"
-    }
-
-    /**
-     * Extension to format any associated POST data into to expected format (key=value pairs, joined
-     * with "&").
-     */
-    private fun Map<String, Any>.toPostData() = keys.joinToString("&") {
-        val charset = Charsets.UTF_8.name()
-        URLEncoder.encode(it, charset) + "=" + URLEncoder.encode(get(it).toString(), charset)
     }
 
     private companion object {
