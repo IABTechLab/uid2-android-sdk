@@ -1,0 +1,13 @@
+{
+  "body": {
+    "advertising_token": "AgAAAnojG9KCix9paKGDw4cyFWj6TC6JcXxkwaJHWbq9e9sBL6ENzlabgtas04zjHxkFCCKAPppamsWt+PISfsmz7o3jrjRZuUmYo9htdDgZLNQSXLxwabHJKvXm4RVJN5gGtVUOUyYzx9ybLMSf2wrdLGZqTBxZIEmO8y/k2jL9ZYq74A==",
+    "user_token": "AgAAAnb/A0tCjX3ewHqonVDvxNGbMYbOyaTsIv3VMb5h9esYbahIJdmkN6ZX1x2ghx75L23jxb58pf5dItQ1/SgX1Zb4fVLG4I6uBIMXhQHqrVAFJfPb3j4PUTUI48Q/9aBR/VE=",
+    "refresh_token": "AAAAAntKHPHFFDsLKy3LngnBg/A4d25Sw1P+evWqRdnVlFKLi5OgQLJq2lAfRtHD2YTaCx7G9VaQkg3dx5gusxUs8rSD0bOR6/aZS70v0mft/qfol4aNxdzCE9BOVTC8EP/Z/vlIcS8DnHMkOgIEk6KD0M782+JpHrjLwXXmt+tMnKDybnZK6X5zjuFYl9OT6aogIEUEUQIMqenP9y4ctu/b3UALvyx6se0zlGKb1wzu1ilnxbND5I42n3MYn2Nqs4eVtuDBRdDT6L8+ElVTHVfVzS02mG+OYWiyVZyAbQP1iyBWmybkP8PcJsTUmDZE2WPzgvtV5+6/deZ/s+taMJo8FMJbP3oVkq5985MYHdXaSTiaT8sBc0JwHgqW9vaUgLsb",
+    "identity_expires": 1675272748539,
+    "refresh_expires": 1677863848539,
+    "refresh_from": 1675272148539,
+    "refresh_response_key": "ZsLNtb55Kr9vGEDj2nTiYN4rqL6ofXcnvXKyI0oVdyM="
+  },
+  "status": "success"
+}
+
