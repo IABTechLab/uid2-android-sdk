@@ -9,12 +9,28 @@ import org.junit.Test
 class UID2IdentityTest {
     @Test
     fun `test invalid json`() {
+        // Verify that completely invalid json is handled correctly.
         listOf(
             JSONObject(),
-            JSONObject(mapOf("key" to "value")),
-            JSONObject(TestData.INVALID_IDENTITY)
+            JSONObject(mapOf("key" to "value"))
         ).forEach {
             val identity = UID2Identity.fromJson(it)
+            assertNull(identity)
+        }
+
+        // Verify that if any of the mandatory parameters are missing, it's handled correctly.
+        listOf(
+            "advertising_token",
+            "refresh_token",
+            "identity_expires",
+            "refresh_expires",
+            "refresh_from",
+            "refresh_response_key"
+        ).forEach {
+            val json = JSONObject(TestData.VALID_IDENTITY)
+            json.remove(it)
+
+            val identity = UID2Identity.fromJson(json)
             assertNull(identity)
         }
     }

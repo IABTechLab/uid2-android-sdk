@@ -58,6 +58,11 @@ data class RefreshResponse(
             val body = json.optJSONObject("body")?.let { UID2Identity.fromJson(it) }
             val message = json.opt("message")?.toString()
 
+            // Check that if we've successfully refreshed, that we have a valid UID2Identity.
+            if (status == SUCCESS && body == null) {
+                return null
+            }
+
             return RefreshResponse(
                 body,
                 status,

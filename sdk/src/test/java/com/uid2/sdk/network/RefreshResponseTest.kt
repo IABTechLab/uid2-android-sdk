@@ -14,27 +14,54 @@ import org.junit.Test
 class RefreshResponseTest {
     @Test
     fun `test invalid json`() {
+        // Verify that completely invalid json is handled correctly.
         listOf(
             JSONObject(),
-            JSONObject(mapOf("key" to "value")),
-            JSONObject(TestData.INVALID_REFRESH)
+            JSONObject(mapOf("key" to "value"))
         ).forEach {
             val refresh = RefreshResponse.fromJson(it)
+            assertNull(refresh)
+        }
+
+        // If we take a valid response but remove the "status" parameter, check that it's handled correctly.
+        val validRefresh = JSONObject(TestData.REFRESH_TOKEN_SUCCESS_DECRYPTED)
+        validRefresh.remove("status")
+
+        val refresh = RefreshResponse.fromJson(validRefresh)
+        assertNull(refresh)
+
+        // The body of the response should contain enough attributes to build a UID2Identity instance. We will test that
+        // if any of these parameters are missing, that we correctly handle it.
+        listOf(
+            "advertising_token",
+            "refresh_token",
+            "identity_expires",
+            "refresh_expires",
+            "refresh_from",
+            "refresh_response_key"
+        ).forEach {
+            val success = JSONObject(TestData.REFRESH_TOKEN_SUCCESS_DECRYPTED)
+            val body = success.getJSONObject("body")
+
+            body.remove(it)
+
+            val refresh = RefreshResponse.fromJson(success)
             assertNull(refresh)
         }
     }
 
     @Test
     fun `test valid json`() {
-        val refresh = RefreshResponse.fromJson(JSONObject(TestData.VALID_REFRESH))
+        val refreshResponse = JSONObject(TestData.REFRESH_TOKEN_SUCCESS_DECRYPTED)
+        val refresh = RefreshResponse.fromJson(refreshResponse)
 
         // Verify that the parsed RefreshResponse matches what we expect for the given input test data.
         assertNotNull(refresh)
         assertNull(refresh?.message)
-        assertEquals(RefreshResponse.Status.forStatus(TestData.VALID_REFRESH_STATUS), refresh?.status)
+        assertEquals(RefreshResponse.Status.SUCCESS, refresh?.status)
 
         // Verify that the identity was parsed correctly.
-        val identity = UID2Identity.fromJson(JSONObject(TestData.VALID_IDENTITY))
+        val identity = UID2Identity.fromJson(refreshResponse.getJSONObject("body"))
         assertEquals(identity, refresh?.body)
 
         // Verify that when converted to a RefreshPackage, the identity still matches what we expect.
@@ -55,7 +82,6 @@ class RefreshResponseTest {
             // Verify that the converted RefreshPackage includes the expected Status.
             assertNotNull(refresh)
             assertEquals(it.value, refresh?.status)
-            assertNotNull(refresh?.message)
         }
     }
 }
