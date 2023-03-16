@@ -17,6 +17,15 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    lint {
+        baseline = file("lint-baseline.xml")
+
+        abortOnError true
+        checkDependencies true
+        checkReleaseBuilds false
+        warningsAsErrors true
+    }
 }
 
 dependencies {
