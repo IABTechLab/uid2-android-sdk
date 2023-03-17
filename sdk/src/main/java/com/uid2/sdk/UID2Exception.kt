@@ -6,6 +6,11 @@ package com.uid2.sdk
 open class UID2Exception(message: String? = null, cause: Throwable? = null): Exception(message, cause)
 
 /**
+ * The SDK has been initialized *after* it's been created.
+ */
+class InitializationException: UID2Exception()
+
+/**
  * The configured API URL is invalid.
  */
 class InvalidApiUrlException: UID2Exception()
