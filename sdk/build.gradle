@@ -7,6 +7,9 @@ apply from:  rootProject.file("$rootDir/common.gradle")
 
 android {
     namespace 'com.uid2'
+    defaultConfig {
+        minSdk 19
+    }
 
     buildTypes {
         release {
