@@ -16,3 +16,4 @@ rootProject.name = "UID2 Android SDK"
 include ':dev-app'
 include ':sdk'
 include ':securesignals-ima'
+include ':securesignals-gma'
