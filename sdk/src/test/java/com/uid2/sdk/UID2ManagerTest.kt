@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -25,6 +26,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -47,14 +49,14 @@ class UID2ManagerTest {
     private val listener: UID2ManagerIdentityChangedListener = mock()
 
     @Before
-    fun before() {
+    fun before() = runBlocking {
         testDispatcher = StandardTestDispatcher()
 
         // By default, we won't expire tokens.
         whenever(timeUtils.hasExpired(anyLong())).thenReturn(false)
 
         whenever(storageManager.loadIdentity()).thenReturn(initialIdentity)
-        manager = UID2Manager(client, storageManager, timeUtils, testDispatcher).apply {
+        manager = UID2Manager(client, storageManager, timeUtils, testDispatcher, false).apply {
             onIdentityChangedListener = listener
         }
     }
@@ -99,7 +101,7 @@ class UID2ManagerTest {
 
     @Test
     fun `refresh no-op when no identity`() {
-        val manager = UID2Manager(client, mock(), timeUtils, testDispatcher)
+        val manager = UID2Manager(client, mock(), timeUtils, testDispatcher, false)
         assertNull(manager.currentIdentity)
 
         // Verify that if we attempt to refresh the Identity when one is not set, nothing happens.
@@ -180,6 +182,46 @@ class UID2ManagerTest {
 
         // Advance the timer enough so that the Manager should have had an opportunity to retry refreshing the identity.
         testScheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(6))
+        assertManagerState(manager, newIdentity, REFRESHED)
+    }
+
+    @Test
+    fun `automatically refreshes when enabled`() = runTest(testDispatcher) {
+        // Configure the storage to not have access to a previously persisted Identity.
+        whenever(storageManager.loadIdentity()).thenReturn(null)
+
+        // Configure a Refresh to be required in +5 seconds when asked. This should result in the Manager scheduling
+        // that via the TestDispatcher.
+        val newIdentity = withRandomIdentity()
+        whenever(timeUtils.diffToNow(anyLong())).thenReturn(TimeUnit.SECONDS.toMillis(5))
+        whenever(client.refreshIdentity(anyString(), anyString())).thenAnswer {
+            RefreshPackage(
+                newIdentity,
+                REFRESHED,
+                "User refreshed"
+            )
+        }
+
+        // Build the Manager.
+        val manager = UID2Manager(client, storageManager, timeUtils, testDispatcher, true)
+        assertNull(manager.currentIdentity)
+
+        // Set the initial identity along with the Listener. We do this afterwards as we don't care about that initial
+        // notification.
+        manager.setIdentity(initialIdentity)
+        manager.onIdentityChangedListener = listener
+
+        // Allow the Test Scheduler to advance by a second, and verify that no refresh has yet occurred.
+        testScheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(1))
+        verifyNoInteractions(listener)
+
+        // Now advance the Test Scheduler past the time we expect a refresh to occur.
+        testScheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(5))
+
+        // Verify that a refresh has occurred and the new identity is reflected by the Manager. We also need to disable
+        // automatic refreshing *before* to avoid a loop where this new identity will refresh every 5 seconds, resulting
+        // in a never-ending test!
+        manager.automaticRefreshEnabled = false
         assertManagerState(manager, newIdentity, REFRESHED)
     }
 

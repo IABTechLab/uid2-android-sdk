@@ -32,6 +32,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 
 /**
@@ -59,7 +62,8 @@ class UID2Manager internal constructor(
     private val client: UID2Client,
     private val storageManager: StorageManager,
     private val timeUtils: TimeUtils,
-    defaultDispatcher: CoroutineDispatcher
+    defaultDispatcher: CoroutineDispatcher,
+    initialAutomaticRefreshEnabled: Boolean
 ) {
     private val scope = CoroutineScope(defaultDispatcher + SupervisorJob())
 
@@ -69,6 +73,9 @@ class UID2Manager internal constructor(
     // The flow representing the state of the UID2Manager.
     private val _state = MutableStateFlow<UID2ManagerState>(NoIdentity)
     val state: Flow<UID2ManagerState> = _state.asStateFlow()
+
+    // An active Job that is scheduled to refresh the current identity
+    private var refreshJob: Job? = null
 
     /**
      * Gets the current Identity, if available.
@@ -94,12 +101,19 @@ class UID2Manager internal constructor(
             is OptOut -> OPT_OUT
     }
 
+    /**
+     * Gets or sets whether tha Manager will automatically refresh the Identity.
+     */
+    var automaticRefreshEnabled: Boolean = initialAutomaticRefreshEnabled
+        set(value) {
+            field = value
+            checkIdentityRefresh()
+        }
+
     init {
         // Attempt to load the Identity from storage. If successful, we can notify any observers.
         storageManager.loadIdentity()?.let {
-            setIdentityInternal(it, ESTABLISHED, false)
-
-            // TODO: Monitor of expiration.
+            validateAndSetIdentity(it, null, false)
         }
     }
 
@@ -110,9 +124,7 @@ class UID2Manager internal constructor(
      * This will also be persisted locally, so that when the application re-launches, we reload this Identity.
      */
     fun setIdentity(identity: UID2Identity) {
-        validateAndSetIdentity(identity, null)?.let {
-            // TODO: Monitor for expiration.
-        }
+        validateAndSetIdentity(identity, null)
     }
 
     /**
@@ -129,8 +141,15 @@ class UID2Manager internal constructor(
      */
     fun refreshIdentity() {
         // If we have a valid Identity, let's refresh it.
-        currentIdentity?.let {
-            refreshToken(it)
+        currentIdentity?.let { refreshIdentityInternal(it) }
+    }
+
+    private fun refreshIdentityInternal(identity: UID2Identity) = scope.launch {
+        refreshToken(identity).retryWhen { _, attempt ->
+            delay(REFRESH_TOKEN_FAILURE_RETRY_MS)
+            attempt < REFRESH_TOKEN_MAX_RETRY
+        }.single().let {
+                result -> validateAndSetIdentity(result.identity, result.status)
         }
     }
 
@@ -153,20 +172,49 @@ class UID2Manager internal constructor(
 
         // If we have an attached listener, report.
         onIdentityChangedListener?.onIdentityStatusChanged(identity, status)
+
+        // After a new identity has been set, we have to work out how we're going to potentially refresh it. If the
+        // identity is null, because it's been reset of the identity has opted out, we don't need to do anything.
+        checkIdentityRefresh()
     }
 
-    private fun validateAndSetIdentity(identity: UID2Identity?, status: IdentityStatus?): UID2Identity? {
+    private fun checkIdentityRefresh() {
+        refreshJob?.cancel()
+        refreshJob = null
+
+        if (!automaticRefreshEnabled) {
+            return
+        }
+
+        currentIdentity?.let {
+            // If the identity is already suitable for a refresh, we can do so immediately. Otherwise, we will work out
+            // how long it is until a refresh is required and schedule it accordingly.
+            refreshJob = if (timeUtils.hasExpired(it.refreshFrom)) {
+                refreshIdentityInternal(it)
+            } else {
+                scope.launch {
+                    val timeToRefresh = timeUtils.diffToNow(it.refreshFrom)
+                    delay(timeToRefresh)
+                    refreshIdentityInternal(it)
+                }
+            }
+        }
+    }
+
+    private fun validateAndSetIdentity(
+        identity: UID2Identity?,
+        status: IdentityStatus?,
+        updateStorage: Boolean = true
+    ) {
         // Process Opt Out.
         if (status == OPT_OUT) {
             setIdentityInternal(null, OPT_OUT)
-            return null
+            return
         }
 
         // Check to see the validity of the Identity, updating our internal state.
         val validity = getIdentityPackage(identity, currentIdentity == null)
-        setIdentityInternal(validity.identity, validity.status)
-
-        return validity.identity
+        setIdentityInternal(validity.identity, validity.status, updateStorage)
     }
 
     /**
@@ -203,16 +251,19 @@ class UID2Manager internal constructor(
     }
 
     /**
+     * The different results from refreshing an identity.
+     */
+    private data class RefreshResult(val identity: UID2Identity?, val status: IdentityStatus)
+
+    /**
      * Refreshes the given Identity.
      */
-    private fun refreshToken(identity: UID2Identity): Job = scope.launch {
+    private suspend fun refreshToken(identity: UID2Identity): Flow<RefreshResult> = flow {
         try {
             val response = client.refreshIdentity(identity.refreshToken, identity.refreshResponseKey)
-            validateAndSetIdentity(response.identity, response.status)
-        } catch (_: Exception) {
-            // If an error occurs while we try and refresh the Identity, we should attempt to retry.
-            delay(REFRESH_TOKEN_FAILURE_RETRY_MS)
-            refreshToken(identity)
+            emit(RefreshResult(response.identity, response.status))
+        } catch (ex: Exception) {
+            throw UID2Exception("Error refreshing token", ex)
         }
     }
 
@@ -231,6 +282,9 @@ class UID2Manager internal constructor(
 
         // The number of milliseconds to wait before retrying after failing to refresh a token.
         private const val REFRESH_TOKEN_FAILURE_RETRY_MS = 5000L
+
+        // We will only allow an automatic retry of a refresh 5 times before giving up.
+        private const val REFRESH_TOKEN_MAX_RETRY = 5
 
         private var api: String = UID2_API_URL_KEY
         private var networkSession: NetworkSession = DefaultNetworkSession()
@@ -266,7 +320,8 @@ class UID2Manager internal constructor(
                 ),
                 storage,
                 TimeUtils(),
-                Dispatchers.Default
+                Dispatchers.Default,
+                true
             ).apply {
                 instance = this
             }
