@@ -36,7 +36,7 @@ open class DefaultNetworkSession : NetworkSession {
             return NetworkResponse(responseCode)
         }
 
-        // Read the response and attempt to convert the returned JSON into a map.
+        // We expect the response to be a String.
         val responseText = connection.inputStream.bufferedReader().use { it.readText() }
         return NetworkResponse(responseCode, responseText)
     }
