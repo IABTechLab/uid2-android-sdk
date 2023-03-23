@@ -310,6 +310,9 @@ class UID2Manager internal constructor(
         }
 
         @JvmStatic
+        fun isInitialized() = instance != null
+
+        @JvmStatic
         fun getInstance(): UID2Manager {
             val storage = storageManager ?: throw InitializationException()
 
