@@ -8,7 +8,7 @@ open class UID2Exception(message: String? = null, cause: Throwable? = null): Exc
 /**
  * The SDK has been initialized *after* it's been created.
  */
-class InitializationException: UID2Exception()
+class InitializationException(message: String? = null): UID2Exception(message)
 
 /**
  * The configured API URL is invalid.
