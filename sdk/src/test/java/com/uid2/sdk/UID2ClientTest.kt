@@ -3,13 +3,16 @@ package com.uid2.sdk
 import com.uid2.sdk.data.IdentityStatus
 import com.uid2.sdk.data.TestData
 import com.uid2.sdk.data.UID2Identity
+import com.uid2.sdk.network.NetworkRequest
 import com.uid2.sdk.network.NetworkResponse
 import com.uid2.sdk.network.NetworkSession
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -129,5 +132,29 @@ class UID2ClientTest {
         val identity = client.refreshIdentity(refreshToken, TestData.REFRESH_TOKEN_ENCRYPTED_OPT_OUT_KEY)
         assertEquals(IdentityStatus.OPT_OUT, identity.status)
         assertNull(identity.identity)
+    }
+
+    @Test
+    fun `test version info`() = runBlocking {
+        val client = UID2Client(
+            url,
+            networkSession
+        )
+
+        // Configure the network session to return a valid (encrypted) payload and allows us to capture the given
+        // NetworkRequest.
+        var networkRequest: NetworkRequest? = null
+        whenever(networkSession.loadData(any(), any())).thenAnswer {
+            networkRequest = it.arguments[1] as NetworkRequest?
+            return@thenAnswer NetworkResponse(200, TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED)
+        }
+
+        // Ask the Client to refresh the Identity, so it can make the appropriate request.
+        client.refreshIdentity(refreshToken, TestData.REFRESH_TOKEN_ENCRYPTED_SUCCESS_KEY)
+
+        // Verify that the Client included the expected Version header, and that it ended with our SDK version.
+        val reportedVersion = networkRequest?.headers?.get("X-UID2-Client-Version")
+        assertNotNull(reportedVersion)
+        assertTrue(reportedVersion?.endsWith(UID2.getVersion()) == true)
     }
 }

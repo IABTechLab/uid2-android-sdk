@@ -34,6 +34,9 @@ class UID2Client(
         }.getOrNull()
     }
 
+    // We expect the Client to report a Version that is in the following format: Android-X.Y.Z
+    private val clientVersion: String by lazy { "Android-${UID2.getVersion()}" }
+
     @Throws(
         InvalidApiUrlException::class,
         RefreshTokenException::class,
@@ -52,7 +55,7 @@ class UID2Client(
         val request = NetworkRequest(
             NetworkRequestType.POST,
             mapOf(
-                "X-UID2-Client-Version" to "Android-0.1",
+                "X-UID2-Client-Version" to clientVersion,
                 "Content-Type" to "application/x-www-form-urlencoded"
             ),
             refreshToken
