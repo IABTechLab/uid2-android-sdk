@@ -6,7 +6,7 @@ plugins {
 apply from:  rootProject.file("$rootDir/common.gradle")
 
 android {
-    namespace 'com.uid2.sdk'
+    namespace 'com.uid2'
 
     buildTypes {
         release {
