@@ -17,7 +17,13 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles = [
+                "okhttp3-proguard-rules.txt",
+                getDefaultProguardFile('proguard-android.txt')
+            ]
+            signingConfig signingConfigs.debug
         }
     }
 
