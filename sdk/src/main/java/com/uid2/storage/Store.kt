@@ -1,4 +1,4 @@
-package com.uid2.sdk.storage
+package com.uid2.storage
 
 /**
  * Store : interface that is a (mostly) drop-in replacement for SharedPreferences.

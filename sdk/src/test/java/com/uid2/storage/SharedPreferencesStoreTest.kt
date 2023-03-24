@@ -1,4 +1,4 @@
-package com.uid2.sdk.storage
+package com.uid2.storage
 
 import android.app.Application
 import android.content.Context
@@ -174,6 +174,7 @@ internal class SharedPreferencesStoreTest {
 
         assertEquals(PI, fakeSharedPrefs.getFloat(key1, PI + 1.0F))
     }
+
     /** ==== Int ==================================================================================================== */
     @Test
     fun `int get, no default, no value stored, returns default`() {
@@ -307,7 +308,7 @@ internal class SharedPreferencesStoreTest {
         assertEquals(STR, fakeSharedPrefs.getString(key1, "$STR $STR"))
     }
 
-    /** ================================================================ */
+    /** ==== StringSet ============================================================================================== */
     @Test
     fun `stringSet get, no default, no value stored, returns default`() {
         assertEquals(Store.STRING_SET_NOT_FOUND_DEFAULT, sharedPrefsStore.getStringSet(key1))
@@ -374,9 +375,7 @@ internal class SharedPreferencesStoreTest {
         assertEquals(STR_SET, fakeSharedPrefs.getStringSet(key1, badDefault))
     }
 
-    /** ================================================================ */
-
-    /** ================================================================ */
+    /** ==== Other functions ======================================================================================== */
     @Test
     fun contains() {
         sharedPrefsStore.putBoolean(key1, false)
@@ -410,7 +409,6 @@ internal class SharedPreferencesStoreTest {
         // No longer returns value after remove
         assertNotEquals(testValue1, sharedPrefsStore.getInt(key1))
     }
-
 
     inner class SharedPrefTestStore(
         context: Context,

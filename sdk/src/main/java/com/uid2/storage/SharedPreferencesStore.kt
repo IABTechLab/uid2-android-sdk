@@ -1,4 +1,4 @@
-package com.uid2.sdk.storage
+package com.uid2.storage
 
 import android.content.Context
 import android.content.SharedPreferences

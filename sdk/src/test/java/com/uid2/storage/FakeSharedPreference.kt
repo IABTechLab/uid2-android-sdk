@@ -1,4 +1,4 @@
-package com.uid2.sdk.storage
+package com.uid2.storage
 
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
