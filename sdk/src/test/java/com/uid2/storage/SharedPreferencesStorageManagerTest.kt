@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import com.uid2.data.UID2Identity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -16,8 +20,11 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class SharedPreferencesStorageManagerTest {
+    private lateinit var testDispatcher: TestDispatcher
+
     private val context: Context = mock()
     private val preferences: SharedPreferences = mock()
     private val editor: Editor = mock()
@@ -26,6 +33,8 @@ class SharedPreferencesStorageManagerTest {
 
     @Before
     fun before() {
+        testDispatcher = StandardTestDispatcher()
+
         whenever(context.getSharedPreferences(any(), any())).thenReturn(preferences)
         whenever(preferences.edit()).thenReturn(editor)
 
@@ -49,7 +58,7 @@ class SharedPreferencesStorageManagerTest {
     }
 
     @Test
-    fun `test storage stores and loads identity`() {
+    fun `test storage stores and loads identity`() = runTest(testDispatcher) {
         val identity = UID2Identity(
             "ad token",
             "refresh token",
@@ -67,7 +76,7 @@ class SharedPreferencesStorageManagerTest {
     }
 
     @Test
-    fun `test clears identity`() {
+    fun `test clears identity`() = runTest(testDispatcher) {
         val identity = UID2Identity(
             "ad token",
             "refresh token",

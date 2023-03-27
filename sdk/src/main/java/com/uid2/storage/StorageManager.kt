@@ -10,17 +10,17 @@ interface StorageManager {
     /**
      * Saves the given UID2Identity locally, allowing to be loaded later.
      */
-    fun saveIdentity(identity: UID2Identity): Boolean
+    suspend fun saveIdentity(identity: UID2Identity): Boolean
 
     /**
      * Loads any previously persisted UID2Identity locally. If no save data is found, this will just return null.
      */
-    fun loadIdentity(): UID2Identity?
+    suspend fun loadIdentity(): UID2Identity?
 
     /**
      * Clears any previously stored data.
      */
-    fun clear(): Boolean
+    suspend fun clear(): Boolean
 
     companion object {
         private var instance: StorageManager? = null
