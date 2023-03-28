@@ -1,7 +1,10 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.dokka'
+    id 'com.vanniktech.maven.publish'
 }
 
 apply from:  rootProject.file("$rootDir/common.gradle")
@@ -61,4 +64,39 @@ tasks.register('dokkaJavadocJar', Jar.class) {
     dependsOn(dokkaJavadoc)
     from(dokkaJavadoc)
     archiveClassifier.set("javadoc")
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Maven Publishing
+
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.S01)
+    signAllPublications()
+
+    coordinates(project.group, "uid2-android-sdk", project.version)
+
+    pom {
+        name = project.name
+        description = 'A framework for integration UID2 into Android applications.'
+        url = 'https://github.com/IABTechLab/uid2-android-sdk'
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+        developers {
+            developer {
+                id = 'IABTechLab'
+                name = 'IAB Tech Lab'
+                url = 'https://iabtechlab.com/'
+            }
+        }
+        scm {
+            url = 'https://github.com/IABTechLab/uid2-android-sdk'
+            connection = 'scm:git:git@github.com:IABTechLab/uid2-android-sdk.git'
+            developerConnection = 'scm:git:ssh://git@github.com:IABTechLab/uid2-android-sdk.git'
+        }
+    }
 }
