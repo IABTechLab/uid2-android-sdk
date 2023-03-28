@@ -6,7 +6,7 @@ import com.uid2.data.UID2Identity
 /**
  * The data available after attempting to refresh the Identity.
  */
-data class RefreshPackage(
+internal data class RefreshPackage(
     val identity: UID2Identity?,
     val status: IdentityStatus,
     val message: String

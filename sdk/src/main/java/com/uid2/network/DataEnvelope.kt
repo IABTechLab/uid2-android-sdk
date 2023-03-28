@@ -9,7 +9,8 @@ import javax.crypto.spec.SecretKeySpec
  * This object is responsible for decoding encrypted responses when refreshing the Identity. The type of encryption used
  * as well as the format of the expected data can be found in the following documentation:
  *
- * https://github.com/IABTechLab/uid2docs/blob/main/api/v2/ref-info/encryption-decryption.md
+ * **See Also:**
+ * [GitHub](https://github.com/IABTechLab/uid2docs/blob/main/api/v2/getting-started/gs-encryption-decryption.md)
  */
 object DataEnvelope {
     // The name and transformation of the encryption algorithm used.
@@ -32,6 +33,10 @@ object DataEnvelope {
      *
      * This relies on the format of the data matching that spec-ed in the API documentation. We assume that it's AES
      * encrypted, and includes the IV in the first 12 bytes of the buffer.
+     * 
+     * @param key The key, in Base64 format, required to decode the given data.
+     * @param data The data, in Base64 format, that needs to be decoded.
+     * @return The unencrypted data. If this decryption fails, null is returned.
      */
     fun decrypt(key: String, data: String, isRefresh: Boolean): ByteArray? {
         // Attempt to decrypt the given data with the provided key. Both the key and data are expected to be in Base64

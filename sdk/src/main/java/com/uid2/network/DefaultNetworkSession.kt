@@ -4,11 +4,17 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * A default implementation of NetworkSession that leverages HttpUrlConnection to make the necessary
+ * A default implementation of [NetworkSession] that leverages [HttpURLConnection] to make the necessary
  * GET and POST requests.
+ *
+ * If a consuming application wants to take control over the network requests, they can implement their own custom
+ * [NetworkSession] and provide it when initialising the SDK via [com.uid2.UID2Manager.init]
  */
 open class DefaultNetworkSession : NetworkSession {
 
+    /**
+     * Loads the given [URL] and [NetworkRequest] using [HttpURLConnection].
+     */
     override fun loadData(url: URL, request: NetworkRequest): NetworkResponse {
         val connection = openConnection(url).apply {
             requestMethod = request.type.toRequestMethod()

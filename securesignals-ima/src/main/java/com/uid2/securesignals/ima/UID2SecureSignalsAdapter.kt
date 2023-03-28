@@ -6,9 +6,12 @@ import com.google.ads.interactivemedia.v3.api.signals.SecureSignalsAdapter
 import com.google.ads.interactivemedia.v3.api.signals.SecureSignalsCollectSignalsCallback
 import com.google.ads.interactivemedia.v3.api.signals.SecureSignalsInitializeCallback
 import com.uid2.UID2
-import com.uid2.InitializationException
-import com.uid2.UID2Exception
 import com.uid2.UID2Manager
+
+/**
+ * A custom exception type that is used to report failures from the UID2SecureSignalsAdapter when an error has occurred.
+ */
+class UID2SecureSignalsException(message: String? = null, cause: Throwable? = null): Exception(message, cause)
 
 /**
  * An implementation of Google's IMA SecureSignalsAdapter that integrates UID2 tokens, accessed via the UID2Manager.
@@ -39,7 +42,7 @@ class UID2SecureSignalsAdapter: SecureSignalsAdapter {
         } else if (UID2Manager.isInitialized()) {
             callback?.onSuccess()
         } else {
-            callback?.onFailure(InitializationException("No Context provided to initialise UID2Manager"))
+            callback?.onFailure(UID2SecureSignalsException("No Context provided to initialise UID2Manager"))
         }
     }
 
@@ -51,7 +54,7 @@ class UID2SecureSignalsAdapter: SecureSignalsAdapter {
         if (token != null) {
             callback?.onSuccess(token)
         } else {
-            callback?.onFailure(UID2Exception("No Advertising Token available"))
+            callback?.onFailure(UID2SecureSignalsException("No Advertising Token available"))
         }
     }
 }

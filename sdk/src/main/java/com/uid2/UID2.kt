@@ -5,6 +5,9 @@ package com.uid2
  */
 data class Version(val major: Int, val minor: Int, val patch: Int)
 
+/**
+ * An object exposing the version information associated with the UID2 SDK.
+ */
 object UID2 {
     private const val VERSION_STRING = BuildConfig.VERSION
 
@@ -14,7 +17,7 @@ object UID2 {
     /**
      * Gets the version of the included UID2 SDK library, in string format.
      */
-    fun getVersion() = VERSION_STRING
+    fun getVersion(): String = VERSION_STRING
 
     /**
      * Gets the version of the included UID2 SDK library, in its individual major, minor and patch components.

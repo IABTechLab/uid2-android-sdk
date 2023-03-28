@@ -6,7 +6,7 @@ import com.uid2.data.UID2Identity
 /**
  * An interface controlling access to local storage, used for the persistence of UID2Identity instances.
  */
-interface StorageManager {
+internal interface StorageManager {
     /**
      * Saves the given UID2Identity locally, allowing to be loaded later.
      */

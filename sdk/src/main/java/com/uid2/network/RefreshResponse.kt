@@ -14,7 +14,7 @@ import org.json.JSONObject
  *
  * https://github.com/IABTechLab/uid2docs/blob/main/api/v2/endpoints/post-token-refresh.md#decrypted-json-response-format
  */
-data class RefreshResponse(
+internal data class RefreshResponse(
     val body: UID2Identity?,
     val status: Status,
     val message: String?
