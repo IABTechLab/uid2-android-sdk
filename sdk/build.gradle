@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.dokka'
 }
 
 apply from:  rootProject.file("$rootDir/common.gradle")
@@ -33,4 +34,31 @@ dependencies {
     testImplementation 'org.mockito:mockito-inline:4.8.0'
 
     testImplementation 'org.json:json:20180813'
+
+    dokkaPlugin 'org.jetbrains.dokka:android-documentation-plugin:1.8.10'
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Dokka Configuration
+
+dokkaHtml {
+    outputDirectory.set(file("build/documentation/html"))
+}
+
+dokkaJavadoc {
+    outputDirectory.set(file("build/documentation/javadoc"))
+}
+
+// Task to generate a Jar file from the HTML documentation.
+tasks.register('dokkaHtmlJar', Jar.class) {
+    dependsOn(dokkaHtml)
+    from(dokkaHtml)
+    archiveClassifier.set("html-docs")
+}
+
+// Task to generate a Jar file from the Javadoc documentation.
+tasks.register('dokkaJavadocJar', Jar.class) {
+    dependsOn(dokkaJavadoc)
+    from(dokkaJavadoc)
+    archiveClassifier.set("javadoc")
 }
