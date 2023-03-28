@@ -3,7 +3,7 @@ package com.uid2.utils
 /**
  * A class containing utility methods around the current time.
  */
-class TimeUtils {
+internal class TimeUtils {
 
     /**
      * Returns whether or not the given (epoch) time in milliseconds, is in the past.

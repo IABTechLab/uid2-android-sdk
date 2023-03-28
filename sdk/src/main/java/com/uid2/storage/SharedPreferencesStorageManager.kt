@@ -11,7 +11,7 @@ import org.json.JSONObject
 /**
  * An implementation of the StorageManager that persists UID2Identity instances in clear-text via Shared Preferences.
  */
-class SharedPreferencesStorageManager(
+internal class SharedPreferencesStorageManager(
     private val context: Context,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : StorageManager {

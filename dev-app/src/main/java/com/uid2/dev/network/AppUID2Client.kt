@@ -1,9 +1,12 @@
 package com.uid2.dev.network
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
 import android.util.Base64
 import com.uid2.data.UID2Identity
-import com.uid2.extensions.getMetadata
 import com.uid2.network.DataEnvelope
 import java.io.ByteArrayOutputStream
 import java.net.URI
@@ -191,5 +194,17 @@ class AppUID2Client(
                 it.getString(UID2_API_SECRET_KEY, "")
             )
         }
+
+        private fun Context.getMetadata(): Bundle = packageManager.getApplicationInfoCompat(
+            packageName,
+            PackageManager.GET_META_DATA
+        ).metaData
+
+        private fun PackageManager.getApplicationInfoCompat(packageName: String, flags: Int = 0): ApplicationInfo =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getApplicationInfo(packageName, PackageManager.ApplicationInfoFlags.of(flags.toLong()))
+            } else {
+                @Suppress("DEPRECATION") getApplicationInfo(packageName, flags)
+            }
     }
 }

@@ -18,7 +18,7 @@ import org.json.JSONObject
  * This class is responsible for refreshing the identity, using a provided refresh token. The payload response will be
  * encrypted, so also is provided a key to allow decryption.
  */
-class UID2Client(
+internal class UID2Client(
     private val apiUrl: String,
     private val session: NetworkSession,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO

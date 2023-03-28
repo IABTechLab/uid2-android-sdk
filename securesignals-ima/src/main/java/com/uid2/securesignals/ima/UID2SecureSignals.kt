@@ -3,6 +3,9 @@ package com.uid2.securesignals.ima
 import com.uid2.BuildConfig
 import com.uid2.Version
 
+/**
+ * An object exposing the version information associated with the UID2 IMA Plugin.
+ */
 object UID2SecureSignals {
     private const val VERSION_STRING = BuildConfig.VERSION
 
