@@ -13,6 +13,12 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    buildTypes {
+        all {
+            buildConfigField "String", "VERSION", "\"$project.version\""
+        }
+    }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
