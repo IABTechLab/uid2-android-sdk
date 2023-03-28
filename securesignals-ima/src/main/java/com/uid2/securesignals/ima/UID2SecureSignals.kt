@@ -1,9 +1,10 @@
 package com.uid2.securesignals.ima
 
+import com.uid2.BuildConfig
 import com.uid2.Version
 
 object UID2SecureSignals {
-    private const val VERSION_STRING = "0.1.0"
+    private const val VERSION_STRING = BuildConfig.VERSION
 
     private const val VERSION_COMPONENTS = 3
     private val INVALID_VERSION = Version(0, 0, 0)

@@ -10,3 +10,7 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '1.8.0' apply false
     id 'org.jetbrains.dokka' version '1.8.10' apply false
 }
+
+allprojects {
+    version = '0.1.0-SNAPSHOT'
+}
