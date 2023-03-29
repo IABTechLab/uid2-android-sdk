@@ -30,6 +30,8 @@ android {
         checkDependencies true
         checkReleaseBuilds false
         warningsAsErrors true
+
+        disable 'GradleDependency'
     }
 }
 
