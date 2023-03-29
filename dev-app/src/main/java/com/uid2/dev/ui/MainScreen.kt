@@ -12,7 +12,6 @@ import com.uid2.dev.ui.MainScreenAction.EmailChanged
 import com.uid2.dev.ui.MainScreenAction.RefreshButtonPressed
 import com.uid2.dev.ui.MainScreenAction.ResetButtonPressed
 import com.uid2.dev.ui.MainScreenState.ErrorState
-import com.uid2.dev.ui.MainScreenState.EmptyState
 import com.uid2.dev.ui.MainScreenState.LoadingState
 import com.uid2.dev.ui.MainScreenState.UserUpdatedState
 import com.uid2.dev.ui.views.ActionButtonView
@@ -40,9 +39,8 @@ fun MainScreen(viewModel: MainScreenViewModel) {
 
             // Depending on the state of the View Model, we will switch in different content view.
             when (val state = viewState) {
-                is EmptyState -> { }
                 is LoadingState -> LoadingView(Modifier)
-                is UserUpdatedState -> UserIdentityView(Modifier, state.identity)
+                is UserUpdatedState -> UserIdentityView(Modifier, state.identity, state.status)
                 is ErrorState -> ErrorView(Modifier, state.error)
             }
         }

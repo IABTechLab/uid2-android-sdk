@@ -8,13 +8,24 @@ import com.uid2.dev.network.AppUID2Client
 import com.uid2.dev.network.AppUID2ClientException
 import com.uid2.dev.network.RequestType.EMAIL
 import com.uid2.dev.ui.MainScreenState.ErrorState
-import com.uid2.dev.ui.MainScreenState.EmptyState
 import com.uid2.dev.ui.MainScreenState.LoadingState
-import com.uid2.dev.ui.MainScreenState.UserUpdatedState
 import com.uid2.UID2Manager
 import com.uid2.UID2ManagerState.Established
+import com.uid2.UID2ManagerState.Expired
+import com.uid2.UID2ManagerState.NoIdentity
+import com.uid2.UID2ManagerState.OptOut
+import com.uid2.UID2ManagerState.RefreshExpired
 import com.uid2.UID2ManagerState.Refreshed
+import com.uid2.data.IdentityStatus
+import com.uid2.data.IdentityStatus.ESTABLISHED
+import com.uid2.data.IdentityStatus.EXPIRED
+import com.uid2.data.IdentityStatus.INVALID
+import com.uid2.data.IdentityStatus.NO_IDENTITY
+import com.uid2.data.IdentityStatus.OPT_OUT
+import com.uid2.data.IdentityStatus.REFRESHED
+import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
+import com.uid2.dev.ui.MainScreenState.UserUpdatedState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,9 +38,8 @@ sealed interface MainScreenAction : ViewModelAction {
 }
 
 sealed interface MainScreenState : ViewState {
-    object EmptyState : MainScreenState
     object LoadingState : MainScreenState
-    data class UserUpdatedState(val identity: UID2Identity) : MainScreenState
+    data class UserUpdatedState(val identity: UID2Identity?, val status: IdentityStatus) : MainScreenState
     data class ErrorState(val error: Throwable) : MainScreenState
 }
 
@@ -38,7 +48,7 @@ class MainScreenViewModel(
     private val manager: UID2Manager
 ) : BasicViewModel<MainScreenAction, MainScreenState>() {
 
-    private val _viewState = MutableStateFlow<MainScreenState>(EmptyState)
+    private val _viewState = MutableStateFlow<MainScreenState>(UserUpdatedState(null, NO_IDENTITY))
     override val viewState: StateFlow<MainScreenState> = _viewState.asStateFlow()
 
     init {
@@ -49,9 +59,13 @@ class MainScreenViewModel(
                 Log.d(TAG, "State Update: $state")
 
                 when (state) {
-                    is Established -> _viewState.emit(UserUpdatedState(state.identity))
-                    is Refreshed -> _viewState.emit(UserUpdatedState(state.identity))
-                    else ->  _viewState.emit(EmptyState)
+                    is Established -> _viewState.emit(UserUpdatedState(state.identity, ESTABLISHED))
+                    is Refreshed -> _viewState.emit(UserUpdatedState(state.identity, REFRESHED))
+                    is NoIdentity -> _viewState.emit(UserUpdatedState(null, NO_IDENTITY))
+                    is Expired -> _viewState.emit(UserUpdatedState(null, EXPIRED))
+                    is RefreshExpired -> _viewState.emit(UserUpdatedState(null, REFRESH_EXPIRED))
+                    is OptOut -> _viewState.emit(UserUpdatedState(null, OPT_OUT))
+                    else ->  _viewState.emit(UserUpdatedState(null, INVALID))
                 }
             }
         }
