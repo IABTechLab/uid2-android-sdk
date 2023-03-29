@@ -28,7 +28,7 @@ class UID2SecureSignalsAdapter: SecureSignalsAdapter {
     /**
      * Gets the version of the UID2 Secure Signals plugin.
      */
-    override fun getVersion(): VersionInfo = UID2SecureSignals.getVersionInfo().let {
+    override fun getVersion(): VersionInfo = PluginVersion.getVersionInfo().let {
         VersionInfo(it.major, it.minor, it.patch)
     }
 

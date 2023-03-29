@@ -27,7 +27,7 @@ class UID2MediationAdapter : RtbAdapter() {
      * Gets the version of the UID2 Secure Signals plugin.
      */
     @Suppress("DEPRECATION")
-    override fun getVersionInfo() = UID2SecureSignals.getVersionInfo().let {
+    override fun getVersionInfo() = PluginVersion.getVersionInfo().let {
         com.google.android.gms.ads.mediation.VersionInfo(it.major, it.minor, it.patch)
     }
 

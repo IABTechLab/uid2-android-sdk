@@ -20,7 +20,7 @@ class UID2SecureSignalsAdapterTest {
     fun `test plugin version`() {
         val adapter = UID2SecureSignalsAdapter()
         val version = adapter.version
-        val expectedVersion = UID2SecureSignals.getVersionInfo()
+        val expectedVersion = PluginVersion.getVersionInfo()
 
         assertEquals(expectedVersion.major, version.majorVersion)
         assertEquals(expectedVersion.minor, version.minorVersion)
