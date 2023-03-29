@@ -70,7 +70,7 @@ tasks.register('dokkaJavadocJar', Jar.class) {
 // Maven Publishing
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.S01)
+    publishToMavenCentral(SonatypeHost.S01, true)
     signAllPublications()
 
     coordinates(project.group, "uid2-android-sdk", project.version)
