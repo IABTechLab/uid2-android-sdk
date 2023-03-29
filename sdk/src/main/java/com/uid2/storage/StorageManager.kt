@@ -1,6 +1,7 @@
 package com.uid2.storage
 
 import android.content.Context
+import com.uid2.data.IdentityStatus
 import com.uid2.data.UID2Identity
 
 /**
@@ -8,14 +9,14 @@ import com.uid2.data.UID2Identity
  */
 internal interface StorageManager {
     /**
-     * Saves the given UID2Identity locally, allowing to be loaded later.
+     * Saves the given UID2Identity and status locally, allowing to be loaded later.
      */
-    suspend fun saveIdentity(identity: UID2Identity): Boolean
+    suspend fun saveIdentity(identity: UID2Identity, status: IdentityStatus): Boolean
 
     /**
-     * Loads any previously persisted UID2Identity locally. If no save data is found, this will just return null.
+     * Loads any previously persisted UID2Identity and status locally.
      */
-    suspend fun loadIdentity(): UID2Identity?
+    suspend fun loadIdentity(): Pair<UID2Identity?, IdentityStatus>
 
     /**
      * Clears any previously stored data.

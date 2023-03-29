@@ -50,6 +50,7 @@ class UID2ManagerTest {
 
     private lateinit var manager: UID2Manager
     private val initialIdentity = withRandomIdentity()
+    private val initialStatus = ESTABLISHED
     private val listener: UID2ManagerIdentityChangedListener = mock()
 
     @Before
@@ -59,7 +60,7 @@ class UID2ManagerTest {
         // By default, we won't expire tokens.
         whenever(timeUtils.hasExpired(anyLong())).thenReturn(false)
 
-        whenever(storageManager.loadIdentity()).thenReturn(initialIdentity)
+        whenever(storageManager.loadIdentity()).thenReturn(Pair(initialIdentity, initialStatus))
         manager = withManager(client, storageManager, timeUtils, testDispatcher, false, listener)
     }
 
@@ -68,7 +69,7 @@ class UID2ManagerTest {
         // Verify that the initial state of the manager reflects the restored Identity.
         assertNotNull(manager.currentIdentity)
         assertEquals(initialIdentity, manager.currentIdentity)
-        assertEquals(ESTABLISHED, manager.currentIdentityStatus)
+        assertEquals(initialStatus, manager.currentIdentityStatus)
     }
 
     @Test
@@ -82,7 +83,7 @@ class UID2ManagerTest {
         // Verify that setting the Identity on the Manager, results in it being persisted via the StorageManager.
         manager.setIdentity(identity)
         testDispatcher.scheduler.advanceUntilIdle()
-        verify(storageManager).saveIdentity(identity)
+        verify(storageManager).saveIdentity(identity, ESTABLISHED)
 
         // Verify that the Manager updated with the new identity and reported the state changes appropriately.
         assertManagerState(manager, identity, ESTABLISHED)

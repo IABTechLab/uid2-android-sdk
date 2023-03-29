@@ -6,7 +6,7 @@ package com.uid2.data
  * This has been translated from the Web implement, see the following for more information:
  * https://github.com/IABTechLab/uid2-web-integrations/blob/5a8295c47697cdb1fe36997bc2eb2e39ae143f8b/src/Uid2InitCallbacks.ts#L12-L20
  */
-enum class IdentityStatus(private val value: Int) {
+enum class IdentityStatus(val value: Int) {
     ESTABLISHED(0),
     REFRESHED(1),
     EXPIRED(100),
