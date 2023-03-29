@@ -75,12 +75,12 @@ class MainScreenViewModel(
         Log.d(TAG, "Action: $action")
 
         viewModelScope.launch {
-            _viewState.emit(LoadingState)
             when (action) {
                 is MainScreenAction.EmailChanged -> {
                     try {
                         // For Development purposes, we are required to generate the initial Identity before then
                         // passing it onto the SDK to be managed.
+                        _viewState.emit(LoadingState)
                         api.generateIdentity(action.address, EMAIL)?.let {
                             manager.setIdentity(it)
                         }
@@ -89,8 +89,14 @@ class MainScreenViewModel(
                     }
                 }
 
-                MainScreenAction.RefreshButtonPressed -> manager.refreshIdentity()
-                MainScreenAction.ResetButtonPressed -> manager.resetIdentity()
+                MainScreenAction.RefreshButtonPressed -> {
+                    manager.currentIdentity?.let { _viewState.emit(LoadingState) }
+                    manager.refreshIdentity()
+                }
+                MainScreenAction.ResetButtonPressed -> {
+                    manager.currentIdentity?.let { _viewState.emit(LoadingState) }
+                    manager.resetIdentity()
+                }
             }
         }
     }
