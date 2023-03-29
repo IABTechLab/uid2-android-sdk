@@ -113,8 +113,8 @@ class UID2Manager internal constructor(
     init {
         scope.launch {
             // Attempt to load the Identity from storage. If successful, we can notify any observers.
-            storageManager.loadIdentity()?.let {
-                validateAndSetIdentity(it, null, false)
+            storageManager.loadIdentity().let {
+                validateAndSetIdentity(it.first, it.second, false)
             }
         }
     }
@@ -166,7 +166,7 @@ class UID2Manager internal constructor(
                 if (identity == null) {
                     storageManager.clear()
                 } else {
-                    storageManager.saveIdentity(identity)
+                    storageManager.saveIdentity(identity, status)
                 }
             }
         }
