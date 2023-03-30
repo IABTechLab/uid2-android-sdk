@@ -2,9 +2,11 @@ package com.uid2
 
 import com.uid2.data.IdentityStatus
 import com.uid2.data.IdentityStatus.ESTABLISHED
+import com.uid2.data.IdentityStatus.EXPIRED
 import com.uid2.data.IdentityStatus.NO_IDENTITY
 import com.uid2.data.IdentityStatus.OPT_OUT
 import com.uid2.data.IdentityStatus.REFRESHED
+import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
 import com.uid2.network.RefreshPackage
 import com.uid2.storage.StorageManager
@@ -42,6 +44,7 @@ import org.mockito.kotlin.whenever
 class UID2ManagerTest {
     private lateinit var testDispatcher: TestDispatcher
 
+    private val expirationInterval = 10 * 1000L // 10 seconds
     private val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
     private val client: UID2Client = mock()
@@ -196,7 +199,7 @@ class UID2ManagerTest {
     @Test
     fun `automatically refreshes when enabled`() = runTest(testDispatcher) {
         // Configure the storage to not have access to a previously persisted Identity.
-        whenever(storageManager.loadIdentity()).thenReturn(null)
+        whenever(storageManager.loadIdentity()).thenReturn(Pair(null, NO_IDENTITY))
 
         // Configure a Refresh to be required in +5 seconds when asked. This should result in the Manager scheduling
         // that via the TestDispatcher.
@@ -214,6 +217,7 @@ class UID2ManagerTest {
 
         // Build the Manager.
         val manager = withManager(client, storageManager, timeUtils, testDispatcher, true, listener)
+        testScheduler.advanceTimeBy(10)
         assertNull(manager.currentIdentity)
 
         // Set the initial identity. We will allow this to be processed before we clear the state of the listener.
@@ -235,6 +239,41 @@ class UID2ManagerTest {
         manager.automaticRefreshEnabled = false
         assertTrue(refreshed)
         assertManagerState(manager, newIdentity, REFRESHED)
+    }
+
+    @Test
+    fun `updates after identity expiration`() = runTest(testDispatcher) {
+        // Configure the storage to not have access to a previously persisted Identity.
+        whenever(storageManager.loadIdentity()).thenReturn(Pair(null, NO_IDENTITY))
+
+        // Bind the TimeUtil's implementation to the clock of the TestDispatcher.
+        whenever(timeUtils.diffToNow(anyLong())).thenAnswer {
+            val fromMs = it.arguments[0] as Long
+            return@thenAnswer fromMs - testDispatcher.scheduler.currentTime
+        }
+        whenever(timeUtils.hasExpired(anyLong())).thenAnswer {
+            val expiryMs = it.arguments[0] as Long
+            return@thenAnswer expiryMs <= testDispatcher.scheduler.currentTime
+        }
+
+        // Build the Manager, allowing it to attempt to load from stroage.
+        val manager = withManager(client, storageManager, timeUtils, testDispatcher, false, listener, true)
+        testScheduler.advanceTimeBy(10)
+        assertNull(manager.currentIdentity)
+
+        // Set the initial identity, ignoring the first notifications.
+        manager.setIdentity(initialIdentity)
+        testScheduler.advanceTimeBy(10)
+        clearInvocations(listener)
+
+        // Advance the clock to just past the time where the identity should expire. Verify that we were notified.
+        testScheduler.advanceTimeBy(initialIdentity.identityExpires + 1000)
+        verify(listener).onIdentityStatusChanged(initialIdentity, EXPIRED)
+
+        // Advance the clock to just past the time where the identity could no longer be refreshed. Verify that we were
+        // notified.
+        testScheduler.advanceTimeBy((initialIdentity.refreshExpires - initialIdentity.identityExpires) + 1000)
+        assertManagerState(manager, null, REFRESH_EXPIRED)
     }
 
     /**
@@ -270,12 +309,14 @@ class UID2ManagerTest {
         timeUtils: TimeUtils,
         dispatcher: CoroutineDispatcher,
         initialAutomaticRefreshEnabled: Boolean,
-        listener: UID2ManagerIdentityChangedListener?
+        listener: UID2ManagerIdentityChangedListener?,
+        initialCheckExpiration: Boolean = false
     ): UID2Manager {
         return UID2Manager(client, storageManager, timeUtils, dispatcher, initialAutomaticRefreshEnabled).apply {
             onIdentityChangedListener = listener
+            checkExpiration = initialCheckExpiration
 
-            if (!initialAutomaticRefreshEnabled) {
+            if (!initialAutomaticRefreshEnabled && !initialCheckExpiration) {
                 testDispatcher.scheduler.advanceUntilIdle()
             }
         }
@@ -284,15 +325,25 @@ class UID2ManagerTest {
     /**
      * Helper function to create a new (Random) identity.
      */
-    private fun withRandomIdentity() = UID2Identity(
-        randomString(12),
-        randomString(12),
-        randomLong(),
-        randomLong(),
-        randomLong(),
-        randomString(12)
-    )
+    private fun withRandomIdentity(): UID2Identity {
+        // We will generate valid expiration times:
+        //  - Refresh From (-10s)
+        //  - Identity Expires (0)
+        //  - Refresh Expires (+10s)
+        val identityExpires = randomLong(expirationInterval)
+        val refreshFrom = identityExpires - expirationInterval
+        val refreshExpires = identityExpires + expirationInterval
+
+        return UID2Identity(
+            randomString(12),
+            randomString(12),
+            identityExpires,
+            refreshFrom,
+            refreshExpires,
+            randomString(12)
+        )
+    }
 
     private fun randomString(length: Int) = List(length) { charPool.random() }.joinToString("")
-    private fun randomLong() = Random.nextLong()
+    private fun randomLong(min: Long) = Random.nextLong(min, Long.MAX_VALUE)
 }

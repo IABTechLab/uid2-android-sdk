@@ -60,7 +60,7 @@ sealed interface UID2ManagerState {
     data class Established(val identity: UID2Identity) : UID2ManagerState
     data class Refreshed(val identity: UID2Identity) : UID2ManagerState
     object NoIdentity : UID2ManagerState
-    object Expired : UID2ManagerState
+    data class Expired(val identity: UID2Identity) : UID2ManagerState
     object Invalid : UID2ManagerState
     object RefreshExpired : UID2ManagerState
     object OptOut : UID2ManagerState
@@ -101,6 +101,12 @@ class UID2Manager internal constructor(
     // An active Job that is scheduled to refresh the current identity
     private var refreshJob: Job? = null
 
+    internal var checkExpiration : Boolean = true
+
+    // The scheduled jobs to check identity expiration.
+    private var checkRefreshExpiresJob: Job? = null
+    private var checkIdentityExpiresJob: Job? = null
+
     /**
      * Gets the current Identity, if available.
      */
@@ -108,6 +114,7 @@ class UID2Manager internal constructor(
         get() = when(val state = _state.value) {
             is Established -> state.identity
             is Refreshed -> state.identity
+            is Expired -> state.identity
             else -> null
     }
 
@@ -183,7 +190,16 @@ class UID2Manager internal constructor(
     /**
      * Gets the current Advertising Token, if available.
      */
-    fun getAdvertisingToken(): String? = currentIdentity?.advertisingToken
+    fun getAdvertisingToken(): String? = currentIdentity?.let {
+        // For a known identity, we should only provide the advertising token if their status is established or
+        // refreshed. It's possible they could have expired and be pending a refresh. In this case, the token is not
+        // useful.
+        return@let if (currentIdentityStatus == ESTABLISHED || currentIdentityStatus == REFRESHED) {
+            it.advertisingToken
+        } else {
+            null
+        }
+    }
 
     private fun setIdentityInternal(identity: UID2Identity?, status: IdentityStatus, updateStorage: Boolean = true) {
         if (updateStorage) {
@@ -201,6 +217,10 @@ class UID2Manager internal constructor(
 
         // If we have an attached listener, report.
         onIdentityChangedListener?.onIdentityStatusChanged(identity, status)
+
+        // An identity's status can change based upon the current time and it's expiration. We will schedule some work
+        // to detect when it changes so that we can report it accordingly.
+        checkIdentityExpiration()
 
         // After a new identity has been set, we have to work out how we're going to potentially refresh it. If the
         // identity is null, because it's been reset of the identity has opted out, we don't need to do anything.
@@ -225,6 +245,44 @@ class UID2Manager internal constructor(
                     val timeToRefresh = timeUtils.diffToNow(it.refreshFrom)
                     delay(timeToRefresh)
                     refreshIdentityInternal(it)
+                }
+            }
+        }
+    }
+
+    /**
+     * The identity status can change as we reach specific time events. We want to observe these and make sure that when
+     * they are reached, we can report them accordingly to our consumer.
+     */
+    private fun checkIdentityExpiration() {
+        checkRefreshExpiresJob?.cancel()
+        checkRefreshExpiresJob = null
+
+        checkIdentityExpiresJob?.cancel()
+        checkIdentityExpiresJob = null
+
+        if (!checkExpiration) {
+            return
+        }
+
+        currentIdentity?.let {
+            // If the expiration time of being able to refresh is in the future, we will schedule a job to detect if we
+            // pass it. This will allow us to reevaluate our state and update accordingly.
+            if (!timeUtils.hasExpired(it.refreshExpires)) {
+                checkRefreshExpiresJob = scope.launch {
+                    val timeToCheck = timeUtils.diffToNow(it.refreshExpires) + EXPIRATION_CHECK_TOLERANCE_MS
+                    delay(timeToCheck)
+                    validateAndSetIdentity(it, null, true)
+                }
+            }
+
+            // If the expiration time of the identity itself is in the future, we will schedule a job to detect if we
+            // pass it. This will allow us to reevaluate our state and update accordingly.
+            if (!timeUtils.hasExpired(it.identityExpires)) {
+                checkIdentityExpiresJob = scope.launch {
+                    val timeToCheck = timeUtils.diffToNow(it.identityExpires) + EXPIRATION_CHECK_TOLERANCE_MS
+                    delay(timeToCheck)
+                    validateAndSetIdentity(it, null, true)
                 }
             }
         }
@@ -315,6 +373,9 @@ class UID2Manager internal constructor(
         // We will only allow an automatic retry of a refresh 5 times before giving up.
         private const val REFRESH_TOKEN_MAX_RETRY = 5
 
+        // The additional time we will allow to pass before checking the expiration of the Identity.
+        private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
+
         private var api: String = UID2_API_URL_KEY
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
@@ -387,7 +448,7 @@ class UID2Manager internal constructor(
                 ESTABLISHED -> identity?.let { return Established(it) }
                 REFRESHED -> identity?.let { return Refreshed(it) }
                 NO_IDENTITY -> NoIdentity
-                EXPIRED -> Expired
+                EXPIRED -> identity?.let { return Expired(it) }
                 INVALID -> Invalid
                 REFRESH_EXPIRED -> RefreshExpired
                 OPT_OUT -> OptOut
