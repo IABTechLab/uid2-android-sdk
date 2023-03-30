@@ -1,6 +1,9 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'com.vanniktech.maven.publish'
 }
 
 apply from:  rootProject.file("$rootDir/common.gradle")
@@ -27,4 +30,16 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Maven Publishing
+
+apply from:  rootProject.file("$rootDir/pom.gradle")
+
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.S01, true)
+    signAllPublications()
+
+    coordinates(project.group, "uid2-android-sdk-ima", project.version)
 }
