@@ -62,7 +62,7 @@ class MainScreenViewModel(
                     is Established -> _viewState.emit(UserUpdatedState(state.identity, ESTABLISHED))
                     is Refreshed -> _viewState.emit(UserUpdatedState(state.identity, REFRESHED))
                     is NoIdentity -> _viewState.emit(UserUpdatedState(null, NO_IDENTITY))
-                    is Expired -> _viewState.emit(UserUpdatedState(null, EXPIRED))
+                    is Expired -> _viewState.emit(UserUpdatedState(state.identity, EXPIRED))
                     is RefreshExpired -> _viewState.emit(UserUpdatedState(null, REFRESH_EXPIRED))
                     is OptOut -> _viewState.emit(UserUpdatedState(null, OPT_OUT))
                     else ->  _viewState.emit(UserUpdatedState(null, INVALID))
