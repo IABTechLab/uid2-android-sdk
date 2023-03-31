@@ -23,13 +23,10 @@ android {
 
 dependencies {
     implementation project(path: ':sdk')
-
-    // We only compile against the GMA SDK as the exact version being used should be defined by the consuming
-    // application.
-    compileOnly 'com.google.android.gms:play-services-ads:21.5.0'
+    implementation 'com.google.android.gms:play-services-ads:22.0.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.google.android.gms:play-services-ads:21.5.0'
+    testImplementation 'com.google.android.gms:play-services-ads:22.0.0'
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

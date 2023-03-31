@@ -23,13 +23,10 @@ android {
 
 dependencies {
     implementation project(path: ':sdk')
-
-    // We only compile against the IMA SDK as the exact version being used should be defined by the consuming
-    // application.
-    compileOnly 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
+    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.30.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
+    testImplementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.30.0'
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
