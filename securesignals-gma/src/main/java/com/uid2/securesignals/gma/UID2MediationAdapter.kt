@@ -51,11 +51,21 @@ class UID2MediationAdapter : RtbAdapter() {
      * Collects the UID2 advertising token, if available.
      */
     override fun collectSignals(rtbSignalData: RtbSignalData, signalCallbacks: SignalCallbacks) {
-        val token = UID2Manager.getInstance().getAdvertisingToken()
-        if (token != null) {
-            signalCallbacks.onSuccess(token)
-        } else {
-            signalCallbacks.onFailure(AdError(0, "No Advertising Token", "UID2"))
+        UID2Manager.getInstance().let { manager ->
+            val token = manager.getAdvertisingToken()
+            if (token != null) {
+                signalCallbacks.onSuccess(token)
+            } else {
+                // We include the IdentityStatus in the "error" to have better visibility on why the Advertising Token
+                // was not present. There are a number of valid reasons why we don't have a token, but we are still
+                // required to report these as "failures".
+                signalCallbacks.onFailure(
+                    AdError(
+                        manager.currentIdentityStatus.value,
+                        "No Advertising Token",
+                        "UID2")
+                )
+            }
         }
     }
 }

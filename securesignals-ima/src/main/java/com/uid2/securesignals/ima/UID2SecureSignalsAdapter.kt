@@ -35,26 +35,32 @@ class UID2SecureSignalsAdapter: SecureSignalsAdapter {
     /**
      * Initialises the UID2 SDK with the given Context.
      */
-    override fun initialize(context: Context?, callback: SecureSignalsInitializeCallback?) {
-        if (context != null) {
+    override fun initialize(context: Context, callback: SecureSignalsInitializeCallback) {
+        // It's possible that the UID2Manager is already initialised. If so, it's a no-op.
+        if (!UID2Manager.isInitialized()) {
             UID2Manager.init(context)
-            callback?.onSuccess()
-        } else if (UID2Manager.isInitialized()) {
-            callback?.onSuccess()
-        } else {
-            callback?.onFailure(UID2SecureSignalsException("No Context provided to initialise UID2Manager"))
         }
+
+        callback.onSuccess()
     }
 
     /**
      * Collects the UID2 advertising token, if available.
      */
-    override fun collectSignals(context: Context?, callback: SecureSignalsCollectSignalsCallback?) {
-        val token = UID2Manager.getInstance().getAdvertisingToken()
-        if (token != null) {
-            callback?.onSuccess(token)
-        } else {
-            callback?.onFailure(UID2SecureSignalsException("No Advertising Token available"))
+    override fun collectSignals(context: Context, callback: SecureSignalsCollectSignalsCallback) {
+        UID2Manager.getInstance().let { manager ->
+            val token = manager.getAdvertisingToken()
+            if (token != null) {
+                callback.onSuccess(token)
+            } else {
+                // We include the IdentityStatus in the "error" to have better visibility on why the Advertising Token
+                // was not present. There are a number of valid reasons why we don't have a token, but we are still
+                // required to report these as "failures".
+                callback.onFailure(
+                    UID2SecureSignalsException(
+                        "No Advertising Token available (Status: ${manager.currentIdentityStatus.value})")
+                )
+            }
         }
     }
 }
