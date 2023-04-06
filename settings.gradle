@@ -10,6 +10,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+
+        // Required when testing a Snapshot build from the DevApp.
+        maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
     }
 }
 rootProject.name = "UID2 Android SDK"

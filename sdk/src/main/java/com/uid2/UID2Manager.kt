@@ -376,7 +376,7 @@ class UID2Manager internal constructor(
         // The additional time we will allow to pass before checking the expiration of the Identity.
         private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
 
-        private var api: String = UID2_API_URL_KEY
+        private var api: String = UID2_API_URL_DEFAULT
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
 
@@ -389,7 +389,7 @@ class UID2Manager internal constructor(
         fun init(context: Context) = init(context, DefaultNetworkSession())
 
         /**
-         * Initializes the class with the given [Context], along with a @see NetworkSession that will be responsible
+         * Initializes the class with the given [Context], along with a [NetworkSession] that will be responsible
          * for making any required network calls.
          *
          * @param context The context to initialise from. This will be used to obtain the package's metadata to extract
