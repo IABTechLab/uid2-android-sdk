@@ -17,7 +17,7 @@ Cutting a Release
 
     ```
     sed -i "" \
-      "s/version = \".*\"/version = \"$RELEASE_VERSION\"/g" \
+      "s/ version = \'.*\'/ version = \'$RELEASE_VERSION\'/g" \
       build.gradle
     ```
 
@@ -35,7 +35,7 @@ Cutting a Release
 
     ```
     sed -i "" \
-      "s/version = \".*\"/version = \"$NEXT_VERSION\"/g" \
+      "s/ version = \'.*\'/ version = \'$NEXT_VERSION\'/g" \
       build.gradle
     git commit -am "Prepare next development version."
     git push
