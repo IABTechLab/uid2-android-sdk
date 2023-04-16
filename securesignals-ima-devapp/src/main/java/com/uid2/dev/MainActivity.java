@@ -22,6 +22,7 @@ import com.google.ads.interactivemedia.v3.api.AdsRequest;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
+import com.uid2.UID2Manager;
 
 import java.util.Arrays;
 
@@ -65,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
+
+        // Setup UID2Manager
+        UID2Manager.init(getApplicationContext());
 
         // Create the UI for controlling the video view.
         mediaController = new MediaController(this);
