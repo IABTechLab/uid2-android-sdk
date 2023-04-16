@@ -35,8 +35,9 @@ android {
 dependencies {
 
 //    implementation 'com.uid2:uid2-android-sdk-ima:0.1.0'
+    implementation project(path: ':securesignals-ima')
     // TODO: - IMA SDK should be an automatic dependency on IMA Plugin
-    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.30.0'
+    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
 
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
