@@ -23,7 +23,14 @@ import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
 import com.uid2.UID2Manager;
+import com.uid2.data.UID2Identity;
 
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 
 /** Main activity. */
@@ -69,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup UID2Manager
         UID2Manager.init(getApplicationContext());
+        loadUID2Identity();
 
         // Create the UI for controlling the video view.
         mediaController = new MediaController(this);
@@ -191,6 +199,36 @@ public class MainActivity extends AppCompatActivity {
                 requestAds(SAMPLE_VAST_TAG_URL);
                 view.setVisibility(View.GONE);
             });
+    }
+
+    private void loadUID2Identity() {
+
+        InputStream is = getResources().openRawResource(R.raw.uid2identity);
+        StringBuilder text = new StringBuilder();
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+
+            String jsonString = text.toString();
+
+            JSONObject jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();;
+            UID2Identity identity = new UID2Identity(jsonObject.getString("advertising_token"),
+                jsonObject.getString("refresh_token"),
+                jsonObject.getLong("identity_expires"),
+                jsonObject.getLong("refresh_from"),
+                jsonObject.getLong("refresh_expires"),
+                jsonObject.getString("refresh_response_key")
+                );
+            UID2Manager.getInstance().setIdentity(identity);
+        } catch (Exception e) {
+            Log.e(LOGTAG, "Error loading Identity: " + e);
+        }
+
     }
 
     private void pauseContentForAds() {
