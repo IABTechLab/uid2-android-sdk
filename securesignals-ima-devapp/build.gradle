@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.uid2.dev'
+    namespace 'com.uid2.securesignals.ima.devapp'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.uid2.dev"
+        applicationId "com.uid2.securesignals.ima.devapp"
         minSdk 26
         targetSdk 33
         versionCode 1
