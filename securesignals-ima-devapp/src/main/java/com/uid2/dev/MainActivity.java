@@ -31,7 +31,9 @@ import org.json.JSONTokener;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.Instant;
 import java.util.Arrays;
+import java.util.Date;
 
 /** Main activity. */
 public class MainActivity extends AppCompatActivity {
@@ -216,12 +218,18 @@ public class MainActivity extends AppCompatActivity {
 
             String jsonString = text.toString();
 
-            JSONObject jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();;
+            JSONObject jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();
+
+            // Emulate A UID2Identity With Valid Times
+            long identityExpires = Instant.now().toEpochMilli() * 60 * 60;
+            long refreshFrom = Instant.now().toEpochMilli() * 60 * 40;
+            long refreshExpires = Instant.now().toEpochMilli() * 60 * 50;
+
             UID2Identity identity = new UID2Identity(jsonObject.getString("advertising_token"),
                 jsonObject.getString("refresh_token"),
-                jsonObject.getLong("identity_expires"),
-                jsonObject.getLong("refresh_from"),
-                jsonObject.getLong("refresh_expires"),
+                identityExpires,
+                refreshFrom,
+                refreshExpires,
                 jsonObject.getString("refresh_response_key")
                 );
             UID2Manager.getInstance().setIdentity(identity);
