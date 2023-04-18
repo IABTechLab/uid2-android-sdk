@@ -33,9 +33,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 
-/** Main activity. */
+/**
+ * Porting of Google's BasicExample
+ * https://github.com/googleads/googleads-ima-android/tree/main/basicexample
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOGTAG = "IMABasicSample";
