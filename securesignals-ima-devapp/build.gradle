@@ -26,6 +26,10 @@ android {
         }
     }
 
+    lint {
+        disable 'GradleDependency', 'IconDipSize', 'IconDensities', 'RtlEnabled'
+    }
+
 }
 
 dependencies {
