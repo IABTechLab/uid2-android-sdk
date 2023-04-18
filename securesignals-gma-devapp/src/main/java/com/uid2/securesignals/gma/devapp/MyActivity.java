@@ -1,5 +1,7 @@
 package com.uid2.securesignals.gma.devapp;
 
+import static com.google.ads.AdRequest.LOGTAG;
+
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
@@ -11,6 +13,16 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.uid2.UID2Manager;
+import com.uid2.data.UID2Identity;
+
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.time.Instant;
 import java.util.Arrays;
 
 /**
@@ -25,6 +37,10 @@ public class MyActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
+
+        // Setup UID2Manager
+        UID2Manager.init(getApplicationContext());
+        loadUID2Identity();
 
         // Log the Mobile Ads SDK version.
         Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
@@ -59,6 +75,42 @@ public class MyActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.my, menu);
         return true;
+    }
+
+    private void loadUID2Identity() {
+
+        InputStream is = getResources().openRawResource(R.raw.uid2identity);
+        StringBuilder text = new StringBuilder();
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+
+            String jsonString = text.toString();
+
+            JSONObject jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();
+
+            // Emulate A UID2Identity With Valid Times
+            long identityExpires = Instant.now().toEpochMilli() * 60 * 60;
+            long refreshFrom = Instant.now().toEpochMilli() * 60 * 40;
+            long refreshExpires = Instant.now().toEpochMilli() * 60 * 50;
+
+            UID2Identity identity = new UID2Identity(jsonObject.getString("advertising_token"),
+                jsonObject.getString("refresh_token"),
+                identityExpires,
+                refreshFrom,
+                refreshExpires,
+                jsonObject.getString("refresh_response_key")
+            );
+            UID2Manager.getInstance().setIdentity(identity);
+        } catch (Exception e) {
+            Log.e(LOGTAG, "Error loading Identity: " + e);
+        }
+
     }
 
     @Override
