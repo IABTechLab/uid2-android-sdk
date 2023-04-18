@@ -26,9 +26,6 @@ android {
         }
     }
 
-    lint {
-        disable 'GradleDependency'
-    }
 }
 
 dependencies {
