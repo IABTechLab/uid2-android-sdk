@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.uid2.securesignals.gma.devapp"
-        minSdk 24
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -47,6 +47,9 @@ android {
 }
 
 dependencies {
+
+    implementation project(path: ':securesignals-gma')
+    implementation 'com.uid2:uid2-android-sdk:0.1.0'
 
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
