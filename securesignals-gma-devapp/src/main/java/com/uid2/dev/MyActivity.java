@@ -23,11 +23,10 @@ import org.json.JSONTokener;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.time.Instant;
 import java.util.Arrays;
 
 /**
- * Port of https://github.com/googleads/googleads-mobile-android-examples/tree/main/java/admob/BannerExample
+ * Port of <a href="https://github.com/googleads/googleads-mobile-android-examples/tree/main/java/admob/BannerExample">BannerExample</a>
  */
 public class MyActivity extends AppCompatActivity {
 
@@ -96,9 +95,10 @@ public class MyActivity extends AppCompatActivity {
             JSONObject jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();
 
             // Emulate A UID2Identity With Valid Times
-            long identityExpires = Instant.now().toEpochMilli() * 60 * 60;
-            long refreshFrom = Instant.now().toEpochMilli() * 60 * 40;
-            long refreshExpires = Instant.now().toEpochMilli() * 60 * 50;
+            long now = System.currentTimeMillis();
+            long identityExpires = now * 60 * 60;
+            long refreshFrom = now * 60 * 40;
+            long refreshExpires = now * 60 * 50;
 
             UID2Identity identity = new UID2Identity(jsonObject.getString("advertising_token"),
                 jsonObject.getString("refresh_token"),
