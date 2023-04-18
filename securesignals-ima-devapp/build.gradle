@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+apply from:  rootProject.file("$rootDir/common.gradle")
+
 android {
     namespace 'com.uid2.dev'
     compileSdk 33
@@ -19,15 +21,13 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
+
+    lint {
+        disable 'GradleDependency'
     }
 }
 
