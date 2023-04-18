@@ -35,7 +35,7 @@ import java.util.Arrays;
 
 /**
  * Porting of Google's BasicExample
- * https://github.com/googleads/googleads-ima-android/tree/main/basicexample
+ * <a href="https://github.com/googleads/googleads-ima-android/tree/main/basicexample">BasicExample</a>
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * IMA sample tag for a single skippable inline video ad. See more IMA sample tags at
-     * https://developers.google.com/interactive-media-ads/docs/sdks/html5/client-side/tags
+     * <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/client-side/tags">Client Side Tags</a>
      */
     private static final String SAMPLE_VAST_TAG_URL =
         "https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/"

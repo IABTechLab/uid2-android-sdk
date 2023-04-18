@@ -18,7 +18,7 @@ import java.util.TimerTask;
 
 /**
  *  Example implementation of IMA's VideoAdPlayer interface.
- *  From: https://github.com/googleads/googleads-ima-android/blob/main/basicexample/app/src/main/java/com/google/ads/interactivemedia/v3/samples/videoplayerapp/VideoAdPlayerAdapter.java
+ *  From: <a href="https://github.com/googleads/googleads-ima-android/blob/main/basicexample/app/src/main/java/com/google/ads/interactivemedia/v3/samples/videoplayerapp/VideoAdPlayerAdapter.java">VideoAdPlayer</a>
  */
 public class VideoAdPlayerAdapter implements VideoAdPlayer {
 
@@ -142,7 +142,7 @@ public class VideoAdPlayerAdapter implements VideoAdPlayer {
 
     /**
      * @param errorType Media player's error type as defined at
-     *     https://cs.android.com/android/platform/superproject/+/master:frameworks/base/media/java/android/media/MediaPlayer.java;l=4335
+     *     <a href="https://cs.android.com/android/platform/superproject/+/master:frameworks/base/media/java/android/media/MediaPlayer.java;l=4335">Media Player</a>
      * @return True to stop the current ad playback.
      */
     private boolean notifyImaSdkAboutAdError(int errorType) {
