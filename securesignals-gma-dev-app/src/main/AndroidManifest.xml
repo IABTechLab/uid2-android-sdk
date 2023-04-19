@@ -15,7 +15,7 @@
 
         <activity
             android:exported="true"
-            android:name="com.uid2.dev.MyActivity">
+            android:name="com.uid2.dev.BannerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

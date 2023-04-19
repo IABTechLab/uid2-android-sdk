@@ -27,7 +27,7 @@ import java.util.Arrays;
 /**
  * Port of <a href="https://github.com/googleads/googleads-mobile-android-examples/tree/main/java/admob/BannerExample">BannerExample</a>
  */
-public class MyActivity extends AppCompatActivity {
+public class BannerActivity extends AppCompatActivity {
 
     private AdView adView;
     private static final String TAG = "MyActivity";
@@ -35,7 +35,7 @@ public class MyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my);
+        setContentView(R.layout.banner_activity);
 
         // Load UID2Identity to test with
         loadUID2Identity();
