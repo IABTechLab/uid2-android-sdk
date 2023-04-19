@@ -7,12 +7,10 @@ apply from:  rootProject.file("$rootDir/common.gradle")
 
 android {
     namespace 'com.uid2.dev'
-    compileSdk 33
 
     defaultConfig {
         applicationId "com.uid2.securesignals.ima.devapp"
         minSdk 21
-        targetSdk 33
         versionCode 1
         versionName "1.0"
 
