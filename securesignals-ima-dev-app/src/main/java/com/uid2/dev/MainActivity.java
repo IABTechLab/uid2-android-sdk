@@ -26,7 +26,6 @@ import com.uid2.UID2Manager;
 import com.uid2.data.UID2Identity;
 
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -212,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             String jsonString = text.toString();
-            JSONObject jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();
+            JSONObject jsonObject = new JSONObject(jsonString);
             UID2Identity fromJsonIdentity = UID2Identity.Companion.fromJson(jsonObject);
 
             // Emulate A UID2Identity With Valid Times
