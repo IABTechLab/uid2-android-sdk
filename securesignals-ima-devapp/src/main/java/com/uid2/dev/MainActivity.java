@@ -64,9 +64,8 @@ public class MainActivity extends AppCompatActivity {
     // The saved content position, used to resumed content following an ad break.
     private int savedPosition = 0;
 
-    // This sample uses a VideoView for content and ad playback. For production
-    // apps, Android's Exoplayer offers a more fully featured player compared to
-    // the VideoView.
+    // This sample uses a VideoView for content and ad playback. For production apps, Android's Exoplayer offers
+    // a more fully featured player compared to the VideoView.
     private VideoView videoPlayer;
     private MediaController mediaController;
     private View playButton;
@@ -144,21 +143,18 @@ public class MainActivity extends AppCompatActivity {
                                 if (adEvent.getType() != AdEvent.AdEventType.AD_PROGRESS) {
                                     Log.i(LOGTAG, "Event: " + adEvent.getType());
                                 }
-                                // These are the suggested event types to handle. For full list of
-                                // all ad event types, see AdEvent.AdEventType documentation.
+                                // These are the suggested event types to handle. For full list of all ad event types,
+                                // see AdEvent.AdEventType documentation.
                                 switch (adEvent.getType()) {
                                     case LOADED:
                                         // AdEventType.LOADED is fired when ads are ready to play.
 
-                                        // This sample app uses the sample tag
-                                        // single_preroll_skippable_ad_tag_url that requires calling
-                                        // AdsManager.start() to start ad playback.
-                                        // If you use a different ad tag URL that returns a VMAP or
-                                        // an ad rules playlist, the adsManager.init() function will
-                                        // trigger ad playback automatically and the IMA SDK will
-                                        // ignore the adsManager.start().
-                                        // It is safe to always call adsManager.start() in the
-                                        // LOADED event.
+                                        // This sample app uses the sample tag single_preroll_skippable_ad_tag_url
+                                        // that requires calling AdsManager.start() to start ad playback. If you use
+                                        // a different ad tag URL that returns a VMAP or an ad rules playlist,
+                                        // the adsManager.init() function will trigger ad playback automatically and
+                                        // the IMA SDK will ignore the adsManager.start(). It is safe to always call
+                                        // adsManager.start() in the LOADED event.
                                         adsManager.start();
                                         break;
                                     case CONTENT_PAUSE_REQUESTED:
