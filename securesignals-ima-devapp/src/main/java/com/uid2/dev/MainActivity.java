@@ -212,8 +212,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             String jsonString = text.toString();
-
             JSONObject jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();
+            UID2Identity fromJsonIdentity = UID2Identity.Companion.fromJson(jsonObject);
 
             // Emulate A UID2Identity With Valid Times
             long now = System.currentTimeMillis();
@@ -221,12 +221,13 @@ public class MainActivity extends AppCompatActivity {
             long refreshFrom = now * 60 * 40;
             long refreshExpires = now * 60 * 80;
 
-            UID2Identity identity = new UID2Identity(jsonObject.getString("advertising_token"),
-                jsonObject.getString("refresh_token"),
+            UID2Identity identity = new UID2Identity(fromJsonIdentity.getAdvertisingToken(),
+                fromJsonIdentity.getRefreshToken(),
                 identityExpires,
                 refreshFrom,
                 refreshExpires,
-                jsonObject.getString("refresh_response_key"));
+                fromJsonIdentity.getRefreshResponseKey());
+
             UID2Manager.getInstance().setIdentity(identity);
         } catch (Exception e) {
             Log.e(LOGTAG, "Error loading Identity: " + e);

@@ -34,6 +34,7 @@ data class UID2Identity(
          * Helper function to parse a given JSON object into the expected UID2Identity instance. If the JSON instance
          * doesn't contain all required parameters, then null is returned.
          */
+        @JvmStatic
         fun fromJson(json: JSONObject): UID2Identity? {
             val advertisingToken = json.opt("advertising_token")?.toString() ?: return null
             val refreshToken = json.opt("refresh_token")?.toString() ?: return null
