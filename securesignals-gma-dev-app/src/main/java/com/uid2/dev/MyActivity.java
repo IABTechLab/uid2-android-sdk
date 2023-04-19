@@ -18,7 +18,6 @@ import com.uid2.data.UID2Identity;
 import com.uid2.devapp.R;
 
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -38,8 +37,7 @@ public class MyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
 
-        // Setup UID2Manager
-        UID2Manager.init(getApplicationContext());
+        // Load UID2Identity to test with
         loadUID2Identity();
 
         // Log the Mobile Ads SDK version.
@@ -91,22 +89,21 @@ public class MyActivity extends AppCompatActivity {
             }
 
             String jsonString = text.toString();
-
-            JSONObject jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();
+            JSONObject jsonObject = new JSONObject(jsonString);
+            UID2Identity fromJsonIdentity = UID2Identity.Companion.fromJson(jsonObject);
 
             // Emulate A UID2Identity With Valid Times
             long now = System.currentTimeMillis();
             long identityExpires = now * 60 * 60;
             long refreshFrom = now * 60 * 40;
-            long refreshExpires = now * 60 * 50;
+            long refreshExpires = now * 60 * 80;
 
-            UID2Identity identity = new UID2Identity(jsonObject.getString("advertising_token"),
-                jsonObject.getString("refresh_token"),
+            UID2Identity identity = new UID2Identity(fromJsonIdentity.getAdvertisingToken(),
+                fromJsonIdentity.getRefreshToken(),
                 identityExpires,
                 refreshFrom,
                 refreshExpires,
-                jsonObject.getString("refresh_response_key")
-            );
+                fromJsonIdentity.getRefreshResponseKey());
             UID2Manager.getInstance().setIdentity(identity);
         } catch (Exception e) {
             Log.e(LOGTAG, "Error loading Identity: " + e);
