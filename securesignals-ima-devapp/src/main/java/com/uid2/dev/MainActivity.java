@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             long now = System.currentTimeMillis();
             long identityExpires = now * 60 * 60;
             long refreshFrom = now * 60 * 40;
-            long refreshExpires = now * 60 * 50;
+            long refreshExpires = now * 60 * 80;
 
             UID2Identity identity = new UID2Identity(jsonObject.getString("advertising_token"),
                 jsonObject.getString("refresh_token"),
