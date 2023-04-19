@@ -49,10 +49,9 @@ public class VideoAdPlayerAdapter implements VideoAdPlayer {
 
     @Override
     public void loadAd(AdMediaInfo adMediaInfo, AdPodInfo adPodInfo) {
-        // This simple ad loading logic works because preloading is disabled. To support
-        // preloading ads your app must maintain state for the currently playing ad
-        // while handling upcoming ad downloading and buffering at the same time.
-        // See the IMA Android preloading guide for more info:
+        // This simple ad loading logic works because preloading is disabled. To support preloading ads your app must
+        // maintain state for the currently playing ad while handling upcoming ad downloading and buffering at the
+        // same time. See the IMA Android preloading guide for more info:
         // https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/preload
         loadedAdMediaInfo = adMediaInfo;
     }
