@@ -200,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadUID2Identity() {
-
         InputStream is = getResources().openRawResource(R.raw.uid2identity);
         StringBuilder text = new StringBuilder();
 
@@ -227,13 +226,11 @@ public class MainActivity extends AppCompatActivity {
                 identityExpires,
                 refreshFrom,
                 refreshExpires,
-                jsonObject.getString("refresh_response_key")
-                );
+                jsonObject.getString("refresh_response_key"));
             UID2Manager.getInstance().setIdentity(identity);
         } catch (Exception e) {
             Log.e(LOGTAG, "Error loading Identity: " + e);
         }
-
     }
 
     private void pauseContentForAds() {
