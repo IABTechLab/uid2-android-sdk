@@ -1,0 +1,38 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+apply from:  rootProject.file("$rootDir/common.gradle")
+
+android {
+    namespace 'com.uid2.devapp'
+
+    defaultConfig {
+        applicationId "com.uid2.securesignals.gma.devapp"
+        minSdk 21
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    lint {
+        disable 'GradleDependency'
+    }
+
+}
+
+dependencies {
+    implementation project(path: ':securesignals-gma')
+    compileOnly 'com.uid2:uid2-android-sdk:0.1.0'
+    compileOnly 'com.google.android.gms:play-services-ads:22.0.0'
+
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+}
