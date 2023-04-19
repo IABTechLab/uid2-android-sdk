@@ -3,14 +3,14 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+apply from:  rootProject.file("$rootDir/common.gradle")
+
 android {
     namespace 'com.uid2.devapp'
-    compileSdk 33
 
     defaultConfig {
         applicationId "com.uid2.securesignals.gma.devapp"
         minSdk 21
-        targetSdk 33
         versionCode 1
         versionName "1.0"
     }
