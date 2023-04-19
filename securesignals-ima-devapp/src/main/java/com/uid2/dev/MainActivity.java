@@ -76,8 +76,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        // Setup UID2Manager
-        UID2Manager.init(getApplicationContext());
+        // Load UID2Identity to test with
         loadUID2Identity();
 
         // Create the UI for controlling the video view.
