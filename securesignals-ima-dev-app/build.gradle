@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    compileOnly project(path: ':securesignals-ima')
+    implementation project(path: ':securesignals-ima')
     compileOnly 'com.uid2:uid2-android-sdk:0.1.0'
     compileOnly 'com.google.ads.interactivemedia.v3:interactivemedia:3.30.1'
 
