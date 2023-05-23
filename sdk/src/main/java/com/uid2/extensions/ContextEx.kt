@@ -9,7 +9,7 @@ import android.os.Bundle
 /**
  * Helper method to extract the MetaData Bundle associated with the given Context.
  */
-internal fun Context.getMetadata(): Bundle = packageManager.getApplicationInfoCompat(
+internal fun Context.getMetadata(): Bundle? = packageManager.getApplicationInfoCompat(
     packageName,
     PackageManager.GET_META_DATA
 ).metaData

@@ -406,7 +406,7 @@ class UID2Manager internal constructor(
 
             val metadata = context.getMetadata()
 
-            this.api = metadata.getString(UID2_API_URL_KEY, UID2_API_URL_DEFAULT)
+            this.api = metadata?.getString(UID2_API_URL_KEY, UID2_API_URL_DEFAULT) ?: UID2_API_URL_DEFAULT
             this.networkSession = networkSession
             this.storageManager = StorageManager.getInstance(context)
         }
