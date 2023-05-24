@@ -98,6 +98,10 @@ class UID2Manager internal constructor(
      */
     val state: Flow<UID2ManagerState> = _state.asStateFlow()
 
+    // The Job responsible for initialising the manager. This will include de-serialising our initial state from
+    // storage.
+    private var initialized: Job
+
     // An active Job that is scheduled to refresh the current identity
     private var refreshJob: Job? = null
 
@@ -143,7 +147,7 @@ class UID2Manager internal constructor(
         }
 
     init {
-        scope.launch {
+        initialized = scope.launch {
             // Attempt to load the Identity from storage. If successful, we can notify any observers.
             storageManager.loadIdentity().let {
                 validateAndSetIdentity(it.first, it.second, false)
@@ -157,15 +161,15 @@ class UID2Manager internal constructor(
      * Once set, assuming it's valid, it will be monitored so that we automatically refresh the token(s) when required.
      * This will also be persisted locally, so that when the application re-launches, we reload this Identity.
      */
-    fun setIdentity(identity: UID2Identity) {
+    fun setIdentity(identity: UID2Identity) = afterInitialized {
         validateAndSetIdentity(identity, null)
     }
 
     /**
      * If a valid Identity has been set, this will reset our state along with clearing any persisted data.
      */
-    fun resetIdentity() {
-        currentIdentity ?: return
+    fun resetIdentity() = afterInitialized {
+        currentIdentity ?: return@afterInitialized
 
         setIdentityInternal(null, NO_IDENTITY, true)
     }
@@ -173,9 +177,25 @@ class UID2Manager internal constructor(
     /**
      * Forces a refresh of the current Identity, if set.
      */
-    fun refreshIdentity() {
+    fun refreshIdentity() = afterInitialized {
         // If we have a valid Identity, let's refresh it.
         currentIdentity?.let { refreshIdentityInternal(it) }
+    }
+
+    /**
+     * Helper function to ensure a task is run **after** the manager has been fully initialised. This is to ensure that
+     * our public interface is not exposed to any race conditions with us initialising/loading our state from disk.
+     */
+    private fun afterInitialized(run: () -> Unit) {
+        if (initialized.isCompleted) {
+            run()
+            return
+        }
+
+        scope.launch {
+            initialized.join()
+            run()
+        }
     }
 
     private fun refreshIdentityInternal(identity: UID2Identity) = scope.launch {

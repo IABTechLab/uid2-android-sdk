@@ -108,6 +108,22 @@ class UID2ManagerTest {
     }
 
     @Test
+    fun `resets identity immediately after initialisation`() = runTest(testDispatcher) {
+        // Create a new instance of the manager but *don't* allow it to finish initialising (loading previous identity)
+        val manager = UID2Manager(client, storageManager, timeUtils, testDispatcher, false).apply {
+            onIdentityChangedListener = listener
+            checkExpiration = false
+        }
+
+        // Reset the Manager's identity
+        manager.resetIdentity()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Verify that the Manager updated with the reset identity and reported the state changes appropriately.
+        assertManagerState(manager, null, NO_IDENTITY)
+    }
+
+    @Test
     fun `refresh no-op when no identity`() {
         val manager = withManager(client, mock(), timeUtils, testDispatcher, false, null)
         assertNull(manager.currentIdentity)
