@@ -6,7 +6,7 @@ plugins {
 apply from:  rootProject.file("$rootDir/common.gradle")
 
 android {
-    namespace 'com.uid2.devapp'
+    namespace 'com.uid2.dev'
 
     defaultConfig {
         applicationId "com.uid2.securesignals.gma.devapp"
@@ -17,7 +17,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
         }
     }
 

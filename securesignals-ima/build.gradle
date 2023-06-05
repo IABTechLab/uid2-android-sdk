@@ -16,6 +16,7 @@ android {
 
     buildTypes {
         release {
+            consumerProguardFiles 'uid2-ima.pro'
             minifyEnabled false
         }
     }
