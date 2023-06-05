@@ -19,8 +19,7 @@ class RefreshResponseTest {
             JSONObject(),
             JSONObject(mapOf("key" to "value"))
         ).forEach {
-            val refresh = RefreshResponse.fromJson(it)
-            assertNull(refresh)
+            assertNull(RefreshResponse.fromJson(it))
         }
 
         // If we take a valid response but remove the "status" parameter, check that it's handled correctly.
@@ -45,8 +44,7 @@ class RefreshResponseTest {
 
             body.remove(it)
 
-            val refresh = RefreshResponse.fromJson(success)
-            assertNull(refresh)
+            assertNull(RefreshResponse.fromJson(success))
         }
     }
 

@@ -15,7 +15,6 @@ import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.uid2.UID2Manager;
 import com.uid2.data.UID2Identity;
-import com.uid2.devapp.R;
 
 import org.json.JSONObject;
 
