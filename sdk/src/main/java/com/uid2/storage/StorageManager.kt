@@ -27,9 +27,9 @@ internal interface StorageManager {
         private var instance: StorageManager? = null
 
         /**
-         * Gets the single instance of the StorageManager.
+         * Gets the single instance of the FileStorageManager.
          */
-        fun getInstance(context: Context) = instance ?: SharedPreferencesStorageManager(context).apply {
+        fun getInstance(context: Context) = instance ?: FileStorageManager(context).apply {
             instance = this
         }
     }
