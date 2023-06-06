@@ -11,8 +11,3 @@ plugins {
     id 'org.jetbrains.dokka' version '1.8.10' apply false
     id 'com.vanniktech.maven.publish' version "0.25.1" apply false
 }
-
-allprojects {
-    group = 'com.uid2'
-    version = '0.3.0-SNAPSHOT'
-}

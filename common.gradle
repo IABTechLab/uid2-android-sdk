@@ -15,7 +15,7 @@ android {
 
     buildTypes {
         all {
-            buildConfigField "String", "VERSION", "\"$project.version\""
+            buildConfigField "String", "VERSION", "\"${property("VERSION_NAME")}\""
         }
     }
 
