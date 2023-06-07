@@ -2,7 +2,6 @@ package com.uid2.dev
 
 import android.app.Application
 import com.uid2.UID2Manager
-import com.uid2.dev.network.OkNetworkSession
 
 class DevApplication : Application() {
     override fun onCreate() {
@@ -13,6 +12,6 @@ class DevApplication : Application() {
         UID2Manager.init(this.applicationContext)
 
         // Alternatively, we could initialise the UID2Manager with our own custom NetworkSession...
-        //UID2Manager.init(this.applicationContext, OkNetworkSession())
+        // UID2Manager.init(this.applicationContext, OkNetworkSession())
     }
 }

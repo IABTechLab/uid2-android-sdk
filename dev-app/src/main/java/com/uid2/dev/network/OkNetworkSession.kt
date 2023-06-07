@@ -4,10 +4,10 @@ import android.util.Log
 import com.uid2.network.NetworkRequest
 import com.uid2.network.NetworkResponse
 import com.uid2.network.NetworkSession
-import java.net.URL
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.net.URL
 
 /**
  * An example of a custom NetworkSession, which internally is using OkHttp.

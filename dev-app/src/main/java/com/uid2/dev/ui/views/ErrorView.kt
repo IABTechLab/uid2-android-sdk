@@ -9,6 +9,6 @@ import androidx.compose.ui.Modifier
 fun ErrorView(modifier: Modifier, error: Throwable) {
     Text(
         text = error.toString(),
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     )
 }

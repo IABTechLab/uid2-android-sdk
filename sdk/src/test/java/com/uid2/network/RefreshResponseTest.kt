@@ -17,7 +17,7 @@ class RefreshResponseTest {
         // Verify that completely invalid json is handled correctly.
         listOf(
             JSONObject(),
-            JSONObject(mapOf("key" to "value"))
+            JSONObject(mapOf("key" to "value")),
         ).forEach {
             assertNull(RefreshResponse.fromJson(it))
         }
@@ -37,7 +37,7 @@ class RefreshResponseTest {
             "identity_expires",
             "refresh_expires",
             "refresh_from",
-            "refresh_response_key"
+            "refresh_response_key",
         ).forEach {
             val success = JSONObject(TestData.REFRESH_TOKEN_SUCCESS_DECRYPTED)
             val body = success.getJSONObject("body")
@@ -73,7 +73,7 @@ class RefreshResponseTest {
     fun `test refresh package`() {
         mapOf(
             JSONObject(TestData.VALID_REFRESH_OPT_OUT) to OPT_OUT,
-            JSONObject(TestData.VALID_REFRESH_EXPIRED_TOKEN) to REFRESH_EXPIRED
+            JSONObject(TestData.VALID_REFRESH_EXPIRED_TOKEN) to REFRESH_EXPIRED,
         ).forEach {
             val refresh = RefreshResponse.fromJson(it.key)?.toRefreshPackage()
 

@@ -8,6 +8,12 @@ import android.os.Bundle
 import android.util.Base64
 import com.uid2.data.UID2Identity
 import com.uid2.network.DataEnvelope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.net.URI
 import java.net.URL
@@ -16,12 +22,6 @@ import java.nio.ByteOrder
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import kotlin.random.Random
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
 
 /**
  * The consuming application is responsible for generating the initial Identity, then passing that to the UID2Manager
@@ -31,7 +31,7 @@ import org.json.JSONObject
 class AppUID2Client(
     private val apiUrl: String,
     private val key: String,
-    private val secret: String
+    private val secret: String,
 ) {
     private val client = OkHttpClient()
 
@@ -39,8 +39,8 @@ class AppUID2Client(
         runCatching {
             URL(
                 URI(apiUrl)
-                .resolve(API_GENERATE_PATH)
-                .toString()
+                    .resolve(API_GENERATE_PATH)
+                    .toString(),
             )
         }.getOrNull()
     }
@@ -52,9 +52,8 @@ class AppUID2Client(
     @Throws(AppUID2ClientException::class)
     suspend fun generateIdentity(
         requestString: String,
-        type: RequestType
+        type: RequestType,
     ): UID2Identity? = withContext(Dispatchers.IO) {
-
         // Check to make sure we have a valid endpoint to hit.
         val url = apiGenerateUrl ?: throw AppUID2ClientException(ERROR_UNKNOWN_API)
 
@@ -64,13 +63,13 @@ class AppUID2Client(
         }
 
         // The secret should be Base64 encoded. Let's decode it and verify that what we have appears valid.
-        val secretBytes = runCatching { Base64.decode(secret, Base64.DEFAULT) }.getOrNull() ?:
-            throw AppUID2ClientException(ERROR_UNABLE_TO_DECODE_SECRET)
+        val secretBytes = runCatching { Base64.decode(secret, Base64.DEFAULT) }.getOrNull()
+            ?: throw AppUID2ClientException(ERROR_UNABLE_TO_DECODE_SECRET)
 
         // The request will contain an encrypted payload which contains the verified identity of the user.
         val requestBody = encryptRequest(
             secretBytes,
-            mapOf(type.parameter to requestString)
+            mapOf(type.parameter to requestString),
         ) ?: throw AppUID2ClientException(ERROR_UNABLE_TO_ENCRYPT_REQUEST)
 
         val request = Request.Builder()
@@ -89,8 +88,8 @@ class AppUID2Client(
         // If we have a valid response, we can try to decrypt it.
         val responseBody = decryptResponse(
             secret,
-            response.body?.string() ?:
-                throw AppUID2ClientException(ERROR_RESPONSE_NO_BODY)
+            response.body?.string()
+                ?: throw AppUID2ClientException(ERROR_RESPONSE_NO_BODY),
         ) ?: throw AppUID2ClientException(ERROR_UNABLE_TO_DECRYPT_RESPONSE)
 
         // Now try to parse the decrypted response (as JSON).
@@ -191,20 +190,21 @@ class AppUID2Client(
             return@let AppUID2Client(
                 it.getString(UID2_API_URL_KEY, UID2_API_URL_DEFAULT),
                 it.getString(UID2_API_KEY_KEY, ""),
-                it.getString(UID2_API_SECRET_KEY, "")
+                it.getString(UID2_API_SECRET_KEY, ""),
             )
         }
 
         private fun Context.getMetadata(): Bundle = packageManager.getApplicationInfoCompat(
             packageName,
-            PackageManager.GET_META_DATA
+            PackageManager.GET_META_DATA,
         ).metaData
 
         private fun PackageManager.getApplicationInfoCompat(packageName: String, flags: Int = 0): ApplicationInfo =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 getApplicationInfo(packageName, PackageManager.ApplicationInfoFlags.of(flags.toLong()))
             } else {
-                @Suppress("DEPRECATION") getApplicationInfo(packageName, flags)
+                @Suppress("DEPRECATION")
+                getApplicationInfo(packageName, flags)
             }
     }
 }

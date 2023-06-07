@@ -11,12 +11,13 @@ import android.os.Bundle
  */
 internal fun Context.getMetadata(): Bundle? = packageManager.getApplicationInfoCompat(
     packageName,
-    PackageManager.GET_META_DATA
+    PackageManager.GET_META_DATA,
 ).metaData
 
 private fun PackageManager.getApplicationInfoCompat(packageName: String, flags: Int = 0): ApplicationInfo =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         getApplicationInfo(packageName, PackageManager.ApplicationInfoFlags.of(flags.toLong()))
     } else {
-        @Suppress("DEPRECATION") getApplicationInfo(packageName, flags)
+        @Suppress("DEPRECATION")
+        getApplicationInfo(packageName, flags)
     }

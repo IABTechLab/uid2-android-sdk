@@ -22,7 +22,9 @@ object TestData {
     const val REFRESH_TOKEN_ENCRYPTED_OPT_OUT_KEY = "DIMOwK7qL6kNfzlkKNdFk2wfXhml75Rcu4FnTFnODo8="
 
     val REFRESH_TOKEN_SUCCESS_ENCRYPTED = ResourceHelper.loadString("test-data/refresh-token-200-success-encrypted.txt")
-    val REFRESH_TOKEN_SUCCESS_DECRYPTED = ResourceHelper.loadString("test-data/refresh-token-200-success-decrypted.json")
+    val REFRESH_TOKEN_SUCCESS_DECRYPTED = ResourceHelper.loadString(
+        "test-data/refresh-token-200-success-decrypted.json",
+    )
     const val REFRESH_TOKEN_ENCRYPTED_SUCCESS_KEY = "mJ8UtxUs4eUennG/h1v5pcxbtSHLSkzVZ1es4a3gLME="
 }
 
@@ -54,4 +56,3 @@ private object ResourceHelper {
         return outputStream.toString(Charsets.UTF_8.name()).trimEnd()
     }
 }
-

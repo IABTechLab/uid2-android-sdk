@@ -36,6 +36,8 @@ A framework for integrating [UID2](https://github.com/IABTechLab/uid2docs) into 
 
 The UID2 SDK is a standalone headless library defined and published via Maven Central.  As such the `dev-app` is the primary way for developing the SDK.  Use Android Studio to open the root folder to begin development.
 
+ode style is enforced via the [Spotless Gradle plugin](https://github.com/diffplug/spotless) (using [ktlint](https://pinterest.github.io/ktlint/)). You can fix any formatting issues by running `./gradlew spotlessApply`.
+
 R8 / ProGuard
 -------------
 If you are using R8 the shrinking and obfuscation rules are included automatically.

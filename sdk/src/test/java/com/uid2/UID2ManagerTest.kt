@@ -11,9 +11,6 @@ import com.uid2.data.UID2Identity
 import com.uid2.network.RefreshPackage
 import com.uid2.storage.StorageManager
 import com.uid2.utils.TimeUtils
-import java.io.IOException
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -38,6 +35,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.IOException
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -45,7 +45,7 @@ class UID2ManagerTest {
     private lateinit var testDispatcher: TestDispatcher
 
     private val expirationInterval = 10 * 1000L // 10 seconds
-    private val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+    private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
     private val client: UID2Client = mock()
     private val storageManager: StorageManager = mock()
@@ -141,8 +141,8 @@ class UID2ManagerTest {
             RefreshPackage(
                 newIdentity,
                 REFRESHED,
-                "Refreshed"
-            )
+                "Refreshed",
+            ),
         )
 
         // Ask the manager to refresh, allowing the current TestDispatcher to process any jobs.
@@ -163,8 +163,8 @@ class UID2ManagerTest {
             RefreshPackage(
                 null,
                 OPT_OUT,
-                "User opt-ed out"
-            )
+                "User opt-ed out",
+            ),
         )
 
         // Ask the manager to refresh, allowing the current TestDispatcher to process any jobs.
@@ -189,7 +189,7 @@ class UID2ManagerTest {
                 return@thenAnswer RefreshPackage(
                     newIdentity,
                     REFRESHED,
-                    "Refreshed"
+                    "Refreshed",
                 )
             } else {
                 hasErrored = true
@@ -227,7 +227,7 @@ class UID2ManagerTest {
             RefreshPackage(
                 newIdentity,
                 REFRESHED,
-                "User refreshed"
+                "User refreshed",
             )
         }
 
@@ -326,7 +326,7 @@ class UID2ManagerTest {
         dispatcher: CoroutineDispatcher,
         initialAutomaticRefreshEnabled: Boolean,
         listener: UID2ManagerIdentityChangedListener?,
-        initialCheckExpiration: Boolean = false
+        initialCheckExpiration: Boolean = false,
     ): UID2Manager {
         return UID2Manager(client, storageManager, timeUtils, dispatcher, initialAutomaticRefreshEnabled).apply {
             onIdentityChangedListener = listener
@@ -356,7 +356,7 @@ class UID2ManagerTest {
             identityExpires,
             refreshFrom,
             refreshExpires,
-            randomString(12)
+            randomString(12),
         )
     }
 

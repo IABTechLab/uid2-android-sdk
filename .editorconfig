@@ -12,9 +12,5 @@ max_line_length = 120
 tab_width = 4
 
 [.editorconfig]
-ij_editorconfig_space_after_comma = false # Workaround for parsing problem of .editorconfig by KtLint
-
-[*.{kt,kts}]
-ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
-ij_kotlin_allow_trailing_comma = false # Only used for declaration site
+ij_editorconfig_space_after_comma = false
 

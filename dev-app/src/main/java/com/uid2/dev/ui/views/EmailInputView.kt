@@ -26,7 +26,7 @@ import com.uid2.devapp.R
 fun EmailInputView(modifier: Modifier, onEmailEntered: (String) -> Unit) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         val emailAddress = remember { mutableStateOf(TextFieldValue()) }
 
@@ -39,20 +39,20 @@ fun EmailInputView(modifier: Modifier, onEmailEntered: (String) -> Unit) {
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Email,
-                    contentDescription = stringResource(R.string.email_icon_content_description)
+                    contentDescription = stringResource(R.string.email_icon_content_description),
                 )
-            }
+            },
         )
 
         FloatingActionButton(
             onClick = { onEmailEntered(emailAddress.value.text) },
             shape = CircleShape,
-            backgroundColor = MaterialTheme.colors.primary
+            backgroundColor = MaterialTheme.colors.primary,
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = stringResource(R.string.email_submit_content_description),
-                tint = Color.White
+                tint = Color.White,
             )
         }
     }

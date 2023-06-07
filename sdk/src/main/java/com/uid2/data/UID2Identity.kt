@@ -11,7 +11,7 @@ data class UID2Identity(
     val identityExpires: Long,
     val refreshFrom: Long,
     val refreshExpires: Long,
-    val refreshResponseKey: String
+    val refreshResponseKey: String,
 ) {
 
     /**
@@ -24,8 +24,8 @@ data class UID2Identity(
             "identity_expires" to identityExpires,
             "refresh_from" to refreshFrom,
             "refresh_expires" to refreshExpires,
-            "refresh_response_key" to refreshResponseKey
-        )
+            "refresh_response_key" to refreshResponseKey,
+        ),
     )
 
     companion object {
@@ -49,7 +49,7 @@ data class UID2Identity(
                 identityExpires,
                 refreshFrom,
                 refreshExpires,
-                refreshResponseKey
+                refreshResponseKey,
             )
         }
     }

@@ -10,7 +10,7 @@ class VersionParserTest {
         listOf(
             "1.0",
             "a.b.c",
-            "1.0.1.1"
+            "1.0.1.1",
         ).forEach {
             val version = VersionParser.parseVersion(it)
             assertEquals(VersionParser.INVALID_VERSION, version)

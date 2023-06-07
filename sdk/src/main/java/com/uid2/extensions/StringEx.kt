@@ -19,4 +19,3 @@ internal fun String.decodeJsonToMap(): Map<String, Any>? {
         it to json.get(it)
     }.toMap()
 }
-

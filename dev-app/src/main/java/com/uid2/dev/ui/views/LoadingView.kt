@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 fun LoadingView(modifier: Modifier) {
     Box(modifier.fillMaxSize()) {
         CircularProgressIndicator(
-            modifier = Modifier.size(64.dp).align(Alignment.Center)
+            modifier = Modifier.size(64.dp).align(Alignment.Center),
         )
     }
 }

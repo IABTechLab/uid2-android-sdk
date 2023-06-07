@@ -8,5 +8,5 @@ internal data class IdentityPackage(
     val valid: Boolean,
     val errorMessage: String?,
     val identity: UID2Identity?,
-    val status: IdentityStatus
+    val status: IdentityStatus,
 )

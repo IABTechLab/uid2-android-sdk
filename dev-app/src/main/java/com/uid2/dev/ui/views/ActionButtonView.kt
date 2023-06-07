@@ -10,7 +10,8 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun ActionButtonView(modifier: Modifier, onResetClick: () -> Unit, onRefreshClick: () -> Unit) {
-    Row(modifier = modifier.fillMaxWidth(),
+    Row(
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         Button(onClick = onResetClick) {

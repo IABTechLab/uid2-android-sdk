@@ -4,11 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.uid2.dev.network.AppUID2Client
-import com.uid2.dev.network.AppUID2ClientException
-import com.uid2.dev.network.RequestType.EMAIL
-import com.uid2.dev.ui.MainScreenState.ErrorState
-import com.uid2.dev.ui.MainScreenState.LoadingState
 import com.uid2.UID2Manager
 import com.uid2.UID2ManagerState.Established
 import com.uid2.UID2ManagerState.Expired
@@ -25,6 +20,11 @@ import com.uid2.data.IdentityStatus.OPT_OUT
 import com.uid2.data.IdentityStatus.REFRESHED
 import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
+import com.uid2.dev.network.AppUID2Client
+import com.uid2.dev.network.AppUID2ClientException
+import com.uid2.dev.network.RequestType.EMAIL
+import com.uid2.dev.ui.MainScreenState.ErrorState
+import com.uid2.dev.ui.MainScreenState.LoadingState
 import com.uid2.dev.ui.MainScreenState.UserUpdatedState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,9 +32,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 sealed interface MainScreenAction : ViewModelAction {
-    data class EmailChanged(val address: String): MainScreenAction
-    object ResetButtonPressed: MainScreenAction
-    object RefreshButtonPressed: MainScreenAction
+    data class EmailChanged(val address: String) : MainScreenAction
+    object ResetButtonPressed : MainScreenAction
+    object RefreshButtonPressed : MainScreenAction
 }
 
 sealed interface MainScreenState : ViewState {
@@ -45,7 +45,7 @@ sealed interface MainScreenState : ViewState {
 
 class MainScreenViewModel(
     private val api: AppUID2Client,
-    private val manager: UID2Manager
+    private val manager: UID2Manager,
 ) : BasicViewModel<MainScreenAction, MainScreenState>() {
 
     private val _viewState = MutableStateFlow<MainScreenState>(UserUpdatedState(null, NO_IDENTITY))
@@ -65,7 +65,7 @@ class MainScreenViewModel(
                     is Expired -> _viewState.emit(UserUpdatedState(state.identity, EXPIRED))
                     is RefreshExpired -> _viewState.emit(UserUpdatedState(null, REFRESH_EXPIRED))
                     is OptOut -> _viewState.emit(UserUpdatedState(null, OPT_OUT))
-                    else ->  _viewState.emit(UserUpdatedState(null, INVALID))
+                    else -> _viewState.emit(UserUpdatedState(null, INVALID))
                 }
             }
         }
@@ -108,8 +108,8 @@ class MainScreenViewModel(
 
 class MainScreenViewModelFactory(
     private val api: AppUID2Client,
-    private val manager: UID2Manager
-): ViewModelProvider.Factory {
+    private val manager: UID2Manager,
+) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return MainScreenViewModel(api, manager) as T

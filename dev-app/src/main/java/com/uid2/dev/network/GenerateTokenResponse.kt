@@ -6,7 +6,7 @@ import org.json.JSONObject
 data class GenerateTokenResponse(
     val body: UID2Identity?,
     val status: String,
-    val message: String?
+    val message: String?,
 ) {
     companion object {
         private const val STATUS = "status"
@@ -27,7 +27,7 @@ data class GenerateTokenResponse(
             return GenerateTokenResponse(
                 body,
                 status,
-                message
+                message,
             )
         }
     }

@@ -29,9 +29,9 @@ fun MainScreen(viewModel: MainScreenViewModel) {
             ActionButtonView(
                 Modifier,
                 onResetClick = { viewModel.processAction(ResetButtonPressed) },
-                onRefreshClick = { viewModel.processAction(RefreshButtonPressed) }
+                onRefreshClick = { viewModel.processAction(RefreshButtonPressed) },
             )
-        }
+        },
     ) { padding ->
         Column(modifier = Modifier.padding(10.dp, 10.dp, 10.dp, 10.dp + padding.calculateBottomPadding())) {
             // The top of the View provides a way for the Email Address to be entered.
