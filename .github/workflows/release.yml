@@ -29,6 +29,11 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
+      - name: Update Git user
+        run: |
+          git config --local user.name "IABTechLab"
+          git config --local user.email IABTechLab@users.noreply.github.com
+
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
 
