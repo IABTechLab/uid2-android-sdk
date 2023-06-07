@@ -13,7 +13,8 @@ enum class IdentityStatus(val value: Int) {
     NO_IDENTITY(-1),
     INVALID(-2),
     REFRESH_EXPIRED(-3),
-    OPT_OUT(-4);
+    OPT_OUT(-4),
+    ;
 
     override fun toString() = when (this) {
         ESTABLISHED -> "Established"

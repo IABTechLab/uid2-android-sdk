@@ -3,10 +3,6 @@ package com.uid2.network
 import com.uid2.extensions.decodeJsonToMap
 import com.uid2.network.NetworkRequestType.GET
 import com.uid2.network.NetworkRequestType.POST
-import java.io.ByteArrayInputStream
-import java.io.OutputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -16,6 +12,10 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.ByteArrayInputStream
+import java.io.OutputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 @RunWith(MockitoJUnitRunner::class)
 class DefaultNetworkSessionTest {

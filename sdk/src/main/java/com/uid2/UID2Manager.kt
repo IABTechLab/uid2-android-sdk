@@ -82,7 +82,7 @@ class UID2Manager internal constructor(
     private val storageManager: StorageManager,
     private val timeUtils: TimeUtils,
     defaultDispatcher: CoroutineDispatcher,
-    initialAutomaticRefreshEnabled: Boolean
+    initialAutomaticRefreshEnabled: Boolean,
 ) {
     private val scope = CoroutineScope(defaultDispatcher + SupervisorJob())
 
@@ -105,7 +105,7 @@ class UID2Manager internal constructor(
     // An active Job that is scheduled to refresh the current identity
     private var refreshJob: Job? = null
 
-    internal var checkExpiration : Boolean = true
+    internal var checkExpiration: Boolean = true
 
     // The scheduled jobs to check identity expiration.
     private var checkRefreshExpiresJob: Job? = null
@@ -115,12 +115,12 @@ class UID2Manager internal constructor(
      * Gets the current Identity, if available.
      */
     val currentIdentity: UID2Identity?
-        get() = when(val state = _state.value) {
+        get() = when (val state = _state.value) {
             is Established -> state.identity
             is Refreshed -> state.identity
             is Expired -> state.identity
             else -> null
-    }
+        }
 
     /**
      * Gets the current Identity Status.
@@ -134,7 +134,7 @@ class UID2Manager internal constructor(
             is Invalid -> INVALID
             is RefreshExpired -> REFRESH_EXPIRED
             is OptOut -> OPT_OUT
-    }
+        }
 
     /**
      * Gets or sets whether tha Manager will automatically refresh the Identity. Setting this to False will cancel any
@@ -203,7 +203,8 @@ class UID2Manager internal constructor(
             delay(REFRESH_TOKEN_FAILURE_RETRY_MS)
             attempt < REFRESH_TOKEN_MAX_RETRY
         }.single().let {
-                result -> validateAndSetIdentity(result.identity, result.status)
+                result ->
+            validateAndSetIdentity(result.identity, result.status)
         }
     }
 
@@ -311,7 +312,7 @@ class UID2Manager internal constructor(
     private fun validateAndSetIdentity(
         identity: UID2Identity?,
         status: IdentityStatus?,
-        updateStorage: Boolean = true
+        updateStorage: Boolean = true,
     ) {
         // Process Opt Out.
         if (status == OPT_OUT) {
@@ -449,12 +450,12 @@ class UID2Manager internal constructor(
             return instance ?: UID2Manager(
                 UID2Client(
                     api,
-                    networkSession
+                    networkSession,
                 ),
                 storage,
                 TimeUtils(),
                 Dispatchers.Default,
-                true
+                true,
             ).apply {
                 instance = this
             }
@@ -464,7 +465,7 @@ class UID2Manager internal constructor(
          * Helper function that translates a given Identity and IdentityStatus into it's Manager State.
          */
         internal fun getManagerState(identity: UID2Identity?, status: IdentityStatus): UID2ManagerState {
-            val converted = when(status) {
+            val converted = when (status) {
                 ESTABLISHED -> identity?.let { return Established(it) }
                 REFRESHED -> identity?.let { return Refreshed(it) }
                 NO_IDENTITY -> NoIdentity

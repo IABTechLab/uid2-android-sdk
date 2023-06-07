@@ -1,6 +1,5 @@
 package com.uid2.extensions
 
-import java.util.Base64
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -8,6 +7,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import java.util.Base64
 
 @RunWith(MockitoJUnitRunner::class)
 class StringExTest {

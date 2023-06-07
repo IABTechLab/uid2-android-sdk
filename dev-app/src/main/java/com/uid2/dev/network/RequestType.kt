@@ -7,5 +7,5 @@ enum class RequestType(val parameter: String) {
     EMAIL("email"),
     EMAIL_HASH("email_hash"),
     PHONE("phone"),
-    PHONE_HASH("phone_hash")
+    PHONE_HASH("phone_hash"),
 }

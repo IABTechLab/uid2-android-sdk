@@ -13,7 +13,7 @@ class DataEnvelopeTest {
         val payload = DataEnvelope.decrypt(
             TestData.REFRESH_TOKEN_ENCRYPTED_OPT_OUT_KEY,
             TestData.REFRESH_TOKEN_OPT_OUT_ENCRYPTED,
-            true
+            true,
         )
 
         // Verify that the payload was actually decoded.
@@ -30,7 +30,7 @@ class DataEnvelopeTest {
         val payload = DataEnvelope.decrypt(
             TestData.REFRESH_TOKEN_ENCRYPTED_SUCCESS_KEY,
             TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED,
-            true
+            true,
         )
 
         // Verify that the payload was actually decoded.
@@ -47,7 +47,7 @@ class DataEnvelopeTest {
         val payload = DataEnvelope.decrypt(
             "This is not a key",
             TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED,
-            true
+            true,
         )
 
         // Verify that when attempting to decrypt valid data with an incorrect key, we are returned the expected null.
@@ -59,7 +59,7 @@ class DataEnvelopeTest {
         val payload = DataEnvelope.decrypt(
             TestData.REFRESH_TOKEN_ENCRYPTED_SUCCESS_KEY,
             "This is not valid",
-            true
+            true,
         )
 
         // Verify that when attempting to decrypt invalid data with a valid key, we are returned the expected null.

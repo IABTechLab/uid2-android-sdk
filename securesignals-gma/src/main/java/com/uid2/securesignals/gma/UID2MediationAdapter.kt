@@ -37,7 +37,7 @@ class UID2MediationAdapter : RtbAdapter() {
     override fun initialize(
         context: Context,
         initializationCompleteCallback: InitializationCompleteCallback,
-        mediationConfigurations: MutableList<MediationConfiguration>
+        mediationConfigurations: MutableList<MediationConfiguration>,
     ) {
         // It's possible that the UID2Manager is already initialised. If so, it's a no-op.
         if (!UID2Manager.isInitialized()) {
@@ -63,7 +63,8 @@ class UID2MediationAdapter : RtbAdapter() {
                     AdError(
                         manager.currentIdentityStatus.value,
                         "No Advertising Token",
-                        "UID2")
+                        "UID2",
+                    ),
                 )
             }
         }

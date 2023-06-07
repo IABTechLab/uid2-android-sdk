@@ -33,7 +33,7 @@ object DataEnvelope {
      *
      * This relies on the format of the data matching that spec-ed in the API documentation. We assume that it's AES
      * encrypted, and includes the IV in the first 12 bytes of the buffer.
-     * 
+     *
      * @param key The key, in Base64 format, required to decode the given data.
      * @param data The data, in Base64 format, that needs to be decoded.
      * @return The unencrypted data. If this decryption fails, null is returned.
@@ -47,7 +47,7 @@ object DataEnvelope {
         if (!isRefresh) {
             payload = payload.copyOfRange(
                 PAYLOAD_TIMESTAMP_LENGTH_BYTES + PAYLOAD_NONCE_LENGTH_BYTES,
-                payload.size
+                payload.size,
             )
         }
 

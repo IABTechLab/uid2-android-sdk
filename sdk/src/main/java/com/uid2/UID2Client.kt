@@ -6,13 +6,13 @@ import com.uid2.network.NetworkRequestType
 import com.uid2.network.NetworkSession
 import com.uid2.network.RefreshPackage
 import com.uid2.network.RefreshResponse
-import java.net.HttpURLConnection
-import java.net.URI
-import java.net.URL
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URI
+import java.net.URL
 
 /**
  * This class is responsible for refreshing the identity, using a provided refresh token. The payload response will be
@@ -21,15 +21,16 @@ import org.json.JSONObject
 internal class UID2Client(
     private val apiUrl: String,
     private val session: NetworkSession,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     // The refresh endpoint is built from the given API root, along with our known refresh path appended. If the
     // consumer has incorrectly configured the SDK, it's possible this could be null.
     private val apiRefreshUrl: URL? by lazy {
         runCatching {
-            URL(URI(apiUrl)
-                .resolve(API_REFRESH_PATH)
-                .toString()
+            URL(
+                URI(apiUrl)
+                    .resolve(API_REFRESH_PATH)
+                    .toString(),
             )
         }.getOrNull()
     }
@@ -41,13 +42,12 @@ internal class UID2Client(
         InvalidApiUrlException::class,
         RefreshTokenException::class,
         PayloadDecryptException::class,
-        InvalidPayloadException::class
+        InvalidPayloadException::class,
     )
     suspend fun refreshIdentity(
         refreshToken: String,
         refreshResponseKey: String,
     ): RefreshPackage = withContext(ioDispatcher) {
-
         // Check to make sure we have a valid endpoint to hit.
         val url = apiRefreshUrl ?: throw InvalidApiUrlException()
 
@@ -56,9 +56,9 @@ internal class UID2Client(
             NetworkRequestType.POST,
             mapOf(
                 "X-UID2-Client-Version" to clientVersion,
-                "Content-Type" to "application/x-www-form-urlencoded"
+                "Content-Type" to "application/x-www-form-urlencoded",
             ),
-            refreshToken
+            refreshToken,
         )
 
         // Attempt to make the request via the provided NetworkSession.

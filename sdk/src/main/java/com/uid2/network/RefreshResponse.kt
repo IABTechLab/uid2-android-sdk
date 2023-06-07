@@ -17,7 +17,7 @@ import org.json.JSONObject
 internal data class RefreshResponse(
     val body: UID2Identity?,
     val status: Status,
-    val message: String?
+    val message: String?,
 ) {
     /**
      * The different possible status values when refreshing.
@@ -28,7 +28,8 @@ internal data class RefreshResponse(
         EXPIRED_TOKEN("expired_token"),
         CLIENT_ERROR("client_error"),
         INVALID_TOKEN("invalid_token"),
-        UNAUTHORIZED("unauthorized");
+        UNAUTHORIZED("unauthorized"),
+        ;
 
         companion object {
             fun forStatus(status: String) = Status.values().first { it.text == status }
@@ -66,7 +67,7 @@ internal data class RefreshResponse(
             return RefreshResponse(
                 body,
                 status,
-                message
+                message,
             )
         }
     }

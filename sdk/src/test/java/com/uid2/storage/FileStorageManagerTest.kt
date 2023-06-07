@@ -3,7 +3,6 @@ package com.uid2.storage
 import com.uid2.data.IdentityStatus.ESTABLISHED
 import com.uid2.data.IdentityStatus.NO_IDENTITY
 import com.uid2.data.UID2Identity
-import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
@@ -16,6 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import java.io.File
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -42,7 +42,7 @@ class FileStorageManagerTest {
             12345L,
             3333L,
             4321L,
-            "refresh response key"
+            "refresh response key",
         )
 
         val storageManager = FileStorageManager(identityFile, testDispatcher)
@@ -62,7 +62,7 @@ class FileStorageManagerTest {
             12345L,
             3333L,
             4321L,
-            "refresh response key"
+            "refresh response key",
         )
 
         val storageManager = FileStorageManager(identityFile, testDispatcher)

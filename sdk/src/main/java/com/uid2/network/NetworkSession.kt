@@ -15,7 +15,7 @@ enum class NetworkRequestType {
     /**
      * A HTTP POST request (which should then include data within the body).
      */
-    POST
+    POST,
 }
 
 /**
@@ -29,7 +29,7 @@ enum class NetworkRequestType {
 data class NetworkRequest(
     val type: NetworkRequestType,
     val headers: Map<String, String> = mapOf(),
-    val data: String? = null
+    val data: String? = null,
 )
 
 /**
@@ -40,7 +40,7 @@ data class NetworkRequest(
  */
 data class NetworkResponse(
     val code: Int,
-    val data: String = ""
+    val data: String = "",
 )
 
 /**

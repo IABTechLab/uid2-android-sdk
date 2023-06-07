@@ -4,21 +4,21 @@ import android.content.Context
 import com.uid2.data.IdentityStatus
 import com.uid2.data.IdentityStatus.NO_IDENTITY
 import com.uid2.data.UID2Identity
-import java.io.File
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.File
 
 /**
  * An implementation of the StorageManager that persists UID2Identity instances in clear-text via a File.
  */
 internal class FileStorageManager(
     private val identityFile: File,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-): StorageManager {
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+) : StorageManager {
 
-    constructor(context: Context): this(File(context.filesDir, FILE_IDENTITY))
+    constructor(context: Context) : this(File(context.filesDir, FILE_IDENTITY))
 
     override suspend fun saveIdentity(identity: UID2Identity, status: IdentityStatus) = withContext(ioDispatcher) {
         runCatching {
@@ -39,7 +39,7 @@ internal class FileStorageManager(
             val identityJson = JSONObject(identityFile.readText(charset))
             return@runCatching Pair(
                 UID2Identity.fromJson(identityJson),
-                IdentityStatus.fromValue(identityJson.getInt(KEY_STATUS))
+                IdentityStatus.fromValue(identityJson.getInt(KEY_STATUS)),
             )
         }.getOrDefault(Pair(null, NO_IDENTITY))
     }

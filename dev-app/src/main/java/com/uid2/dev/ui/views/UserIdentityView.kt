@@ -35,7 +35,10 @@ fun UserIdentityView(modifier: Modifier, identity: UID2Identity?, status: Identi
         identity?.let {
             UserIdentityParameter(stringResource(R.string.identity_advertising_token), identity.advertisingToken)
             UserIdentityParameter(stringResource(R.string.identity_refresh_token), identity.refreshToken)
-            UserIdentityParameter(stringResource(R.string.identity_identity_expires), identity.identityExpires.toString())
+            UserIdentityParameter(
+                stringResource(R.string.identity_identity_expires),
+                identity.identityExpires.toString(),
+            )
             UserIdentityParameter(stringResource(R.string.identity_refresh_from), identity.refreshFrom.toString())
             UserIdentityParameter(stringResource(R.string.identity_refresh_expires), identity.refreshExpires.toString())
             UserIdentityParameter(stringResource(R.string.identity_refresh_response_key), identity.refreshResponseKey)
@@ -55,15 +58,17 @@ private fun UserIdentityParameter(title: String, subtitle: String) {
 }
 
 @Composable
-private fun IdentityStatus.toUserString() : String {
-    return stringResource(when (this) {
-        ESTABLISHED -> R.string.status_established
-        REFRESHED -> R.string.status_refreshed
-        NO_IDENTITY -> R.string.status_no_identity
-        EXPIRED -> R.string.status_expired
-        INVALID -> R.string.status_invalid
-        REFRESH_EXPIRED -> R.string.status_refresh_expired
-        OPT_OUT -> R.string.status_opt_out
-        else -> R.string.status_invalid
-    })
+private fun IdentityStatus.toUserString(): String {
+    return stringResource(
+        when (this) {
+            ESTABLISHED -> R.string.status_established
+            REFRESHED -> R.string.status_refreshed
+            NO_IDENTITY -> R.string.status_no_identity
+            EXPIRED -> R.string.status_expired
+            INVALID -> R.string.status_invalid
+            REFRESH_EXPIRED -> R.string.status_refresh_expired
+            OPT_OUT -> R.string.status_opt_out
+            else -> R.string.status_invalid
+        },
+    )
 }

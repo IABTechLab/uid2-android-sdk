@@ -11,12 +11,12 @@ import com.uid2.UID2Manager
 /**
  * A custom exception type that is used to report failures from the UID2SecureSignalsAdapter when an error has occurred.
  */
-class UID2SecureSignalsException(message: String? = null, cause: Throwable? = null): Exception(message, cause)
+class UID2SecureSignalsException(message: String? = null, cause: Throwable? = null) : Exception(message, cause)
 
 /**
  * An implementation of Google's IMA SecureSignalsAdapter that integrates UID2 tokens, accessed via the UID2Manager.
  */
-class UID2SecureSignalsAdapter: SecureSignalsAdapter {
+class UID2SecureSignalsAdapter : SecureSignalsAdapter {
 
     /**
      * Gets the version of the UID2 SDK.
@@ -58,7 +58,8 @@ class UID2SecureSignalsAdapter: SecureSignalsAdapter {
                 // required to report these as "failures".
                 callback.onFailure(
                     UID2SecureSignalsException(
-                        "No Advertising Token available (Status: ${manager.currentIdentityStatus.value})")
+                        "No Advertising Token available (Status: ${manager.currentIdentityStatus.value})",
+                    ),
                 )
             }
         }

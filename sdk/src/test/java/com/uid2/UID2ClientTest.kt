@@ -32,7 +32,7 @@ class UID2ClientTest {
     fun `test invalid api url`() {
         val client = UID2Client(
             "this is not a url",
-            networkSession
+            networkSession,
         )
 
         // Verify that when we have configured the client with an invalid URL, that it throws the appropriate exception
@@ -42,12 +42,11 @@ class UID2ClientTest {
         }
     }
 
-
     @Test
     fun `test network failure`() {
         val client = UID2Client(
             url,
-            networkSession
+            networkSession,
         )
 
         // Configure the network session to report a failure.
@@ -63,11 +62,11 @@ class UID2ClientTest {
     fun `test invalid data failure`() {
         val client = UID2Client(
             url,
-            networkSession
+            networkSession,
         )
 
         whenever(networkSession.loadData(any(), any())).thenReturn(
-            NetworkResponse(200, "This is not encrypted")
+            NetworkResponse(200, "This is not encrypted"),
         )
 
         // Verify that when an unexpected response is returned, the appropriate exception is thrown.
@@ -80,11 +79,11 @@ class UID2ClientTest {
     fun `test invalid data key`() {
         val client = UID2Client(
             url,
-            networkSession
+            networkSession,
         )
 
         whenever(networkSession.loadData(any(), any())).thenReturn(
-            NetworkResponse(200, TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED)
+            NetworkResponse(200, TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED),
         )
 
         // Verify that when an unexpected response is returned, the appropriate exception is thrown.
@@ -97,12 +96,12 @@ class UID2ClientTest {
     fun `test successful refresh`() = runBlocking {
         val client = UID2Client(
             url,
-            networkSession
+            networkSession,
         )
 
         // Configure the network session to return a valid (encrypted) payload.
         whenever(networkSession.loadData(any(), any())).thenReturn(
-            NetworkResponse(200, TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED)
+            NetworkResponse(200, TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED),
         )
 
         // Verify that the payload was successfully decrypted, and parsed.
@@ -120,12 +119,12 @@ class UID2ClientTest {
     fun `test successful optout`() = runBlocking {
         val client = UID2Client(
             url,
-            networkSession
+            networkSession,
         )
 
         // Configure the network session to return a valid (encrypted) payload.
         whenever(networkSession.loadData(any(), any())).thenReturn(
-            NetworkResponse(200, TestData.REFRESH_TOKEN_OPT_OUT_ENCRYPTED)
+            NetworkResponse(200, TestData.REFRESH_TOKEN_OPT_OUT_ENCRYPTED),
         )
 
         // Verify that the payload was successfully decrypted, and parsed.
@@ -138,7 +137,7 @@ class UID2ClientTest {
     fun `test version info`() = runBlocking {
         val client = UID2Client(
             url,
-            networkSession
+            networkSession,
         )
 
         // Configure the network session to return a valid (encrypted) payload and allows us to capture the given

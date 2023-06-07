@@ -12,7 +12,7 @@ class UID2IdentityTest {
         // Verify that completely invalid json is handled correctly.
         listOf(
             JSONObject(),
-            JSONObject(mapOf("key" to "value"))
+            JSONObject(mapOf("key" to "value")),
         ).forEach {
             val identity = UID2Identity.fromJson(it)
             assertNull(identity)
@@ -25,7 +25,7 @@ class UID2IdentityTest {
             "identity_expires",
             "refresh_expires",
             "refresh_from",
-            "refresh_response_key"
+            "refresh_response_key",
         ).forEach {
             val json = JSONObject(TestData.VALID_IDENTITY)
             json.remove(it)
