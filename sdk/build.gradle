@@ -1,5 +1,3 @@
-import com.vanniktech.maven.publish.SonatypeHost
-
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
@@ -39,41 +37,4 @@ dependencies {
     testImplementation 'org.json:json:20180813'
 
     dokkaPlugin 'org.jetbrains.dokka:android-documentation-plugin:1.8.10'
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Dokka Configuration
-
-dokkaHtml {
-    outputDirectory.set(file("build/documentation/html"))
-}
-
-dokkaJavadoc {
-    outputDirectory.set(file("build/documentation/javadoc"))
-}
-
-// Task to generate a Jar file from the HTML documentation.
-tasks.register('dokkaHtmlJar', Jar.class) {
-    dependsOn(dokkaHtml)
-    from(dokkaHtml)
-    archiveClassifier.set("html-docs")
-}
-
-// Task to generate a Jar file from the Javadoc documentation.
-tasks.register('dokkaJavadocJar', Jar.class) {
-    dependsOn(dokkaJavadoc)
-    from(dokkaJavadoc)
-    archiveClassifier.set("javadoc")
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Maven Publishing
-
-apply from:  rootProject.file("$rootDir/pom.gradle")
-
-mavenPublishing {
-    publishToMavenCentral(SonatypeHost.S01, true)
-    signAllPublications()
-
-    coordinates(project.group, "uid2-android-sdk", project.version)
 }
