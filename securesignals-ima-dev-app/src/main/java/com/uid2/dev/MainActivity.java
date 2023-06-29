@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Porting of Google's BasicExample
@@ -46,10 +47,13 @@ public class MainActivity extends AppCompatActivity {
      * IMA sample tag for a single skippable inline video ad. See more IMA sample tags at
      * <a href="https://developers.google.com/interactive-media-ads/docs/sdks/html5/client-side/tags">Client Side Tags</a>
      */
+    //https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/extrernal/adx-test-tag&tfcd=0&npa=0&sz=640x480&gdfp_req=1&output=vast&unviewed_position_start=1&env=vp&impl=s&correlator=
     private static final String SAMPLE_VAST_TAG_URL =
-        "https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/"
-            + "single_preroll_skippable&sz=640x480&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast"
-            + "&unviewed_position_start=1&env=vp&impl=s&correlator=";
+//        "https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/"
+//            + "single_preroll_skippable&sz=640x480&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast"
+//            + "&unviewed_position_start=1&env=vp&impl=s&correlator=";
+    // specified by Greg Schoppe
+    "https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/extrernal/adx-test-tag&tfcd=0&npa=0&sz=640x480&gdfp_req=1&output=vast&unviewed_position_start=1&env=vp&impl=s&correlator=";
 
     // Factory class for creating SDK objects.
     private ImaSdkFactory sdkFactory;
@@ -220,12 +224,39 @@ public class MainActivity extends AppCompatActivity {
             long refreshFrom = now * 60 * 40;
             long refreshExpires = now * 60 * 80;
 
-            UID2Identity identity = new UID2Identity(fromJsonIdentity.getAdvertisingToken(),
-                fromJsonIdentity.getRefreshToken(),
-                identityExpires,
-                refreshFrom,
-                refreshExpires,
-                fromJsonIdentity.getRefreshResponseKey());
+// old code
+//            UID2Identity identity = new UID2Identity(fromJsonIdentity.getAdvertisingToken(),
+//                fromJsonIdentity.getRefreshToken(),
+//                identityExpires,
+//                refreshFrom,
+//                refreshExpires,
+//                fromJsonIdentity.getRefreshResponseKey());
+
+            long baseTime = System.currentTimeMillis();
+            UID2Identity identity = new UID2Identity(
+                "NewAdvertisingTokenIjb6u6KcMAtd0/4ZIAYkXvFrMdlZVqfb9LNf99B+1ysE/lBzYVt64pxYxjobJMGbh5q/HsKY7KC0Xo5Rb/Vo8HC4dYOoWXyuGUaL7Jmbw4bzh+3pgokelUGyTX19DfArTeIg7n+8cxWQ=",
+                "NewRefreshTokenAAAF2c8H5dF8AAAF2c8H5dF8AAAADX393Vw94afoVLL6A+qjdSUEisEKx6t42fLgN+2dmTgUavagz0Q6Kp7ghM989hKhZDyAGjHyuAAwm+CX1cO7DWEtMeNUA9vkWDjcIc8yeDZ+jmBtEaw07x/cxoul6fpv2PQ==",
+                baseTime + TimeUnit.HOURS.toMillis(3),
+                baseTime + TimeUnit.HOURS.toMillis(1),
+                baseTime + TimeUnit.HOURS.toMillis(2),
+                "refreshResponseKey"
+            );
+
+// What was used in successful GMA testing previously
+//            // Workaround for bug fixed in 0.2.0:
+//            // https://github.com/IABTechLab/uid2-android-sdk/commit/b8200c58653237f6322de269d0597f9d29569471
+//            new Handler().postDelayed(() -> {
+//                // Set a hard coded identity via the Manager.
+//                long baseTime = System.currentTimeMillis();
+//                UID2Manager.getInstance().setIdentity(new UID2Identity(
+//                    "NewAdvertisingTokenIjb6u6KcMAtd0/4ZIAYkXvFrMdlZVqfb9LNf99B+1ysE/lBzYVt64pxYxjobJMGbh5q/HsKY7KC0Xo5Rb/Vo8HC4dYOoWXyuGUaL7Jmbw4bzh+3pgokelUGyTX19DfArTeIg7n+8cxWQ=",
+//                    "NewRefreshTokenAAAF2c8H5dF8AAAF2c8H5dF8AAAADX393Vw94afoVLL6A+qjdSUEisEKx6t42fLgN+2dmTgUavagz0Q6Kp7ghM989hKhZDyAGjHyuAAwm+CX1cO7DWEtMeNUA9vkWDjcIc8yeDZ+jmBtEaw07x/cxoul6fpv2PQ==",
+//                    baseTime + TimeUnit.HOURS.toMillis(3),
+//                    baseTime + TimeUnit.HOURS.toMillis(1),
+//                    baseTime + TimeUnit.HOURS.toMillis(2),
+//                    "refreshResponseKey"
+//                ));
+//            }, TimeUnit.SECONDS.toMillis(3));
 
             UID2Manager.getInstance().setIdentity(identity);
         } catch (Exception e) {
