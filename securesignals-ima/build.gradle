@@ -22,8 +22,10 @@ android {
 
 dependencies {
     implementation project(path: ':sdk')
-    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.30.1'
+    //noinspection GradleDependency stick with 3.29.0 as Google marked 3.30.1 and 3.30.0 deprecated with problems
+    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.30.1'
+    //noinspection GradleDependency stick with 3.29.0 as Google marked 3.30.1 and 3.30.0 deprecated with problems
+    testImplementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.29.0'
 }

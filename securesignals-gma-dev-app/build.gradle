@@ -30,7 +30,7 @@ android {
 
 dependencies {
     implementation project(path: ':securesignals-gma')
-    compileOnly 'com.uid2:uid2-android-sdk:0.1.0'
+    compileOnly 'com.uid2:uid2-android-sdk:0.3.0'
     compileOnly 'com.google.android.gms:play-services-ads:22.0.0'
 
     implementation 'androidx.multidex:multidex:2.0.1'
