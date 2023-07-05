@@ -213,6 +213,66 @@ class UID2ManagerTest {
     }
 
     @Test
+    fun `refresh retries until expired`() = runTest(testDispatcher) {
+        // Configure the client to always report an error, e.g. the network isn't accessible.
+        var refreshCount = 0
+        whenever(
+            client.refreshIdentity(initialIdentity.refreshToken, initialIdentity.refreshResponseKey),
+        ).thenAnswer {
+            refreshCount++
+            throw IOException()
+        }
+
+        // Ask the manager to refresh, allowing the current TestDispatcher to process some jobs.
+        manager.refreshIdentity()
+        testDispatcher.scheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(10))
+
+        // Since we should retry every 5 seconds (initially), we expect two attempts to refresh.
+        assertEquals(2, refreshCount)
+
+        // Now report that the identity has expired, and therefore not able to refresh any more. Allow the current
+        // TestDispatcher to process all/any remaining jobs.
+        whenever(timeUtils.hasExpired(anyLong())).thenReturn(true)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Verify no more refresh attempts occurred.
+        assertEquals(2, refreshCount)
+    }
+
+    @Test
+    fun `refresh retries slow down`() = runTest(testDispatcher) {
+        try {
+            // Configure the client to always report an error, e.g. the network isn't accessible.
+            var refreshCount = 0
+            whenever(
+                client.refreshIdentity(initialIdentity.refreshToken, initialIdentity.refreshResponseKey),
+            ).thenAnswer {
+                refreshCount++
+                throw IOException()
+            }
+
+            // Ask the manager to refresh, allowing the current TestDispatcher to process some jobs.
+            manager.refreshIdentity()
+            testDispatcher.scheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(30))
+
+            // Since we should retry every 5 seconds (initially), we expect two attempts to refresh.
+            assertEquals(6, refreshCount)
+
+            testDispatcher.scheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(30))
+            assertEquals(6, refreshCount)
+
+            testDispatcher.scheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(30))
+            assertEquals(7, refreshCount)
+
+            testDispatcher.scheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(60))
+            assertEquals(8, refreshCount)
+        } finally {
+            // Make sure we expire the identity, so that any automatic refresh stops.
+            whenever(timeUtils.hasExpired(anyLong())).thenReturn(true)
+        }
+    }
+
+    @Test
     fun `automatically refreshes when enabled`() = runTest(testDispatcher) {
         // Configure the storage to not have access to a previously persisted Identity.
         whenever(storageManager.loadIdentity()).thenReturn(Pair(null, NO_IDENTITY))
