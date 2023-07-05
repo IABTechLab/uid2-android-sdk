@@ -199,12 +199,26 @@ class UID2Manager internal constructor(
     }
 
     private fun refreshIdentityInternal(identity: UID2Identity) = scope.launch {
-        refreshToken(identity).retryWhen { _, attempt ->
-            delay(REFRESH_TOKEN_FAILURE_RETRY_MS)
-            attempt < REFRESH_TOKEN_MAX_RETRY
-        }.single().let {
-                result ->
-            validateAndSetIdentity(result.identity, result.status)
+        try {
+            refreshToken(identity).retryWhen { _, attempt ->
+                // The delay between retry attempts is based upon how many attempts we have previously had. After a
+                // number of sequential failures, we will increase the delay.
+                val delayMs = if (attempt < REFRESH_TOKEN_FAILURE_RETRY_THRESHOLD) {
+                    REFRESH_TOKEN_FAILURE_RETRY_SHORT_MS
+                } else {
+                    REFRESH_TOKEN_FAILURE_RETRY_LONG_MS
+                }
+
+                delay(delayMs)
+
+                // Keep trying to automatically refresh the identity, while it's considered valid.
+                getIdentityPackage(identity, false).valid
+            }.single().let {
+                    result ->
+                validateAndSetIdentity(result.identity, result.status)
+            }
+        } catch (_: UID2Exception) {
+            // This will happen after we decide to no longer try to update the identity, e.g. it's no longer valid.
         }
     }
 
@@ -388,11 +402,11 @@ class UID2Manager internal constructor(
         private const val PACKAGE_IDENTITY_ESTABLISHED = "Identity established"
         private const val PACKAGE_IDENTITY_REFRESHED = "Identity refreshed"
 
-        // The number of milliseconds to wait before retrying after failing to refresh a token.
-        private const val REFRESH_TOKEN_FAILURE_RETRY_MS = 5000L
-
-        // We will only allow an automatic retry of a refresh 5 times before giving up.
-        private const val REFRESH_TOKEN_MAX_RETRY = 5
+        // The number of milliseconds to wait before retrying after failing to refresh a token is dependent on the
+        // number of consecutive failures we've had. After a threshold, we will increase the time.
+        private const val REFRESH_TOKEN_FAILURE_RETRY_THRESHOLD = 5
+        private const val REFRESH_TOKEN_FAILURE_RETRY_SHORT_MS = 5000L
+        private const val REFRESH_TOKEN_FAILURE_RETRY_LONG_MS = 60000L // 1 minute
 
         // The additional time we will allow to pass before checking the expiration of the Identity.
         private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
