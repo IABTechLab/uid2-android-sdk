@@ -26,6 +26,10 @@ android {
             }
         }
     }
+
+    kotlin {
+        explicitApi()
+    }
 }
 
 dependencies {
