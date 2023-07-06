@@ -24,12 +24,12 @@ android {
     }
 
     lint {
-        baseline = file("lint-baseline.xml")
-
         abortOnError true
-        checkDependencies true
-        checkReleaseBuilds false
         warningsAsErrors true
+
+        disable 'GradleDependency' // Updated dependencies should not fail the build
+        disable 'DataExtractionRules' // We don't want the dev apps to use backup
+        disable 'IconMissingDensityFolder' // Using scaled down launcher icon is fine for dev-apps
     }
 }
 
