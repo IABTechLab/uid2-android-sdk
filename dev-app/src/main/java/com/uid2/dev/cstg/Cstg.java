@@ -41,7 +41,7 @@ public class Cstg {
     private static final int PUBLIC_KEY_PREFIX_LENGTH = 9;
     private static final int AUTHENTICATION_TAG_LENGTH_BITS = 128;
     private static final int IV_BYTES = 12;
-    public static final String CSTG_REQUEST = "{\"email\":[\"user@example.com\",\"user2@example.com\"]}";
+    public static final String CSTG_REQUEST = "{\"email_hash\":\"eVvLS/Vg+YZ6+z3i0NOpSXYyQAfEXqCZ7BTpAjFUBUc=\"}";
 
     public static String getV2ClientSideTokenGenerateEnvelope()  throws Exception {
 

@@ -102,8 +102,6 @@ class MainScreenViewModel(
 //                    manager.currentIdentity?.let { _viewState.emit(LoadingState) }
                     viewModelScope.launch {
                         val cstgEnvelopeStr = getV2ClientSideTokenGenerateEnvelope()
-//                        val objectMapper = ObjectMapper()
-//                        val requestBody = objectMapper.writeValueAsString(cstgEnvelopeStr)
                         manager.cstg(cstgEnvelopeStr)
                     }
                 }
