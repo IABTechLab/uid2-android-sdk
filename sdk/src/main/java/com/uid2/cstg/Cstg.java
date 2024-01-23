@@ -1,4 +1,4 @@
-package com.uid2.dev.cstg;
+package com.uid2.cstg;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonArray;
@@ -38,9 +38,9 @@ public class Cstg {
     public static final String CLIENT_SIDE_TOKEN_GENERATE_SUBSCRIPTION_ID = "4WvryDGbR5";
     public static final String BASE_URL = "http://localhost:8080/";
     public static final String APP_NAME = "" ;
-    private static final int PUBLIC_KEY_PREFIX_LENGTH = 9;
-    private static final int AUTHENTICATION_TAG_LENGTH_BITS = 128;
-    private static final int IV_BYTES = 12;
+    public static final int PUBLIC_KEY_PREFIX_LENGTH = 9;
+    public static final int AUTHENTICATION_TAG_LENGTH_BITS = 128;
+    public static final int IV_BYTES = 12;
     public static final String CSTG_REQUEST = "{\"email_hash\":\"eVvLS/Vg+YZ6+z3i0NOpSXYyQAfEXqCZ7BTpAjFUBUc=\"}";
 
     public static String getV2ClientSideTokenGenerateEnvelope()  throws Exception {
@@ -66,16 +66,16 @@ public class Cstg {
     }
 
 
-    private static JsonNode v2DecryptResponseWithoutNonce(String response, byte[] key) throws Exception {
+    public static JsonNode v2DecryptResponseWithoutNonce(String response, byte[] key) throws Exception {
         Method decryptMethod = PublisherUid2Helper.class.getDeclaredMethod("decrypt", String.class, byte[].class, boolean.class, byte[].class);
         decryptMethod.setAccessible(true);
         String decryptedResponse = (String) decryptMethod.invoke(PublisherUid2Helper.class, response, key, true, null);
         return Mapper.OBJECT_MAPPER.readTree(decryptedResponse);
     }
 
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    public static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-    private static JsonObject createCstgEnvelope(String request, String subscriptionId, PublicKey clientPublicKey, SecretKey sharedSecret) {
+    public static JsonObject createCstgEnvelope(String request, String subscriptionId, PublicKey clientPublicKey, SecretKey sharedSecret) {
         final long now = Clock.systemUTC().millis();
 
         final byte[] iv = new byte[IV_BYTES];
@@ -100,7 +100,7 @@ public class Cstg {
         return body;
     }
 
-    private static byte[] encryptCSTG(byte[] plaintext, byte[] iv, byte[] aad, SecretKey key) {
+    public static byte[] encryptCSTG(byte[] plaintext, byte[] iv, byte[] aad, SecretKey key) {
         final Cipher cipher;
         try {
             cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -123,7 +123,7 @@ public class Cstg {
         }
     }
 
-    private static SecretKey generateSharedSecret(PublicKey serverPublicKey, KeyPair clientKeypair) {
+    public static SecretKey generateSharedSecret(PublicKey serverPublicKey, KeyPair clientKeypair) {
         try {
             final KeyAgreement ka = KeyAgreement.getInstance("ECDH");
             ka.init(clientKeypair.getPrivate());
@@ -134,7 +134,7 @@ public class Cstg {
         }
     }
 
-    private static KeyPair generateKeyPair() {
+    public static KeyPair generateKeyPair() {
         final KeyPairGenerator keyPairGenerator;
         try {
             keyPairGenerator = KeyPairGenerator.getInstance("EC");
@@ -150,11 +150,11 @@ public class Cstg {
         return keyPairGenerator.genKeyPair();
     }
 
-    private static byte[] base64ToByteArray(String str) {
+    public static byte[] base64ToByteArray(String str) {
         return Base64.getDecoder().decode(str);
     }
 
-    private static String byteArrayToBase64(byte[] b) {
+    public static String byteArrayToBase64(byte[] b) {
         return Base64.getEncoder().encodeToString(b);
     }
 

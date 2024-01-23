@@ -10,7 +10,7 @@ apply from:  rootProject.file("$rootDir/common.gradle")
 android {
     namespace 'com.uid2'
     defaultConfig {
-        minSdk 19
+        minSdk 26
     }
 
     sourceSets {
@@ -39,6 +39,10 @@ dependencies {
     testImplementation 'org.mockito:mockito-inline:4.8.0'
 
     testImplementation 'org.json:json:20180813'
+
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    implementation 'com.uid2:uid2-client:4.2.4-dcf7ac1ce6'
 
     dokkaPlugin 'org.jetbrains.dokka:android-documentation-plugin:1.8.10'
 }

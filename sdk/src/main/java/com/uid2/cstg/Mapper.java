@@ -1,4 +1,4 @@
-package com.uid2.dev.cstg;
+package com.uid2.cstg;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

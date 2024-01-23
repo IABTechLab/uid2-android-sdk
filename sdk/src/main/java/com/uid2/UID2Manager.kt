@@ -414,9 +414,9 @@ class UID2Manager internal constructor(
     }
 
     // TODO should i use = afterInitialized on the function declaration?
-    suspend fun cstg(cstgEnvelope: String) {
+    suspend fun cstg(dii: String) {
         try {
-            client.cstg(cstgEnvelope)
+            client.cstg(dii)
 //            cstgInternal(cstgEnvelope)
 //            emit(RefreshResult(response.identity, response.status))
         } catch (ex: Exception) {

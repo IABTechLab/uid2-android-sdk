@@ -1,5 +1,10 @@
 package com.uid2
 
+import android.util.Log
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.uid2.cstg.Cstg
+import com.uid2.cstg.Cstg.v2DecryptResponseWithoutNonce
 import com.uid2.network.DataEnvelope
 import com.uid2.network.NetworkRequest
 import com.uid2.network.NetworkRequestType
@@ -13,6 +18,9 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
+import java.security.KeyFactory
+import java.security.spec.X509EncodedKeySpec
+
 
 /**
  * This class is responsible for refreshing the identity, using a provided refresh token. The payload response will be
@@ -87,9 +95,24 @@ internal class UID2Client(
         return@withContext refreshResponse?.toRefreshPackage() ?: throw InvalidPayloadException()
     }
 
-    suspend fun cstg(
-        requestBody: String,
-    ) = withContext(ioDispatcher) {
+    suspend fun cstg(dii: String) = withContext(ioDispatcher) {
+
+        val serverPublicKeyBytes =
+            Cstg.base64ToByteArray(Cstg.CLIENT_SIDE_TOKEN_GENERATE_SERVER_PUBLIC_KEY.substring(Cstg.PUBLIC_KEY_PREFIX_LENGTH))
+
+        val serverPublicKey = KeyFactory.getInstance("EC")
+            .generatePublic(X509EncodedKeySpec(serverPublicKeyBytes))
+
+        val keyPair = Cstg.generateKeyPair()
+        val sharedSecret = Cstg.generateSharedSecret(serverPublicKey, keyPair)
+
+        val cstgEnvelope = Cstg.createCstgEnvelope(
+            dii,
+            Cstg.CLIENT_SIDE_TOKEN_GENERATE_SUBSCRIPTION_ID,
+            keyPair.public,
+            sharedSecret
+        )
+
         // Check to make sure we have a valid endpoint to hit.
         val url = apiCstgUrl ?: throw InvalidApiUrlException()
 
@@ -99,7 +122,7 @@ internal class UID2Client(
                 "Origin" to "DemoApp",
 //                "Content-Type" to "application/x-www-form-urlencoded",
             ),
-            requestBody
+            cstgEnvelope.toString()
         )
 
         // Attempt to make the request via the provided NetworkSession.
@@ -107,6 +130,11 @@ internal class UID2Client(
         if (response.code != HttpURLConnection.HTTP_OK) {
             throw RefreshTokenException(response.code)
         }
+
+        val jsonTokenResponse = v2DecryptResponseWithoutNonce(response.data, sharedSecret.encoded)
+
+        prettyPrintJsonString(jsonTokenResponse)?.let { Log.v("CSTG_TAG", it) }
+
 
         // The response should be an encrypted payload. Let's attempt to decrypt it using the key we were provided.
 //        val payload = DataEnvelope.decrypt(refreshResponseKey, response.data, true)
@@ -117,6 +145,17 @@ internal class UID2Client(
 //        return@withContext refreshResponse?.toRefreshPackage() ?: throw InvalidPayloadException()
         return@withContext "Hello"
     }
+
+    fun prettyPrintJsonString(jsonNode: JsonNode): String? {
+        return try {
+            val mapper = ObjectMapper()
+            val json = mapper.readValue(jsonNode.toString(), Any::class.java)
+            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json)
+        } catch (e: Exception) {
+            "Sorry, pretty print didn't work"
+        }
+    }
+
 
     private companion object {
         // The relative path of the API's refresh endpoint
