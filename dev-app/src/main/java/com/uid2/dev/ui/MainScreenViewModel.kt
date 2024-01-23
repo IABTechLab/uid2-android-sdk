@@ -20,6 +20,7 @@ import com.uid2.data.IdentityStatus.OPT_OUT
 import com.uid2.data.IdentityStatus.REFRESHED
 import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
+import com.uid2.dev.cstg.Cstg.v2ClientSideTokenGenerate
 import com.uid2.dev.network.AppUID2Client
 import com.uid2.dev.network.AppUID2ClientException
 import com.uid2.dev.network.RequestType.EMAIL
@@ -35,6 +36,7 @@ sealed interface MainScreenAction : ViewModelAction {
     data class EmailChanged(val address: String) : MainScreenAction
     object ResetButtonPressed : MainScreenAction
     object RefreshButtonPressed : MainScreenAction
+    object CstgButtonPressed : MainScreenAction
 }
 
 sealed interface MainScreenState : ViewState {
@@ -93,6 +95,10 @@ class MainScreenViewModel(
                     manager.currentIdentity?.let { _viewState.emit(LoadingState) }
                     manager.refreshIdentity()
                 }
+                MainScreenAction.CstgButtonPressed -> {
+//                    manager.currentIdentity?.let { _viewState.emit(LoadingState) }
+                    cstg()
+                }
                 MainScreenAction.ResetButtonPressed -> {
                     manager.currentIdentity?.let { _viewState.emit(LoadingState) }
                     manager.resetIdentity()
@@ -100,6 +106,11 @@ class MainScreenViewModel(
             }
         }
     }
+
+    private fun cstg()  {
+        v2ClientSideTokenGenerate()
+    }
+
 
     private companion object {
         const val TAG = "MainScreenViewModel"

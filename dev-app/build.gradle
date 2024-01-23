@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.uid2.devapp"
-        minSdk 21
+        minSdk 26
         versionCode 1
         versionName "1.0"
     }
@@ -53,6 +53,12 @@ dependencies {
     implementation 'androidx.compose.material:material:1.4.0'
 
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    //implementation 'com.fasterxml.jackson.core:2.14.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    implementation 'com.uid2:uid2-client:4.2.4-dcf7ac1ce6'
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"

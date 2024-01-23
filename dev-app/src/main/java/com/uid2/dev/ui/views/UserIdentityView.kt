@@ -43,8 +43,7 @@ fun UserIdentityView(modifier: Modifier, identity: UID2Identity?, status: Identi
             UserIdentityParameter(stringResource(R.string.identity_refresh_expires), identity.refreshExpires.toString())
             UserIdentityParameter(stringResource(R.string.identity_refresh_response_key), identity.refreshResponseKey)
         }
-
-        UserIdentityParameter(stringResource(R.string.identity_status), status.toUserString())
+        UserIdentityParameter(stringResource(R.string.identity_status), "hello world")
     }
 }
 

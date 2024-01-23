@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ActionButtonView(modifier: Modifier, onResetClick: () -> Unit, onRefreshClick: () -> Unit) {
+fun ActionButtonView(modifier: Modifier, onResetClick: () -> Unit, onRefreshClick: () -> Unit, onCstgClick: () -> Unit) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -20,6 +20,10 @@ fun ActionButtonView(modifier: Modifier, onResetClick: () -> Unit, onRefreshClic
 
         Button(onClick = onRefreshClick) {
             Text("Manual Refresh")
+        }
+
+        Button(onClick = onCstgClick) {
+            Text("CSTG")
         }
     }
 }

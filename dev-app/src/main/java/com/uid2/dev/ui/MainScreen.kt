@@ -30,6 +30,7 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                 Modifier,
                 onResetClick = { viewModel.processAction(ResetButtonPressed) },
                 onRefreshClick = { viewModel.processAction(RefreshButtonPressed) },
+                onCstgClick = { viewModel.processAction(MainScreenAction.CstgButtonPressed) },
             )
         },
     ) { padding ->
