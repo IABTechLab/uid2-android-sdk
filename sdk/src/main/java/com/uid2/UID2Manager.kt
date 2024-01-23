@@ -222,6 +222,28 @@ class UID2Manager internal constructor(
         }
     }
 
+    private fun cstgInternal(cstgEnvelope: String) = scope.launch {
+        try {
+            actualCstgCall(cstgEnvelope).single().let {
+                    result ->
+//                validateAndSetIdentity(result.identity, result.status)
+            }
+        } catch (_: UID2Exception) {
+            // This will happen after we decide to no longer try to update the identity, e.g. it's no longer valid.
+        }
+    }
+
+    private suspend fun actualCstgCall(cstgEnvelope: String): Flow<RefreshResult> = flow {
+        try {
+            client.cstg(cstgEnvelope)
+//            emit(RefreshResult(response.identity, response.status))
+        } catch (ex: Exception) {
+            throw UID2Exception("Error refreshing token", ex)
+        }
+    }
+
+
+
     /**
      * Gets the current Advertising Token, if available.
      */
@@ -376,6 +398,7 @@ class UID2Manager internal constructor(
      * The different results from refreshing an identity.
      */
     private data class RefreshResult(val identity: UID2Identity?, val status: IdentityStatus)
+    private data class CstgResult(val result: String)
 
     /**
      * Refreshes the given Identity.
@@ -388,6 +411,17 @@ class UID2Manager internal constructor(
             throw UID2Exception("Error refreshing token", ex)
         }
     }
+
+    // TODO should i use = afterInitialized on the function declaration?
+    fun cstg(cstgEnvelope: String) {
+        try {
+            cstgInternal(cstgEnvelope)
+//            emit(RefreshResult(response.identity, response.status))
+        } catch (ex: Exception) {
+            throw UID2Exception("Error refreshing token", ex)
+        }
+    }
+
 
     companion object {
         // The default API server.

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.uid2.UID2Manager
 import com.uid2.UID2ManagerState.Established
 import com.uid2.UID2ManagerState.Expired
@@ -20,7 +21,7 @@ import com.uid2.data.IdentityStatus.OPT_OUT
 import com.uid2.data.IdentityStatus.REFRESHED
 import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
-import com.uid2.dev.cstg.Cstg.v2ClientSideTokenGenerate
+import com.uid2.dev.cstg.Cstg.getV2ClientSideTokenGenerateEnvelope
 import com.uid2.dev.network.AppUID2Client
 import com.uid2.dev.network.AppUID2ClientException
 import com.uid2.dev.network.RequestType.EMAIL
@@ -31,6 +32,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody
+
 
 sealed interface MainScreenAction : ViewModelAction {
     data class EmailChanged(val address: String) : MainScreenAction
@@ -97,7 +100,11 @@ class MainScreenViewModel(
                 }
                 MainScreenAction.CstgButtonPressed -> {
 //                    manager.currentIdentity?.let { _viewState.emit(LoadingState) }
-                    cstg()
+                    val cstgEnvelopeStr = getV2ClientSideTokenGenerateEnvelope()
+                    val objectMapper = ObjectMapper()
+                    val requestBody = objectMapper.writeValueAsString(cstgEnvelopeStr)
+
+                    manager.cstg(requestBody)
                 }
                 MainScreenAction.ResetButtonPressed -> {
                     manager.currentIdentity?.let { _viewState.emit(LoadingState) }
@@ -106,11 +113,6 @@ class MainScreenViewModel(
             }
         }
     }
-
-    private fun cstg()  {
-        v2ClientSideTokenGenerate()
-    }
-
 
     private companion object {
         const val TAG = "MainScreenViewModel"

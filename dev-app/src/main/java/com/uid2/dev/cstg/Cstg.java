@@ -43,7 +43,7 @@ public class Cstg {
     private static final int IV_BYTES = 12;
     public static final String CSTG_REQUEST = "{\"email\":[\"user@example.com\",\"user2@example.com\"]}";
 
-    public static JsonNode v2ClientSideTokenGenerate()  throws Exception {
+    public static String getV2ClientSideTokenGenerateEnvelope()  throws Exception {
 
         final byte[] serverPublicKeyBytes = base64ToByteArray(CLIENT_SIDE_TOKEN_GENERATE_SERVER_PUBLIC_KEY.substring(PUBLIC_KEY_PREFIX_LENGTH));
 
@@ -55,18 +55,14 @@ public class Cstg {
 
         final JsonObject cstgEnvelope = createCstgEnvelope(CSTG_REQUEST, CLIENT_SIDE_TOKEN_GENERATE_SUBSCRIPTION_ID, keyPair.getPublic(), sharedSecret);
 
-        final Request.Builder requestBuilder = new Request.Builder()
-            .url(BASE_URL + "/v2/token/client-generate")
-            .addHeader("Origin", APP_NAME)
-            .post(RequestBody.create(cstgEnvelope.toString(), HttpClient.JSON));
+        return cstgEnvelope.toString();
 
-
-
-
-
-
-        final String encryptedResponse = HttpClient.execute(requestBuilder.build(), HttpClient.HttpMethod.POST);
-        return v2DecryptResponseWithoutNonce(encryptedResponse, sharedSecret.getEncoded());
+//        final Request.Builder requestBuilder = new Request.Builder()
+//            .url(BASE_URL + "/v2/token/client-generate")
+//            .addHeader("Origin", APP_NAME)
+//            .post(RequestBody.create(cstgEnvelope.toString(), HttpClient.JSON));
+//        final String encryptedResponse = HttpClient.execute(requestBuilder.build(), HttpClient.HttpMethod.POST);
+//        return v2DecryptResponseWithoutNonce(encryptedResponse, sharedSecret.getEncoded());
     }
 
 
