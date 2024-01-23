@@ -100,11 +100,12 @@ class MainScreenViewModel(
                 }
                 MainScreenAction.CstgButtonPressed -> {
 //                    manager.currentIdentity?.let { _viewState.emit(LoadingState) }
-                    val cstgEnvelopeStr = getV2ClientSideTokenGenerateEnvelope()
-                    val objectMapper = ObjectMapper()
-                    val requestBody = objectMapper.writeValueAsString(cstgEnvelopeStr)
-
-                    manager.cstg(requestBody)
+                    viewModelScope.launch {
+                        val cstgEnvelopeStr = getV2ClientSideTokenGenerateEnvelope()
+//                        val objectMapper = ObjectMapper()
+//                        val requestBody = objectMapper.writeValueAsString(cstgEnvelopeStr)
+                        manager.cstg(cstgEnvelopeStr)
+                    }
                 }
                 MainScreenAction.ResetButtonPressed -> {
                     manager.currentIdentity?.let { _viewState.emit(LoadingState) }

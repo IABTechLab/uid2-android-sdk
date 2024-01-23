@@ -224,6 +224,7 @@ class UID2Manager internal constructor(
 
     private fun cstgInternal(cstgEnvelope: String) = scope.launch {
         try {
+
             actualCstgCall(cstgEnvelope).single().let {
                     result ->
 //                validateAndSetIdentity(result.identity, result.status)
@@ -413,9 +414,10 @@ class UID2Manager internal constructor(
     }
 
     // TODO should i use = afterInitialized on the function declaration?
-    fun cstg(cstgEnvelope: String) {
+    suspend fun cstg(cstgEnvelope: String) {
         try {
-            cstgInternal(cstgEnvelope)
+            client.cstg(cstgEnvelope)
+//            cstgInternal(cstgEnvelope)
 //            emit(RefreshResult(response.identity, response.status))
         } catch (ex: Exception) {
             throw UID2Exception("Error refreshing token", ex)
@@ -474,7 +476,8 @@ class UID2Manager internal constructor(
             }
 
             val metadata = context.getMetadata()
-
+            // TODO get package name
+//            val packageName = context.packageName
             this.api = metadata?.getString(UID2_API_URL_KEY, UID2_API_URL_DEFAULT) ?: UID2_API_URL_DEFAULT
             this.networkSession = networkSession
             this.storageManager = StorageManager.getInstance(context)

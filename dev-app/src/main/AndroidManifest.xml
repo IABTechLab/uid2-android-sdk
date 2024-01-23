@@ -11,10 +11,11 @@
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
         <!-- The metadata consumed by the Dev App + SDK -->
-        <meta-data android:name="uid2_api_url" android:value="https://operator-integ.uidapi.com"/>
+        <meta-data android:name="uid2_api_url" android:value="http://localhost:8080"/>
         <meta-data android:name="uid2_api_key" android:value=""/>
         <meta-data android:name="uid2_api_secret" android:value=""/>
 
