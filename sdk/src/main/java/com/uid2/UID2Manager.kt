@@ -222,18 +222,6 @@ class UID2Manager internal constructor(
         }
     }
 
-    private fun cstgInternal(cstgEnvelope: String) = scope.launch {
-        try {
-
-            actualCstgCall(cstgEnvelope).single().let {
-                    result ->
-//                validateAndSetIdentity(result.identity, result.status)
-            }
-        } catch (_: UID2Exception) {
-            // This will happen after we decide to no longer try to update the identity, e.g. it's no longer valid.
-        }
-    }
-
     private suspend fun actualCstgCall(cstgEnvelope: String): Flow<RefreshResult> = flow {
         try {
             client.cstg(cstgEnvelope)
@@ -417,7 +405,6 @@ class UID2Manager internal constructor(
     suspend fun cstg(dii: String) {
         try {
             client.cstg(dii)
-//            cstgInternal(cstgEnvelope)
 //            emit(RefreshResult(response.identity, response.status))
         } catch (ex: Exception) {
             throw UID2Exception("Error refreshing token", ex)
@@ -447,6 +434,7 @@ class UID2Manager internal constructor(
         // The additional time we will allow to pass before checking the expiration of the Identity.
         private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
 
+        private var appName: String = "default"
         private var api: String = UID2_API_URL_DEFAULT
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
@@ -477,7 +465,7 @@ class UID2Manager internal constructor(
 
             val metadata = context.getMetadata()
             // TODO get package name
-//            val packageName = context.packageName
+            this.appName = context.packageName
             this.api = metadata?.getString(UID2_API_URL_KEY, UID2_API_URL_DEFAULT) ?: UID2_API_URL_DEFAULT
             this.networkSession = networkSession
             this.storageManager = StorageManager.getInstance(context)
@@ -502,6 +490,8 @@ class UID2Manager internal constructor(
                 UID2Client(
                     api,
                     networkSession,
+                    Dispatchers.IO,
+                    appName
                 ),
                 storage,
                 TimeUtils(),

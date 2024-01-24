@@ -30,6 +30,7 @@ internal class UID2Client(
     private val apiUrl: String,
     private val session: NetworkSession,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val appName: String = "default",
 ) {
     // The refresh endpoint is built from the given API root, along with our known refresh path appended. If the
     // consumer has incorrectly configured the SDK, it's possible this could be null.
@@ -110,7 +111,8 @@ internal class UID2Client(
             dii,
             Cstg.CLIENT_SIDE_TOKEN_GENERATE_SUBSCRIPTION_ID,
             keyPair.public,
-            sharedSecret
+            sharedSecret,
+            appName
         )
 
         // Check to make sure we have a valid endpoint to hit.
@@ -119,7 +121,8 @@ internal class UID2Client(
         val request = NetworkRequest(
             NetworkRequestType.POST,
             mapOf(
-                "Origin" to "DemoApp",
+//  adding app name into the cstgEnvelope instead, see Cstg.createCstgEnvelope method
+//                "Origin" to "DemoApp",
 //                "Content-Type" to "application/x-www-form-urlencoded",
             ),
             cstgEnvelope.toString()

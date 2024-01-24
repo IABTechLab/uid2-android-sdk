@@ -9,14 +9,12 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.ECGenParameterSpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.time.Clock;
 import java.util.Base64;
 
@@ -29,9 +27,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import okhttp3.Request;
-import okhttp3.RequestBody;
-
 public class Cstg {
 
     public static final String CLIENT_SIDE_TOKEN_GENERATE_SERVER_PUBLIC_KEY = "UID2-X-L-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtXJdTSZAYHvoRDWiehMHoWF1BNPuqLs5w2ZHiAZ1IJc7O4/z0ojPTB0V+KYX/wxQK0hxx6kxCvHj335eI/ZQsQ==";
@@ -43,27 +38,28 @@ public class Cstg {
     public static final int IV_BYTES = 12;
     public static final String CSTG_REQUEST = "{\"email_hash\":\"eVvLS/Vg+YZ6+z3i0NOpSXYyQAfEXqCZ7BTpAjFUBUc=\"}";
 
-    public static String getV2ClientSideTokenGenerateEnvelope()  throws Exception {
-
-        final byte[] serverPublicKeyBytes = base64ToByteArray(CLIENT_SIDE_TOKEN_GENERATE_SERVER_PUBLIC_KEY.substring(PUBLIC_KEY_PREFIX_LENGTH));
-
-        final PublicKey serverPublicKey = KeyFactory.getInstance("EC")
-            .generatePublic(new X509EncodedKeySpec(serverPublicKeyBytes));
-
-        final KeyPair keyPair = generateKeyPair();
-        final SecretKey sharedSecret = generateSharedSecret(serverPublicKey, keyPair);
-
-        final JsonObject cstgEnvelope = createCstgEnvelope(CSTG_REQUEST, CLIENT_SIDE_TOKEN_GENERATE_SUBSCRIPTION_ID, keyPair.getPublic(), sharedSecret);
-
-        return cstgEnvelope.toString();
-
+    // cloned into com.uid2.UID2Client.cstg method
+//    public static String getV2ClientSideTokenGenerateEnvelope()  throws Exception {
+//
+//        final byte[] serverPublicKeyBytes = base64ToByteArray(CLIENT_SIDE_TOKEN_GENERATE_SERVER_PUBLIC_KEY.substring(PUBLIC_KEY_PREFIX_LENGTH));
+//
+//        final PublicKey serverPublicKey = KeyFactory.getInstance("EC")
+//            .generatePublic(new X509EncodedKeySpec(serverPublicKeyBytes));
+//
+//        final KeyPair keyPair = generateKeyPair();
+//        final SecretKey sharedSecret = generateSharedSecret(serverPublicKey, keyPair);
+//
+//        final JsonObject cstgEnvelope = createCstgEnvelope(CSTG_REQUEST, CLIENT_SIDE_TOKEN_GENERATE_SUBSCRIPTION_ID, keyPair.getPublic(), sharedSecret);
+//
+//        return cstgEnvelope.toString();
+//
 //        final Request.Builder requestBuilder = new Request.Builder()
 //            .url(BASE_URL + "/v2/token/client-generate")
 //            .addHeader("Origin", APP_NAME)
 //            .post(RequestBody.create(cstgEnvelope.toString(), HttpClient.JSON));
 //        final String encryptedResponse = HttpClient.execute(requestBuilder.build(), HttpClient.HttpMethod.POST);
 //        return v2DecryptResponseWithoutNonce(encryptedResponse, sharedSecret.getEncoded());
-    }
+//    }
 
 
     public static JsonNode v2DecryptResponseWithoutNonce(String response, byte[] key) throws Exception {
@@ -75,7 +71,7 @@ public class Cstg {
 
     public static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-    public static JsonObject createCstgEnvelope(String request, String subscriptionId, PublicKey clientPublicKey, SecretKey sharedSecret) {
+    public static JsonObject createCstgEnvelope(String request, String subscriptionId, PublicKey clientPublicKey, SecretKey sharedSecret, String appName) {
         final long now = Clock.systemUTC().millis();
 
         final byte[] iv = new byte[IV_BYTES];
@@ -96,6 +92,7 @@ public class Cstg {
         body.addProperty("public_key", byteArrayToBase64(clientPublicKey.getEncoded()));
         body.addProperty("timestamp", now);
         body.addProperty("subscription_id", subscriptionId);
+        body.addProperty("app_name", appName);
 
         return body;
     }

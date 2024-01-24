@@ -20,7 +20,6 @@ import com.uid2.data.IdentityStatus.OPT_OUT
 import com.uid2.data.IdentityStatus.REFRESHED
 import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
-import com.uid2.cstg.Cstg.getV2ClientSideTokenGenerateEnvelope
 import com.uid2.dev.network.AppUID2Client
 import com.uid2.dev.network.AppUID2ClientException
 import com.uid2.dev.network.RequestType.EMAIL
