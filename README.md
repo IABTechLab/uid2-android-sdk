@@ -5,6 +5,16 @@ A framework for integrating [UID2](https://github.com/IABTechLab/uid2docs) into 
 
 [![License: Apache](https://img.shields.io/badge/License-Apache-green.svg)](https://www.apache.org/licenses/)
 
+## Integration Guides
+
+For the latest instructions on how to use the sdk and plugins in this repo, please read the following
+
+| Component        | Guide                                                                                                        |
+|------------------|--------------------------------------------------------------------------------------------------------------|
+| UID2 Android SDK | [UID2 SDK for Android Reference Guide](https://unifiedid.com/docs/sdks/uid2-sdk-ref-android)                 |
+| UID2 Google Mobile Ads (GMA) Plugin | [UID2 GMA Plugin for Android Integration Guide](https://unifiedid.com/docs/guides/mobile-plugin-gma-android) |
+| UID2 Interactive Media Ads (IMA) Plugin | [UID2 IMA Plugin for Android Integration Guide](https://unifiedid.com/docs/guides/mobile-plugin-ima-android) |
+
 ## Repository Structure
 
 ```
