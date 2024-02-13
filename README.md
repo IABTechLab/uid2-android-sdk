@@ -7,7 +7,7 @@ A framework for integrating [UID2](https://github.com/IABTechLab/uid2docs) into 
 
 ## Integration Guides
 
-For the latest instructions on how to use the sdk and plugins in this repo, please read the following
+For the latest instructions on how to use the SDK and plugins in this repository, refer to the following:
 
 | Component        | Guide                                                                                                        |
 |------------------|--------------------------------------------------------------------------------------------------------------|
