@@ -2,6 +2,7 @@ package com.uid2.network
 
 import com.uid2.extensions.decodeBase64
 import javax.crypto.Cipher
+import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
@@ -29,6 +30,18 @@ public object DataEnvelope {
     private const val PAYLOAD_NONCE_LENGTH_BYTES = 8
 
     /**
+     * Encrypts the given data with the provided key.
+     *
+     * @param key The key, as represented by a [SecretKey], required to encrypt the given data.
+     * @param data The data to encrypt.
+     * @param iv The initialization vector.
+     * @param aad Any additional authentication data.
+     */
+    public fun encrypt(key: SecretKey, data: String, iv: ByteArray, aad: ByteArray): ByteArray? {
+        return encryptWithCipher(key, data.toByteArray(), iv, aad)
+    }
+
+    /**
      * Decrypts the given data with the provided key.
      *
      * This relies on the format of the data matching that spec-ed in the API documentation. We assume that it's AES
@@ -39,9 +52,23 @@ public object DataEnvelope {
      * @return The unencrypted data. If this decryption fails, null is returned.
      */
     public fun decrypt(key: String, data: String, isRefresh: Boolean): ByteArray? {
+        return decrypt(key.decodeBase64(), data, isRefresh)
+    }
+
+    /**
+     * Decrypts the given data with the provided key.
+     *
+     * This relies on the format of the data matching that spec-ed in the API documentation. We assume that it's AES
+     * encrypted, and includes the IV in the first 12 bytes of the buffer.
+     *
+     * @param key The key, in bytes, required to decode the given data.
+     * @param data The data, in Base64 format, that needs to be decoded.
+     * @return The unencrypted data. If this decryption fails, null is returned.
+     */
+    public fun decrypt(key: ByteArray?, data: String, isRefresh: Boolean): ByteArray? {
         // Attempt to decrypt the given data with the provided key. Both the key and data are expected to be in Base64
         // format. If this fails, then null will be returned.
-        var payload = decryptWithCipher(key.decodeBase64(), data.decodeBase64()) ?: return null
+        var payload = decryptWithCipher(key, data.decodeBase64()) ?: return null
 
         // If we are not refreshing, we expect the decoded payload to include both Timestamp and Nonce values.
         if (!isRefresh) {
@@ -52,6 +79,18 @@ public object DataEnvelope {
         }
 
         return payload
+    }
+
+    private fun encryptWithCipher(key: SecretKey, data: ByteArray, iv: ByteArray, aad: ByteArray): ByteArray? {
+        val spec = GCMParameterSpec(AUTHENTICATION_TAG_LENGTH_BITS, iv)
+
+        // Initialise the appropriate AES Cipher.
+        val cipher = Cipher.getInstance(ALGORITHM_TRANSFORMATION)?.apply {
+            init(Cipher.ENCRYPT_MODE, key, spec)
+            updateAAD(aad)
+        } ?: return null
+
+        return cipher.doFinal(data)
     }
 
     private fun decryptWithCipher(key: ByteArray?, data: ByteArray?): ByteArray? {

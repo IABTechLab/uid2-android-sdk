@@ -6,6 +6,8 @@ import com.uid2.data.UID2Identity
 import com.uid2.network.NetworkRequest
 import com.uid2.network.NetworkResponse
 import com.uid2.network.NetworkSession
+import com.uid2.utils.KeyUtils
+import com.uid2.utils.TimeUtils
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -23,6 +25,9 @@ import org.mockito.kotlin.whenever
 @RunWith(MockitoJUnitRunner::class)
 class UID2ClientTest {
     private val networkSession: NetworkSession = mock()
+    private val packageName = "com.uid2.devapp"
+    private val keyUtils: KeyUtils = mock()
+    private val timeUtils: TimeUtils = mock()
 
     private val url = "https://test.dev"
     private val refreshToken = "RefreshToken"
@@ -32,7 +37,10 @@ class UID2ClientTest {
     fun `test invalid api url`() {
         val client = UID2Client(
             "this is not a url",
+            null,
+            null,
             networkSession,
+            packageName,
         )
 
         // Verify that when we have configured the client with an invalid URL, that it throws the appropriate exception
@@ -44,10 +52,7 @@ class UID2ClientTest {
 
     @Test
     fun `test network failure`() {
-        val client = UID2Client(
-            url,
-            networkSession,
-        )
+        val client = withClient()
 
         // Configure the network session to report a failure.
         whenever(networkSession.loadData(any(), any())).thenReturn(NetworkResponse(400))
@@ -60,10 +65,7 @@ class UID2ClientTest {
 
     @Test
     fun `test invalid data failure`() {
-        val client = UID2Client(
-            url,
-            networkSession,
-        )
+        val client = withClient()
 
         whenever(networkSession.loadData(any(), any())).thenReturn(
             NetworkResponse(200, "This is not encrypted"),
@@ -77,10 +79,7 @@ class UID2ClientTest {
 
     @Test
     fun `test invalid data key`() {
-        val client = UID2Client(
-            url,
-            networkSession,
-        )
+        val client = withClient()
 
         whenever(networkSession.loadData(any(), any())).thenReturn(
             NetworkResponse(200, TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED),
@@ -94,10 +93,7 @@ class UID2ClientTest {
 
     @Test
     fun `test successful refresh`() = runBlocking {
-        val client = UID2Client(
-            url,
-            networkSession,
-        )
+        val client = withClient()
 
         // Configure the network session to return a valid (encrypted) payload.
         whenever(networkSession.loadData(any(), any())).thenReturn(
@@ -117,10 +113,7 @@ class UID2ClientTest {
 
     @Test
     fun `test successful optout`() = runBlocking {
-        val client = UID2Client(
-            url,
-            networkSession,
-        )
+        val client = withClient()
 
         // Configure the network session to return a valid (encrypted) payload.
         whenever(networkSession.loadData(any(), any())).thenReturn(
@@ -135,10 +128,7 @@ class UID2ClientTest {
 
     @Test
     fun `test version info`() = runBlocking {
-        val client = UID2Client(
-            url,
-            networkSession,
-        )
+        val client = withClient()
 
         // Configure the network session to return a valid (encrypted) payload and allows us to capture the given
         // NetworkRequest.
@@ -156,4 +146,14 @@ class UID2ClientTest {
         assertNotNull(reportedVersion)
         assertTrue(reportedVersion?.endsWith(UID2.getVersion()) == true)
     }
+
+    private fun withClient() = UID2Client(
+        url,
+        null,
+        null,
+        networkSession,
+        packageName,
+        timeUtils,
+        keyUtils,
+    )
 }

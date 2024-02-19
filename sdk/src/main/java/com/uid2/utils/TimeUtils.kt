@@ -6,6 +6,11 @@ package com.uid2.utils
 internal class TimeUtils {
 
     /**
+     * Returns the current epoch time (in milliseconds).
+     */
+    fun now() = System.currentTimeMillis()
+
+    /**
      * Returns whether or not the given (epoch) time in milliseconds, is in the past.
      */
     fun hasExpired(expiryMs: Long) = expiryMs <= System.currentTimeMillis()

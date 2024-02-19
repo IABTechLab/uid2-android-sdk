@@ -32,7 +32,7 @@ internal data class RefreshResponse(
         ;
 
         companion object {
-            fun forStatus(status: String) = Status.values().first { it.text == status }
+            fun forStatus(status: String) = entries.first { it.text == status }
         }
     }
 
@@ -43,6 +43,14 @@ internal data class RefreshResponse(
         SUCCESS -> RefreshPackage(body, REFRESHED, "Identity refreshed")
         Status.OPT_OUT -> RefreshPackage(null, OPT_OUT, "User opt out")
         EXPIRED_TOKEN -> RefreshPackage(null, REFRESH_EXPIRED, "Refresh token expired")
+        else -> null
+    }
+
+    /**
+     * Converts the response into the generated (or refreshed) identity, if available.
+     */
+    fun toGeneratedIdentity(): UID2Identity? = when (status) {
+        SUCCESS -> body
         else -> null
     }
 

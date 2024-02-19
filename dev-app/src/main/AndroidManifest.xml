@@ -13,6 +13,11 @@
         android:supportsRtl="true"
         tools:targetApi="31">
 
+        <!-- Metadata Required for Client Side Token Generation -->
+        <!-- This information will be provided when you register your app with the UID2 operator. -->
+        <meta-data android:name="uid2_api_public_key" android:value="UID2-X-L-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtXJdTSZAYHvoRDWiehMHoWF1BNPuqLs5w2ZHiAZ1IJc7O4/z0ojPTB0V+KYX/wxQK0hxx6kxCvHj335eI/ZQsQ=="/>
+        <meta-data android:name="uid2_api_subscription_id" android:value="4WvryDGbR5"/>
+
         <!-- The metadata consumed by the Dev App + SDK -->
         <meta-data android:name="uid2_api_url" android:value="https://operator-integ.uidapi.com"/>
         <meta-data android:name="uid2_api_key" android:value=""/>

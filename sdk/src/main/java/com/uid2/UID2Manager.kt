@@ -156,6 +156,22 @@ public class UID2Manager internal constructor(
     }
 
     /**
+     * Generates a new identity with the given (hashed) email address.
+     *
+     * Once set, assuming it's valid, it will be monitored so that we automatically refresh the token(s) when required.
+     * This will also be persisted locally, so that when the application re-launches, we reload this Identity.
+     */
+    public fun generateIdentity(emailHash: String): Unit = afterInitialized {
+        scope.launch {
+            try {
+                validateAndSetIdentity(client.generateIdentity(emailHash), null)
+            } catch (ex: UID2Exception) {
+                // How to report?
+            }
+        }
+    }
+
+    /**
      * Sets the current Identity.
      *
      * Once set, assuming it's valid, it will be monitored so that we automatically refresh the token(s) when required.
@@ -394,6 +410,12 @@ public class UID2Manager internal constructor(
         private const val UID2_API_URL_KEY = "uid2_api_url"
         private const val UID2_API_URL_DEFAULT = "https://prod.uidapi.com"
 
+        // The metadata keys that are used to provide access to required parameters for client side token generation.
+        private const val UID2_API_PUBLIC_KEY = "uid2_api_public_key"
+        private const val UID2_API_SUBSCRIPTION_ID = "uid2_api_subscription_id"
+
+        private const val PACKAGE_NAME_DEFAULT = "unknown"
+
         private const val PACKAGE_NOT_AVAILABLE = "Identity not available"
         private const val PACKAGE_AD_TOKEN_NOT_AVAILABLE = "advertising_token is not available or is not valid"
         private const val PACKAGE_REFRESH_TOKEN_NOT_AVAILABLE = "refresh_token is not available or is not valid"
@@ -412,6 +434,9 @@ public class UID2Manager internal constructor(
         private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
 
         private var api: String = UID2_API_URL_DEFAULT
+        private var apiPublicKey: String? = null
+        private var apiSubscriptionId: String? = null
+        private var packageName: String = PACKAGE_NAME_DEFAULT
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
 
@@ -442,6 +467,9 @@ public class UID2Manager internal constructor(
             val metadata = context.getMetadata()
 
             this.api = metadata?.getString(UID2_API_URL_KEY, UID2_API_URL_DEFAULT) ?: UID2_API_URL_DEFAULT
+            this.apiPublicKey = metadata?.getString(UID2_API_PUBLIC_KEY, null)
+            this.apiSubscriptionId = metadata?.getString(UID2_API_SUBSCRIPTION_ID, null)
+            this.packageName = context.packageName
             this.networkSession = networkSession
             this.storageManager = StorageManager.getInstance(context)
         }
@@ -464,7 +492,10 @@ public class UID2Manager internal constructor(
             return instance ?: UID2Manager(
                 UID2Client(
                     api,
+                    apiPublicKey,
+                    apiSubscriptionId,
                     networkSession,
+                    packageName,
                 ),
                 storage,
                 TimeUtils(),

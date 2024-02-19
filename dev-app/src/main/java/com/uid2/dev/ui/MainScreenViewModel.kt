@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.uid2.UID2Exception
 import com.uid2.UID2Manager
 import com.uid2.UID2ManagerState.Established
 import com.uid2.UID2ManagerState.Expired
@@ -21,24 +22,24 @@ import com.uid2.data.IdentityStatus.REFRESHED
 import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
 import com.uid2.dev.network.AppUID2Client
-import com.uid2.dev.network.AppUID2ClientException
 import com.uid2.dev.network.RequestType.EMAIL
 import com.uid2.dev.ui.MainScreenState.ErrorState
 import com.uid2.dev.ui.MainScreenState.LoadingState
 import com.uid2.dev.ui.MainScreenState.UserUpdatedState
+import com.uid2.dev.utils.toSha256
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 sealed interface MainScreenAction : ViewModelAction {
-    data class EmailChanged(val address: String) : MainScreenAction
-    object ResetButtonPressed : MainScreenAction
-    object RefreshButtonPressed : MainScreenAction
+    data class EmailChanged(val address: String, val clientSide: Boolean) : MainScreenAction
+    data object ResetButtonPressed : MainScreenAction
+    data object RefreshButtonPressed : MainScreenAction
 }
 
 sealed interface MainScreenState : ViewState {
-    object LoadingState : MainScreenState
+    data object LoadingState : MainScreenState
     data class UserUpdatedState(val identity: UID2Identity?, val status: IdentityStatus) : MainScreenState
     data class ErrorState(val error: Throwable) : MainScreenState
 }
@@ -77,18 +78,22 @@ class MainScreenViewModel(
         viewModelScope.launch {
             when (action) {
                 is MainScreenAction.EmailChanged -> {
+                    _viewState.emit(LoadingState)
+
                     try {
-                        // For Development purposes, we are required to generate the initial Identity before then
-                        // passing it onto the SDK to be managed.
-                        _viewState.emit(LoadingState)
-                        api.generateIdentity(action.address, EMAIL)?.let {
-                            manager.setIdentity(it)
+                        if (action.clientSide) {
+                            // Generate the identity via client side token generation.
+                            manager.generateIdentity(action.address.toSha256())
+                        } else {
+                            // We're going to generate the identity as if we've obtained it via a backend service.
+                            api.generateIdentity(action.address, EMAIL)?.let {
+                                manager.setIdentity(it)
+                            }
                         }
-                    } catch (ex: AppUID2ClientException) {
+                    } catch (ex: UID2Exception) {
                         _viewState.emit(ErrorState(ex))
                     }
                 }
-
                 MainScreenAction.RefreshButtonPressed -> {
                     manager.currentIdentity?.let { _viewState.emit(LoadingState) }
                     manager.refreshIdentity()
