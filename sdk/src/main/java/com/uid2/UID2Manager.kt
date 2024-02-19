@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
  * A listener interface allowing the consumer to be notified when either the identity or status of the identity changes
  * within the [UID2Manager].
  */
-interface UID2ManagerIdentityChangedListener {
+public interface UID2ManagerIdentityChangedListener {
 
     /**
      * The identity or status of the identity has changed.
@@ -50,20 +50,20 @@ interface UID2ManagerIdentityChangedListener {
      * user.
      * @param status The new status of the associated identity.
      */
-    fun onIdentityStatusChanged(identity: UID2Identity?, status: IdentityStatus)
+    public fun onIdentityStatusChanged(identity: UID2Identity?, status: IdentityStatus)
 }
 
 /**
  * A interface defining the flow of state communicated by the [UID2Manager].
  */
-sealed interface UID2ManagerState {
-    data class Established(val identity: UID2Identity) : UID2ManagerState
-    data class Refreshed(val identity: UID2Identity) : UID2ManagerState
-    object NoIdentity : UID2ManagerState
-    data class Expired(val identity: UID2Identity) : UID2ManagerState
-    object Invalid : UID2ManagerState
-    object RefreshExpired : UID2ManagerState
-    object OptOut : UID2ManagerState
+public sealed interface UID2ManagerState {
+    public data class Established(val identity: UID2Identity) : UID2ManagerState
+    public data class Refreshed(val identity: UID2Identity) : UID2ManagerState
+    public data object NoIdentity : UID2ManagerState
+    public data class Expired(val identity: UID2Identity) : UID2ManagerState
+    public data object Invalid : UID2ManagerState
+    public data object RefreshExpired : UID2ManagerState
+    public data object OptOut : UID2ManagerState
 }
 
 /**
@@ -77,7 +77,7 @@ sealed interface UID2ManagerState {
  * After the manager is initialized, updates of the Identity or Status can be done via either the
  * [UID2ManagerIdentityChangedListener] or via [UID2Manager.state].
  */
-class UID2Manager internal constructor(
+public class UID2Manager internal constructor(
     private val client: UID2Client,
     private val storageManager: StorageManager,
     private val timeUtils: TimeUtils,
@@ -89,14 +89,14 @@ class UID2Manager internal constructor(
     /**
      * Gets or sets the listener that will be notified when either the Identity or Identity Status changes.
      */
-    var onIdentityChangedListener: UID2ManagerIdentityChangedListener? = null
+    public var onIdentityChangedListener: UID2ManagerIdentityChangedListener? = null
 
     private val _state = MutableStateFlow<UID2ManagerState>(NoIdentity)
 
     /**
      * The flow representing the state of the UID2Manager.
      */
-    val state: Flow<UID2ManagerState> = _state.asStateFlow()
+    public val state: Flow<UID2ManagerState> = _state.asStateFlow()
 
     // The Job responsible for initialising the manager. This will include de-serialising our initial state from
     // storage.
@@ -114,7 +114,7 @@ class UID2Manager internal constructor(
     /**
      * Gets the current Identity, if available.
      */
-    val currentIdentity: UID2Identity?
+    public val currentIdentity: UID2Identity?
         get() = when (val state = _state.value) {
             is Established -> state.identity
             is Refreshed -> state.identity
@@ -125,7 +125,7 @@ class UID2Manager internal constructor(
     /**
      * Gets the current Identity Status.
      */
-    val currentIdentityStatus: IdentityStatus
+    public val currentIdentityStatus: IdentityStatus
         get() = when (_state.value) {
             is Established -> ESTABLISHED
             is Refreshed -> REFRESHED
@@ -140,7 +140,7 @@ class UID2Manager internal constructor(
      * Gets or sets whether tha Manager will automatically refresh the Identity. Setting this to False will cancel any
      * pending refresh.
      */
-    var automaticRefreshEnabled: Boolean = initialAutomaticRefreshEnabled
+    public var automaticRefreshEnabled: Boolean = initialAutomaticRefreshEnabled
         set(value) {
             field = value
             checkIdentityRefresh()
@@ -161,14 +161,14 @@ class UID2Manager internal constructor(
      * Once set, assuming it's valid, it will be monitored so that we automatically refresh the token(s) when required.
      * This will also be persisted locally, so that when the application re-launches, we reload this Identity.
      */
-    fun setIdentity(identity: UID2Identity) = afterInitialized {
+    public fun setIdentity(identity: UID2Identity): Unit = afterInitialized {
         validateAndSetIdentity(identity, null)
     }
 
     /**
      * If a valid Identity has been set, this will reset our state along with clearing any persisted data.
      */
-    fun resetIdentity() = afterInitialized {
+    public fun resetIdentity(): Unit = afterInitialized {
         currentIdentity ?: return@afterInitialized
 
         setIdentityInternal(null, NO_IDENTITY, true)
@@ -177,7 +177,7 @@ class UID2Manager internal constructor(
     /**
      * Forces a refresh of the current Identity, if set.
      */
-    fun refreshIdentity() = afterInitialized {
+    public fun refreshIdentity(): Unit = afterInitialized {
         // If we have a valid Identity, let's refresh it.
         currentIdentity?.let { refreshIdentityInternal(it) }
     }
@@ -225,7 +225,7 @@ class UID2Manager internal constructor(
     /**
      * Gets the current Advertising Token, if available.
      */
-    fun getAdvertisingToken(): String? = currentIdentity?.let {
+    public fun getAdvertisingToken(): String? = currentIdentity?.let {
         // For a known identity, we should only provide the advertising token if their status is established or
         // refreshed. It's possible they could have expired and be pending a refresh. In this case, the token is not
         // useful.
@@ -389,7 +389,7 @@ class UID2Manager internal constructor(
         }
     }
 
-    companion object {
+    public companion object {
         // The default API server.
         private const val UID2_API_URL_KEY = "uid2_api_url"
         private const val UID2_API_URL_DEFAULT = "https://prod.uidapi.com"
@@ -421,7 +421,7 @@ class UID2Manager internal constructor(
          * Initializes the class with the given [Context].
          */
         @JvmStatic
-        fun init(context: Context) = init(context, DefaultNetworkSession())
+        public fun init(context: Context): Unit = init(context, DefaultNetworkSession())
 
         /**
          * Initializes the class with the given [Context], along with a [NetworkSession] that will be responsible
@@ -434,7 +434,7 @@ class UID2Manager internal constructor(
          */
         @JvmStatic
         @Throws(InitializationException::class)
-        fun init(context: Context, networkSession: NetworkSession) {
+        public fun init(context: Context, networkSession: NetworkSession) {
             if (instance != null) {
                 throw InitializationException()
             }
@@ -450,7 +450,7 @@ class UID2Manager internal constructor(
          * Returns True if the manager is already initialised, otherwise False.
          */
         @JvmStatic
-        fun isInitialized() = instance != null
+        public fun isInitialized(): Boolean = instance != null
 
         /**
          * Gets the current singleton instance of the manager.
@@ -458,7 +458,7 @@ class UID2Manager internal constructor(
          * @throws InitializationException Thrown if the manager has not yet been initialised.
          */
         @JvmStatic
-        fun getInstance(): UID2Manager {
+        public fun getInstance(): UID2Manager {
             val storage = storageManager ?: throw InitializationException()
 
             return instance ?: UID2Manager(

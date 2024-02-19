@@ -12,7 +12,7 @@ import javax.crypto.spec.SecretKeySpec
  * **See Also:**
  * [GitHub](https://github.com/IABTechLab/uid2docs/blob/main/api/v2/getting-started/gs-encryption-decryption.md)
  */
-object DataEnvelope {
+public object DataEnvelope {
     // The name and transformation of the encryption algorithm used.
     private const val ALGORITHM_NAME = "AES"
     private const val ALGORITHM_TRANSFORMATION = "AES/GCM/NoPadding"
@@ -38,7 +38,7 @@ object DataEnvelope {
      * @param data The data, in Base64 format, that needs to be decoded.
      * @return The unencrypted data. If this decryption fails, null is returned.
      */
-    fun decrypt(key: String, data: String, isRefresh: Boolean): ByteArray? {
+    public fun decrypt(key: String, data: String, isRefresh: Boolean): ByteArray? {
         // Attempt to decrypt the given data with the provided key. Both the key and data are expected to be in Base64
         // format. If this fails, then null will be returned.
         var payload = decryptWithCipher(key.decodeBase64(), data.decodeBase64()) ?: return null
