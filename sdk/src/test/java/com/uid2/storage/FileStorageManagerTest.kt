@@ -45,7 +45,7 @@ class FileStorageManagerTest {
             "refresh response key",
         )
 
-        val storageManager = FileStorageManager(identityFile, testDispatcher)
+        val storageManager = FileStorageManager({ identityFile }, testDispatcher)
         storageManager.saveIdentity(identity, ESTABLISHED)
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -65,7 +65,7 @@ class FileStorageManagerTest {
             "refresh response key",
         )
 
-        val storageManager = FileStorageManager(identityFile, testDispatcher)
+        val storageManager = FileStorageManager({ identityFile }, testDispatcher)
         storageManager.saveIdentity(identity, ESTABLISHED)
         testDispatcher.scheduler.advanceUntilIdle()
 
