@@ -5,7 +5,7 @@ import java.net.URL
 /**
  * The type of request that needs to be made. We currently only require either a GET or a POST.
  */
-enum class NetworkRequestType {
+public enum class NetworkRequestType {
 
     /**
      * A HTTP GET request.
@@ -26,7 +26,7 @@ enum class NetworkRequestType {
  * @param headers The collection of headers to be used in the request (in key/value pairs).
  * @param data The optional body data, used in a [NetworkRequestType.POST].
  */
-data class NetworkRequest(
+public data class NetworkRequest(
     val type: NetworkRequestType,
     val headers: Map<String, String> = mapOf(),
     val data: String? = null,
@@ -38,7 +38,7 @@ data class NetworkRequest(
  * @param code The HTTP response code received after attempting to make the request.
  * @param data The body data contained within the response. If none is available, the empty string should be provided.
  */
-data class NetworkResponse(
+public data class NetworkResponse(
     val code: Int,
     val data: String = "",
 )
@@ -47,7 +47,7 @@ data class NetworkResponse(
  * This interface controls all network access. A default implementation will be included within the library, but
  * consumers can also choose to implement it to leverage their own networking code (e.g. OkHttp).
  */
-interface NetworkSession {
+public interface NetworkSession {
 
     /**
      * Requests the given URL with the details provided in the request.
@@ -56,5 +56,5 @@ interface NetworkSession {
      * @param request The details of the required request.
      * @return The [NetworkResponse] which contains the outcome of the attempted request.
      */
-    fun loadData(url: URL, request: NetworkRequest): NetworkResponse
+    public fun loadData(url: URL, request: NetworkRequest): NetworkResponse
 }

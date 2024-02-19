@@ -42,7 +42,7 @@ import kotlin.random.Random
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class UID2ManagerTest {
-    private lateinit var testDispatcher: TestDispatcher
+    private val testDispatcher: TestDispatcher = StandardTestDispatcher()
 
     private val expirationInterval = 10 * 1000L // 10 seconds
     private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
@@ -58,8 +58,6 @@ class UID2ManagerTest {
 
     @Before
     fun before() = runBlocking {
-        testDispatcher = StandardTestDispatcher()
-
         // By default, we won't expire tokens.
         whenever(timeUtils.hasExpired(anyLong())).thenReturn(false)
 
@@ -68,7 +66,7 @@ class UID2ManagerTest {
     }
 
     @Test
-    fun `restores identity from storage`() {
+    fun `restores identity from storage`() = runTest(testDispatcher) {
         // Verify that the initial state of the manager reflects the restored Identity.
         assertNotNull(manager.currentIdentity)
         assertEquals(initialIdentity, manager.currentIdentity)
@@ -124,8 +122,12 @@ class UID2ManagerTest {
     }
 
     @Test
-    fun `refresh no-op when no identity`() {
-        val manager = withManager(client, mock(), timeUtils, testDispatcher, false, null)
+    fun `refresh no-op when no identity`() = runTest(testDispatcher) {
+        // Create a mock StorageManager that doesn't have any previously saved Identity.
+        val storageManager: StorageManager = mock()
+        whenever(storageManager.loadIdentity()).thenReturn(Pair(null, NO_IDENTITY))
+
+        val manager = withManager(client, storageManager, timeUtils, testDispatcher, false, null)
         assertNull(manager.currentIdentity)
 
         // Verify that if we attempt to refresh the Identity when one is not set, nothing happens.

@@ -10,7 +10,7 @@ import java.net.URL
  * If a consuming application wants to take control over the network requests, they can implement their own custom
  * [NetworkSession] and provide it when initialising the SDK via [com.uid2.UID2Manager.init]
  */
-open class DefaultNetworkSession : NetworkSession {
+public open class DefaultNetworkSession : NetworkSession {
 
     /**
      * Loads the given [URL] and [NetworkRequest] using [HttpURLConnection].
@@ -53,7 +53,7 @@ open class DefaultNetworkSession : NetworkSession {
      * This is done via an open method, to allow better testability, given that the URL class is
      * final and therefore hard to mock itself.
      */
-    open fun openConnection(url: URL) = (url.openConnection() as HttpURLConnection)
+    public open fun openConnection(url: URL): HttpURLConnection = (url.openConnection() as HttpURLConnection)
 
     /**
      * Extension to convert the given NetworkRequestType into the expected request method name.

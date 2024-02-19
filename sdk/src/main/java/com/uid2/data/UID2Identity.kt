@@ -5,7 +5,7 @@ import org.json.JSONObject
 /**
  * This class represents the core UID2 identity.
  */
-data class UID2Identity(
+public data class UID2Identity(
     val advertisingToken: String,
     val refreshToken: String,
     val identityExpires: Long,
@@ -17,7 +17,7 @@ data class UID2Identity(
     /**
      * Converts the current UID2Identity instance into a JSON representation.
      */
-    fun toJson() = JSONObject(
+    public fun toJson(): JSONObject = JSONObject(
         mapOf(
             "advertising_token" to advertisingToken,
             "refresh_token" to refreshToken,
@@ -28,14 +28,14 @@ data class UID2Identity(
         ),
     )
 
-    companion object {
+    public companion object {
 
         /**
          * Helper function to parse a given JSON object into the expected UID2Identity instance. If the JSON instance
          * doesn't contain all required parameters, then null is returned.
          */
         @JvmStatic
-        fun fromJson(json: JSONObject): UID2Identity? {
+        public fun fromJson(json: JSONObject): UID2Identity? {
             val advertisingToken = json.opt("advertising_token")?.toString() ?: return null
             val refreshToken = json.opt("refresh_token")?.toString() ?: return null
             val identityExpires = (json.opt("identity_expires")?.toString())?.toLongOrNull() ?: return null

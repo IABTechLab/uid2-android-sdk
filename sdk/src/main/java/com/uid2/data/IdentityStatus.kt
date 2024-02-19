@@ -6,7 +6,7 @@ package com.uid2.data
  * This has been translated from the Web implement, see the following for more information:
  * https://github.com/IABTechLab/uid2-web-integrations/blob/5a8295c47697cdb1fe36997bc2eb2e39ae143f8b/src/Uid2InitCallbacks.ts#L12-L20
  */
-enum class IdentityStatus(val value: Int) {
+public enum class IdentityStatus(public val value: Int) {
     ESTABLISHED(0),
     REFRESHED(1),
     EXPIRED(100),
@@ -16,7 +16,7 @@ enum class IdentityStatus(val value: Int) {
     OPT_OUT(-4),
     ;
 
-    override fun toString() = when (this) {
+    public override fun toString(): String = when (this) {
         ESTABLISHED -> "Established"
         REFRESHED -> "Refreshed"
         EXPIRED -> "Expired"
@@ -26,11 +26,11 @@ enum class IdentityStatus(val value: Int) {
         OPT_OUT -> "Opt Out"
     }
 
-    companion object {
+    public companion object {
 
         /**
          * Converts the given integer value into the associated IdentityStatus.
          */
-        fun fromValue(value: Int) = IdentityStatus.values().first { it.value == value }
+        public fun fromValue(value: Int): IdentityStatus = entries.first { it.value == value }
     }
 }
