@@ -8,12 +8,14 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class DataEnvelopeTest {
+    private val dataEnvelope = DataEnvelope
+
     @Test
     fun `test encrypted opt out`() {
-        val payload = DataEnvelope.decrypt(
+        val payload = dataEnvelope.decrypt(
             TestData.REFRESH_TOKEN_ENCRYPTED_OPT_OUT_KEY,
             TestData.REFRESH_TOKEN_OPT_OUT_ENCRYPTED,
-            true,
+            false,
         )
 
         // Verify that the payload was actually decoded.
@@ -27,10 +29,10 @@ class DataEnvelopeTest {
 
     @Test
     fun `test encrypted refresh`() {
-        val payload = DataEnvelope.decrypt(
+        val payload = dataEnvelope.decrypt(
             TestData.REFRESH_TOKEN_ENCRYPTED_SUCCESS_KEY,
             TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED,
-            true,
+            false,
         )
 
         // Verify that the payload was actually decoded.
@@ -44,10 +46,10 @@ class DataEnvelopeTest {
 
     @Test
     fun `test invalid key`() {
-        val payload = DataEnvelope.decrypt(
+        val payload = dataEnvelope.decrypt(
             "This is not a key",
             TestData.REFRESH_TOKEN_SUCCESS_ENCRYPTED,
-            true,
+            false,
         )
 
         // Verify that when attempting to decrypt valid data with an incorrect key, we are returned the expected null.
@@ -56,10 +58,10 @@ class DataEnvelopeTest {
 
     @Test
     fun `test invalid data`() {
-        val payload = DataEnvelope.decrypt(
+        val payload = dataEnvelope.decrypt(
             TestData.REFRESH_TOKEN_ENCRYPTED_SUCCESS_KEY,
             "This is not valid",
-            true,
+            false,
         )
 
         // Verify that when attempting to decrypt invalid data with a valid key, we are returned the expected null.

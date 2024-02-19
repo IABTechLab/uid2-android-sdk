@@ -1,5 +1,7 @@
 package com.uid2
 
+import com.uid2.UID2Manager.GenerateIdentityResult
+import com.uid2.data.IdentityRequest
 import com.uid2.data.IdentityStatus
 import com.uid2.data.IdentityStatus.ESTABLISHED
 import com.uid2.data.IdentityStatus.EXPIRED
@@ -8,8 +10,9 @@ import com.uid2.data.IdentityStatus.OPT_OUT
 import com.uid2.data.IdentityStatus.REFRESHED
 import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
-import com.uid2.network.RefreshPackage
+import com.uid2.network.ResponsePackage
 import com.uid2.storage.StorageManager
+import com.uid2.utils.InputUtils
 import com.uid2.utils.Logger
 import com.uid2.utils.TimeUtils
 import kotlinx.coroutines.CoroutineDispatcher
@@ -30,6 +33,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
@@ -51,6 +55,7 @@ class UID2ManagerTest {
     private val client: UID2Client = mock()
     private val storageManager: StorageManager = mock()
     private val timeUtils: TimeUtils = mock()
+    private val inputUtils: InputUtils = mock()
     private val logger: Logger = mock()
 
     private lateinit var manager: UID2Manager
@@ -63,8 +68,16 @@ class UID2ManagerTest {
         // By default, we won't expire tokens.
         whenever(timeUtils.hasExpired(anyLong())).thenReturn(false)
 
+        whenever(inputUtils.normalize(any(IdentityRequest.Email::class.java))).thenAnswer {
+            it.arguments[0] as IdentityRequest.Email
+        }
+
+        whenever(inputUtils.normalize(any(IdentityRequest.Phone::class.java))).thenAnswer {
+            it.arguments[0] as IdentityRequest.Phone
+        }
+
         whenever(storageManager.loadIdentity()).thenReturn(Pair(initialIdentity, initialStatus))
-        manager = withManager(client, storageManager, timeUtils, testDispatcher, false, listener)
+        manager = withManager(client, storageManager, timeUtils, inputUtils, testDispatcher, false, listener)
     }
 
     @Test
@@ -72,7 +85,7 @@ class UID2ManagerTest {
         var isInitialized = false
         val onInitialized = { isInitialized = true }
 
-        val manager = UID2Manager(client, storageManager, timeUtils, testDispatcher, false, logger).apply {
+        val manager = UID2Manager(client, storageManager, timeUtils, inputUtils, testDispatcher, false, logger).apply {
             this.checkExpiration = false
             this.onInitialized = onInitialized
         }
@@ -128,6 +141,50 @@ class UID2ManagerTest {
     }
 
     @Test
+    fun `generates identity for different requests`() = runTest(testDispatcher) {
+        listOf(
+            IdentityRequest.Email("test@test.com"),
+            IdentityRequest.EmailHash("a-hash"),
+            IdentityRequest.Phone("+00000000000"),
+            IdentityRequest.PhoneHash("another-hash"),
+        ).forEach { request ->
+            val generated = withRandomIdentity()
+            whenever(client.generateIdentity(request)).thenReturn(ResponsePackage(generated, ESTABLISHED, ""))
+
+            // Request a new identity should be generated.
+            var result: GenerateIdentityResult? = null
+            manager.generateIdentity(request) { result = it }
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            // Verify that the identity is updated from the one provided via the Client.
+            assertEquals(manager.currentIdentity, generated)
+
+            // Verify that the result callback was invoked.
+            assertEquals(GenerateIdentityResult.Success, result)
+        }
+    }
+
+    @Test
+    fun `existing identity untouched if generation fails`() = runTest(testDispatcher) {
+        val request = IdentityRequest.Email("test@test.com")
+        whenever(client.generateIdentity(request)).thenThrow(PayloadDecryptException::class.java)
+
+        // Verify that the manager has a known (existing) identity.
+        assertEquals(manager.currentIdentity, initialIdentity)
+
+        // Request a new identity is generated, knowing that this will fail.
+        var result: GenerateIdentityResult? = null
+        manager.generateIdentity(request) { result = it }
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Verify that after the failure, the existing identity is still present.
+        assertEquals(manager.currentIdentity, initialIdentity)
+
+        // Verify that the result callback was invoked.
+        assertTrue(result is GenerateIdentityResult.Error)
+    }
+
+    @Test
     fun `resets identity`() = runTest(testDispatcher) {
         // Verify that the initial state of the manager reflects the restored Identity.
         assertNotNull(manager.currentIdentity)
@@ -145,7 +202,7 @@ class UID2ManagerTest {
     @Test
     fun `resets identity immediately after initialisation`() = runTest(testDispatcher) {
         // Create a new instance of the manager but *don't* allow it to finish initialising (loading previous identity)
-        val manager = UID2Manager(client, storageManager, timeUtils, testDispatcher, false, logger).apply {
+        val manager = UID2Manager(client, storageManager, timeUtils, inputUtils, testDispatcher, false, logger).apply {
             onIdentityChangedListener = listener
             checkExpiration = false
         }
@@ -180,7 +237,7 @@ class UID2ManagerTest {
     fun `reports when no identity available after opt-out`() = runTest(testDispatcher) {
         // Configure the client so that when asked to refresh, it actually reports that the user has now opted out.
         whenever(client.refreshIdentity(initialIdentity.refreshToken, initialIdentity.refreshResponseKey)).thenReturn(
-            RefreshPackage(
+            ResponsePackage(
                 null,
                 OPT_OUT,
                 "User opt-ed out",
@@ -202,7 +259,7 @@ class UID2ManagerTest {
         val storageManager: StorageManager = mock()
         whenever(storageManager.loadIdentity()).thenReturn(Pair(null, NO_IDENTITY))
 
-        val manager = withManager(client, storageManager, timeUtils, testDispatcher, false, null)
+        val manager = withManager(client, storageManager, timeUtils, inputUtils, testDispatcher, false, null)
         assertNull(manager.currentIdentity)
 
         // Verify that if we attempt to refresh the Identity when one is not set, nothing happens.
@@ -215,7 +272,7 @@ class UID2ManagerTest {
         // Configure the client so that when asked to refresh, it returns a new Identity.
         val newIdentity = withRandomIdentity()
         whenever(client.refreshIdentity(initialIdentity.refreshToken, initialIdentity.refreshResponseKey)).thenReturn(
-            RefreshPackage(
+            ResponsePackage(
                 newIdentity,
                 REFRESHED,
                 "Refreshed",
@@ -237,7 +294,7 @@ class UID2ManagerTest {
     fun `refresh identities opt out`() = runTest(testDispatcher) {
         // Configure the client so that when asked to refresh, it actually reports that the user has now opted out.
         whenever(client.refreshIdentity(initialIdentity.refreshToken, initialIdentity.refreshResponseKey)).thenReturn(
-            RefreshPackage(
+            ResponsePackage(
                 null,
                 OPT_OUT,
                 "User opt-ed out",
@@ -263,7 +320,7 @@ class UID2ManagerTest {
         val newIdentity = withRandomIdentity()
         whenever(client.refreshIdentity(initialIdentity.refreshToken, initialIdentity.refreshResponseKey)).thenAnswer {
             if (hasErrored) {
-                return@thenAnswer RefreshPackage(
+                return@thenAnswer ResponsePackage(
                     newIdentity,
                     REFRESHED,
                     "Refreshed",
@@ -361,7 +418,7 @@ class UID2ManagerTest {
         whenever(timeUtils.diffToNow(anyLong())).thenReturn(TimeUnit.SECONDS.toMillis(5))
         whenever(client.refreshIdentity(anyString(), anyString())).thenAnswer {
             refreshed = true
-            RefreshPackage(
+            ResponsePackage(
                 newIdentity,
                 REFRESHED,
                 "User refreshed",
@@ -369,7 +426,7 @@ class UID2ManagerTest {
         }
 
         // Build the Manager.
-        val manager = withManager(client, storageManager, timeUtils, testDispatcher, true, listener)
+        val manager = withManager(client, storageManager, timeUtils, inputUtils, testDispatcher, true, listener)
         testScheduler.advanceTimeBy(10)
         assertNull(manager.currentIdentity)
 
@@ -409,8 +466,8 @@ class UID2ManagerTest {
             return@thenAnswer expiryMs <= testDispatcher.scheduler.currentTime
         }
 
-        // Build the Manager, allowing it to attempt to load from stroage.
-        val manager = withManager(client, storageManager, timeUtils, testDispatcher, false, listener, true)
+        // Build the Manager, allowing it to attempt to load from storage.
+        val manager = withManager(client, storageManager, timeUtils, inputUtils, testDispatcher, false, listener, true)
         testScheduler.advanceTimeBy(10)
         assertNull(manager.currentIdentity)
 
@@ -460,6 +517,7 @@ class UID2ManagerTest {
         client: UID2Client,
         storageManager: StorageManager,
         timeUtils: TimeUtils,
+        inputUtils: InputUtils,
         dispatcher: CoroutineDispatcher,
         initialAutomaticRefreshEnabled: Boolean,
         listener: UID2ManagerIdentityChangedListener?,
@@ -469,6 +527,7 @@ class UID2ManagerTest {
             client,
             storageManager,
             timeUtils,
+            inputUtils,
             dispatcher,
             initialAutomaticRefreshEnabled,
             logger,
@@ -506,4 +565,6 @@ class UID2ManagerTest {
 
     private fun randomString(length: Int) = List(length) { charPool.random() }.joinToString("")
     private fun randomLong(min: Long) = Random.nextLong(min, Long.MAX_VALUE)
+
+    private fun <T> any(type: Class<T>): T = Mockito.any(type)
 }

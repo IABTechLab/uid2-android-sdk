@@ -19,7 +19,7 @@ fun ActionButtonView(modifier: Modifier, onResetClick: () -> Unit, onRefreshClic
         }
 
         Button(onClick = onRefreshClick) {
-            Text("Manual Refresh")
+            Text("Refresh")
         }
     }
 }
