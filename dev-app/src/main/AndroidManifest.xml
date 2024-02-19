@@ -13,8 +13,16 @@
         android:supportsRtl="true"
         tools:targetApi="31">
 
-        <!-- The metadata consumed by the Dev App + SDK -->
+        <!-- Optional override for the default API URL. -->
         <meta-data android:name="uid2_api_url" android:value="https://operator-integ.uidapi.com"/>
+
+        <!-- Metadata Required for Client Side Integration -->
+        <!-- This information will be provided when you register your app with the UID2 operator. -->
+        <meta-data android:name="uid2_api_public_key" android:value="UID2-X-L-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtXJdTSZAYHvoRDWiehMHoWF1BNPuqLs5w2ZHiAZ1IJc7O4/z0ojPTB0V+KYX/wxQK0hxx6kxCvHj335eI/ZQsQ=="/>
+        <meta-data android:name="uid2_api_subscription_id" android:value="4WvryDGbR5"/>
+
+        <!-- Metadata Required for Server Side Integration -->
+        <!-- This information is only consumed by the DevApp (not the SDK) to simulate a server side integration. -->
         <meta-data android:name="uid2_api_key" android:value=""/>
         <meta-data android:name="uid2_api_secret" android:value=""/>
 

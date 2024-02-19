@@ -3,7 +3,7 @@ package com.uid2
 /**
  * Base class for all custom exceptions reported by the UID2 SDK.
  */
-internal open class UID2Exception(message: String? = null, cause: Throwable? = null) : Exception(message, cause)
+public open class UID2Exception(message: String? = null, cause: Throwable? = null) : Exception(message, cause)
 
 /**
  * The SDK has been initialized *after* it's been created.
@@ -16,9 +16,19 @@ internal class InitializationException(message: String? = null) : UID2Exception(
 internal class InvalidApiUrlException : UID2Exception()
 
 /**
- * The attempt to refresh the token/identity via the API failed.
+ * An attempt to generate one of the required keys (for token generation) failed.
  */
-internal class RefreshTokenException(val statusCode: Int) : UID2Exception()
+internal class CryptoException : UID2Exception()
+
+/**
+ * The given input appears to be invalid.
+ */
+public class InputValidationException(description: String?) : UID2Exception(description)
+
+/**
+ * An attempt was made to the API that resulted in a failure.
+ */
+internal class RequestFailureException(val statusCode: Int) : UID2Exception()
 
 /**
  * The encrypted payload could not be decrypted successfully.

@@ -2,8 +2,8 @@
     <string name="app_name">UID2 SDK Dev App</string>
 
     <string name="email">Email</string>
-    <string name="email_icon_content_description">Email Icon</string>
-    <string name="email_submit_content_description">Submit Email</string>
+    <string name="phone">Phone Number</string>
+    <string name="generate_client_side">Client Side</string>
 
     <string name="identity_advertising_token">Advertising Token</string>
     <string name="identity_refresh_token">Refresh Token</string>
