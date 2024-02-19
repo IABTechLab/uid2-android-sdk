@@ -14,11 +14,14 @@ import java.io.File
  * An implementation of the StorageManager that persists UID2Identity instances in clear-text via a File.
  */
 internal class FileStorageManager(
-    private val identityFile: File,
+    val identityFileFactory: () -> File,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : StorageManager {
 
-    constructor(context: Context) : this(File(context.filesDir, FILE_IDENTITY))
+    constructor(context: Context) : this({ File(context.filesDir, FILE_IDENTITY) })
+
+    // This lazy value *should* only be requested on the ioDispatcher.
+    private val identityFile: File by lazy { identityFileFactory() }
 
     override suspend fun saveIdentity(identity: UID2Identity, status: IdentityStatus) = withContext(ioDispatcher) {
         runCatching {
