@@ -142,7 +142,7 @@ class AppUID2Client(
     }
 
     private fun decryptResponse(key: String, data: String) =
-        DataEnvelope.decrypt(key, data, false)?.toString(Charsets.UTF_8)
+        DataEnvelope.decrypt(key, data, true)?.toString(Charsets.UTF_8)
 
     private fun Long.toByteArray() = ByteBuffer.allocate(Long.SIZE_BYTES).apply {
         order(ByteOrder.BIG_ENDIAN)

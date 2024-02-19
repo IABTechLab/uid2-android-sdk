@@ -10,6 +10,9 @@ import com.uid2.UID2ManagerState.OptOut
 import com.uid2.UID2ManagerState.RefreshExpired
 import com.uid2.UID2ManagerState.Refreshed
 import com.uid2.data.IdentityPackage
+import com.uid2.data.IdentityRequest
+import com.uid2.data.IdentityRequest.Email
+import com.uid2.data.IdentityRequest.Phone
 import com.uid2.data.IdentityStatus
 import com.uid2.data.IdentityStatus.ESTABLISHED
 import com.uid2.data.IdentityStatus.EXPIRED
@@ -22,6 +25,7 @@ import com.uid2.data.UID2Identity
 import com.uid2.network.DefaultNetworkSession
 import com.uid2.network.NetworkSession
 import com.uid2.storage.StorageManager
+import com.uid2.utils.InputUtils
 import com.uid2.utils.Logger
 import com.uid2.utils.TimeUtils
 import kotlinx.coroutines.CoroutineDispatcher
@@ -83,6 +87,7 @@ public class UID2Manager internal constructor(
     private val client: UID2Client,
     private val storageManager: StorageManager,
     private val timeUtils: TimeUtils,
+    private val inputUtils: InputUtils,
     defaultDispatcher: CoroutineDispatcher,
     initialAutomaticRefreshEnabled: Boolean,
     private val logger: Logger,
@@ -142,8 +147,8 @@ public class UID2Manager internal constructor(
         }
 
     /**
-     * Gets whether or not [UID2Manager] has a known [UID2Identity]. If not, a new identity should be generated and set
-     * via [setIdentity].
+     * Gets whether or not [UID2Manager] has a known [UID2Identity]. If not, a new identity should be generated either
+     * via [generateIdentity] or generated externally and set via [setIdentity].
      */
     public fun hasIdentity(): Boolean = currentIdentity != null
 
@@ -185,6 +190,74 @@ public class UID2Manager internal constructor(
 
             // If we have a callback provided, invoke it.
             onInitialized?.invoke()
+        }
+    }
+
+    /**
+     * Represents the result of a request to [generateIdentity].
+     */
+    public sealed class GenerateIdentityResult {
+
+        /**
+         * The identity was generated successfully and the [UID2Manager] as updated.
+         */
+        public data object Success : GenerateIdentityResult()
+
+        /**
+         * The generation of the identity failed.
+         *
+         * @param ex The exception which caused the request to fail.
+         */
+        public data class Error(public val ex: UID2Exception) : GenerateIdentityResult()
+    }
+
+    /**
+     * Generates a new identity.
+     *
+     * Once set, assuming it's valid, it will be monitored so that we automatically refresh the token(s) when required.
+     * This will also be persisted locally, so that when the application re-launches, we reload this Identity.
+     *
+     * @param identityRequest The identify for which the [UID2Identity] is required for.
+     * @param subscriptionId The subscription id that was obtained when configuring your account.
+     * @param publicKey The public key that was obtained when configuring your account.
+     *
+     * @throws InputValidationException Thrown if the given [IdentityRequest] is not valid. For a
+     * [IdentityRequest.Phone] we expect the given number to conform to the ITU E.164 Standard
+     * (https://en.wikipedia.org/wiki/E.164).
+     */
+    @Throws(InputValidationException::class)
+    public fun generateIdentity(
+        identityRequest: IdentityRequest,
+        subscriptionId: String,
+        publicKey: String,
+        onResult: (GenerateIdentityResult) -> Unit,
+    ): Unit = afterInitialized {
+        // Normalize any given input to validate it.
+        val request = when (identityRequest) {
+            is Email -> inputUtils.normalize(identityRequest)
+            is Phone -> inputUtils.normalize(identityRequest)
+            else -> identityRequest
+        }
+
+        scope.launch {
+            try {
+                // Attempt to generate the new identity.
+                val identity = client.generateIdentity(request, subscriptionId, publicKey)
+
+                // Cancel any in-flight refresh job that could be processing a previously set identity.
+                refreshJob?.cancel()
+                refreshJob = null
+
+                // Update our identity.
+                validateAndSetIdentity(identity.identity, identity.status)
+
+                // Report our result.
+                onResult(GenerateIdentityResult.Success)
+            } catch (ex: UID2Exception) {
+                // The identity generation failed, so we will not modify our current state and report this to the
+                // caller.
+                onResult(GenerateIdentityResult.Error(ex))
+            }
         }
     }
 
@@ -447,6 +520,8 @@ public class UID2Manager internal constructor(
         // The default API server.
         private const val UID2_API_URL_DEFAULT = "https://prod.uidapi.com"
 
+        private const val APPLICATION_ID_DEFAULT = "unknown"
+
         private const val PACKAGE_NOT_AVAILABLE = "Identity not available"
         private const val PACKAGE_AD_TOKEN_NOT_AVAILABLE = "advertising_token is not available or is not valid"
         private const val PACKAGE_REFRESH_TOKEN_NOT_AVAILABLE = "refresh_token is not available or is not valid"
@@ -465,6 +540,7 @@ public class UID2Manager internal constructor(
         private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
 
         private var serverUrl: String = UID2_API_URL_DEFAULT
+        private var applicationId: String = APPLICATION_ID_DEFAULT
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
         private var isLoggingEnabled: Boolean = false
@@ -494,6 +570,7 @@ public class UID2Manager internal constructor(
             }
 
             this.serverUrl = serverUrl
+            this.applicationId = context.packageName
             this.networkSession = networkSession
             this.storageManager = StorageManager.getInstance(context.applicationContext)
             this.isLoggingEnabled = isLoggingEnabled
@@ -517,12 +594,14 @@ public class UID2Manager internal constructor(
 
             return instance ?: UID2Manager(
                 UID2Client(
-                    serverUrl,
-                    networkSession,
-                    logger,
+                    apiUrl = serverUrl,
+                    session = networkSession,
+                    applicationId = applicationId,
+                    logger = logger,
                 ),
                 storage,
-                TimeUtils(),
+                TimeUtils,
+                InputUtils(),
                 Dispatchers.Default,
                 true,
                 logger,

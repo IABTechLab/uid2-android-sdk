@@ -63,7 +63,7 @@ class RefreshResponseTest {
         assertEquals(identity, refresh?.body)
 
         // Verify that when converted to a RefreshPackage, the identity still matches what we expect.
-        val refreshPackage = refresh?.toRefreshPackage()
+        val refreshPackage = refresh?.toResponsePackage(true)
         assertNotNull(refreshPackage)
         assertEquals(identity, refreshPackage?.identity)
         assertEquals(REFRESHED, refreshPackage?.status)
@@ -75,7 +75,7 @@ class RefreshResponseTest {
             JSONObject(TestData.VALID_REFRESH_OPT_OUT) to OPT_OUT,
             JSONObject(TestData.VALID_REFRESH_EXPIRED_TOKEN) to REFRESH_EXPIRED,
         ).forEach {
-            val refresh = RefreshResponse.fromJson(it.key)?.toRefreshPackage()
+            val refresh = RefreshResponse.fromJson(it.key)?.toResponsePackage(true)
 
             // Verify that the converted RefreshPackage includes the expected Status.
             assertNotNull(refresh)

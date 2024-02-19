@@ -32,6 +32,13 @@ fun UserIdentityView(modifier: Modifier, identity: UID2Identity?, status: Identi
             .padding(0.dp, 10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        Text(
+            modifier = Modifier.padding(bottom = 10.dp),
+            text = stringResource(id = R.string.current_identity),
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+        )
+
         identity?.let {
             UserIdentityParameter(stringResource(R.string.identity_advertising_token), identity.advertisingToken)
             UserIdentityParameter(stringResource(R.string.identity_refresh_token), identity.refreshToken)
