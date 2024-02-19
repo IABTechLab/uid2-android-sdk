@@ -7,6 +7,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.uid2.devapp.R
 
 @Composable
 fun ActionButtonView(modifier: Modifier, onResetClick: () -> Unit, onRefreshClick: () -> Unit) {
@@ -15,11 +17,11 @@ fun ActionButtonView(modifier: Modifier, onResetClick: () -> Unit, onRefreshClic
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         Button(onClick = onResetClick) {
-            Text("Reset")
+            Text(stringResource(id = R.string.action_reset))
         }
 
         Button(onClick = onRefreshClick) {
-            Text("Manual Refresh")
+            Text(stringResource(id = R.string.action_refresh))
         }
     }
 }

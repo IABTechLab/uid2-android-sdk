@@ -1,5 +1,6 @@
 package com.uid2.network
 
+import com.uid2.data.IdentityStatus.ESTABLISHED
 import com.uid2.data.IdentityStatus.OPT_OUT
 import com.uid2.data.IdentityStatus.REFRESHED
 import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
@@ -12,7 +13,7 @@ import org.json.JSONObject
  * This class defines the expected response from the Identity API when refreshing. The results could include a new
  * (refreshed) Identity, or represent a failure/error.
  *
- * https://github.com/IABTechLab/uid2docs/blob/main/api/v2/endpoints/post-token-refresh.md#decrypted-json-response-format
+ * https://unifiedid.com/docs/endpoints/post-token-refresh
  */
 internal data class RefreshResponse(
     val body: UID2Identity?,
@@ -32,17 +33,23 @@ internal data class RefreshResponse(
         ;
 
         companion object {
-            fun forStatus(status: String) = Status.values().first { it.text == status }
+            fun forStatus(status: String) = entries.first { it.text == status }
         }
     }
 
     /**
-     * Converts the response into the equivalent RefreshPackage.
+     * Converts the response into the equivalent [ResponsePackage].
      */
-    fun toRefreshPackage(): RefreshPackage? = when (status) {
-        SUCCESS -> RefreshPackage(body, REFRESHED, "Identity refreshed")
-        Status.OPT_OUT -> RefreshPackage(null, OPT_OUT, "User opt out")
-        EXPIRED_TOKEN -> RefreshPackage(null, REFRESH_EXPIRED, "Refresh token expired")
+    fun toResponsePackage(isRefresh: Boolean): ResponsePackage? = when (status) {
+        SUCCESS -> {
+            if (isRefresh) {
+                ResponsePackage(body, REFRESHED, "Identity refreshed")
+            } else {
+                ResponsePackage(body, ESTABLISHED, "Identity established")
+            }
+        }
+        Status.OPT_OUT -> ResponsePackage(null, OPT_OUT, "User opt out")
+        EXPIRED_TOKEN -> ResponsePackage(null, REFRESH_EXPIRED, "Refresh token expired")
         else -> null
     }
 
