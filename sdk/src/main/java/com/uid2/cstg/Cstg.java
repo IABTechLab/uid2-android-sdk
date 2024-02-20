@@ -58,12 +58,11 @@ public class Cstg {
 //        return v2DecryptResponseWithoutNonce(encryptedResponse, sharedSecret.getEncoded());
 //    }
 
-    public static final int NONCE_LENGTH_BYTES = 8;
     private static final int GCM_TAG_LENGTH_BYTES = 16;
     private static final int GCM_IV_LENGTH_BYTES = 12;
 
     public static JsonNode v2DecryptResponseWithoutNonce(String response, byte[] secretBytes) throws Exception {
-        byte[] responseBytes = Base64.getDecoder().decode(response);
+        final byte[] responseBytes = Base64.getDecoder().decode(response);
         byte[] payload;
 
         try {
@@ -91,7 +90,7 @@ public class Cstg {
             "status" : "success"
         }
         */
-        String resultStr = new String(resultBytes, StandardCharsets.UTF_8);
+        final String resultStr = new String(resultBytes, StandardCharsets.UTF_8);
         return Mapper.OBJECT_MAPPER.readTree(resultStr);
     }
 
