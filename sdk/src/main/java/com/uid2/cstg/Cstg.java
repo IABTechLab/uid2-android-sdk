@@ -3,9 +3,6 @@ package com.uid2.cstg;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.uid2.client.PublisherUid2Helper;
-
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -61,12 +58,41 @@ public class Cstg {
 //        return v2DecryptResponseWithoutNonce(encryptedResponse, sharedSecret.getEncoded());
 //    }
 
+    public static final int NONCE_LENGTH_BYTES = 8;
+    private static final int GCM_TAG_LENGTH_BYTES = 16;
+    private static final int GCM_IV_LENGTH_BYTES = 12;
 
-    public static JsonNode v2DecryptResponseWithoutNonce(String response, byte[] key) throws Exception {
-        Method decryptMethod = PublisherUid2Helper.class.getDeclaredMethod("decrypt", String.class, byte[].class, boolean.class, byte[].class);
-        decryptMethod.setAccessible(true);
-        String decryptedResponse = (String) decryptMethod.invoke(PublisherUid2Helper.class, response, key, true, null);
-        return Mapper.OBJECT_MAPPER.readTree(decryptedResponse);
+    public static JsonNode v2DecryptResponseWithoutNonce(String response, byte[] secretBytes) throws Exception {
+        byte[] responseBytes = Base64.getDecoder().decode(response);
+        byte[] payload;
+
+        try {
+            final SecretKey key = new SecretKeySpec(secretBytes, "AES");
+            final GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH_BYTES * 8, responseBytes, 0, GCM_IV_LENGTH_BYTES);
+            final Cipher c = Cipher.getInstance("AES/GCM/NoPadding");
+            c.init(Cipher.DECRYPT_MODE, key, gcmParameterSpec);
+            payload = c.doFinal(responseBytes, GCM_IV_LENGTH_BYTES, responseBytes.length - GCM_IV_LENGTH_BYTES);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to Decrypt", e);
+        }
+        byte[] resultBytes = payload;
+
+        //example of resultStr
+        /*
+        {
+            "body" : {
+            "advertising_token" : "AgAAAGU....dqzWQ==",
+                "refresh_token" : "AAAAAG....794RHvjV",
+                "identity_expires" : 1708410149086,
+                "refresh_expires" : 1708492949086,
+                "refresh_from" : 1708407449086,
+                "refresh_response_key" : "FkwHuwv....8YBOX5ifyR8="
+        },
+            "status" : "success"
+        }
+        */
+        String resultStr = new String(resultBytes, StandardCharsets.UTF_8);
+        return Mapper.OBJECT_MAPPER.readTree(resultStr);
     }
 
     public static final SecureRandom SECURE_RANDOM = new SecureRandom();
