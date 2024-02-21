@@ -65,13 +65,13 @@ public object DataEnvelope {
      * @param data The data, in Base64 format, that needs to be decoded.
      * @return The unencrypted data. If this decryption fails, null is returned.
      */
-    public fun decrypt(key: ByteArray?, data: String, isRefresh: Boolean): ByteArray? {
+    public fun decrypt(key: ByteArray?, data: String, isRefreshOrCstg: Boolean): ByteArray? {
         // Attempt to decrypt the given data with the provided key. Both the key and data are expected to be in Base64
         // format. If this fails, then null will be returned.
         var payload = decryptWithCipher(key, data.decodeBase64()) ?: return null
 
-        // If we are not refreshing, we expect the decoded payload to include both Timestamp and Nonce values.
-        if (!isRefresh) {
+        // If we are not refreshing or using client side token generation, we expect the decoded payload to include both Timestamp and Nonce values.
+        if (!isRefreshOrCstg) {
             payload = payload.copyOfRange(
                 PAYLOAD_TIMESTAMP_LENGTH_BYTES + PAYLOAD_NONCE_LENGTH_BYTES,
                 payload.size,

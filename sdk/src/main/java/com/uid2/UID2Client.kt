@@ -105,7 +105,7 @@ internal class UID2Client(
         }
 
         // The response should be an encrypted payload. Let's attempt to decrypt it using the key we were provided.
-        val envelope = DataEnvelope.decrypt(sharedSecret.encoded, response.data, false)
+        val envelope = DataEnvelope.decrypt(sharedSecret.encoded, response.data, true)
             ?: throw PayloadDecryptException()
 
         // The decrypted payload should be JSON which we can parse.

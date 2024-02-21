@@ -28,8 +28,7 @@ fun EmailInputView(modifier: Modifier, onEmailEntered: (String) -> Unit) {
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        val emailAddress = remember { mutableStateOf(TextFieldValue()) }
-
+        val emailAddress = remember { mutableStateOf(TextFieldValue(text = "myemail@example.com")) }
         TextField(
             value = emailAddress.value,
             onValueChange = { emailAddress.value = it },
@@ -42,6 +41,7 @@ fun EmailInputView(modifier: Modifier, onEmailEntered: (String) -> Unit) {
                     contentDescription = stringResource(R.string.email_icon_content_description),
                 )
             },
+
         )
 
         FloatingActionButton(

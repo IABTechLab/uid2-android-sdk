@@ -6,7 +6,7 @@ import org.json.JSONObject
 /**
  * Extension method to decode a String base Base64.
  */
-internal fun String.decodeBase64(): ByteArray? = runCatching { Base64.decode(this, Base64.DEFAULT) }.getOrNull()
+internal fun String.decodeBase64(): ByteArray? = runCatching { Base64.decode(this, Base64.NO_WRAP) }.getOrNull()
 
 /**
  * Extension to parse a given String as JSON and convert to a Map. If parsing fails, e.g. the JSON
