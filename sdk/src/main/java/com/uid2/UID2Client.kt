@@ -1,6 +1,7 @@
 package com.uid2
 
 import com.uid2.data.UID2Identity
+import com.uid2.extensions.encodeBase64NonURLSafe
 import com.uid2.extensions.encodeBase64URLSafe
 import com.uid2.network.DataEnvelope
 import com.uid2.network.NetworkRequest
@@ -87,9 +88,9 @@ internal class UID2Client(
             mapOf(),
             paramsFactory(
                 mapOf(
-                    "payload" to encryptedPayload.encodeBase64URLSafe(),
-                    "iv" to iv.encodeBase64URLSafe(),
-                    "public_key" to clientKeyPair.public.encoded.encodeBase64URLSafe(),
+                    "payload" to encryptedPayload.encodeBase64NonURLSafe(),
+                    "iv" to iv.encodeBase64NonURLSafe(),
+                    "public_key" to clientKeyPair.public.encoded.encodeBase64NonURLSafe(),
                     "timestamp" to now.toString(),
                     "subscription_id" to apiSubscriptionId,
                     "app_name" to packageName,

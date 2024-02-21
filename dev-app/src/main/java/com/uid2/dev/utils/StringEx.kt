@@ -9,5 +9,5 @@ fun String.toSha256(): String {
     return MessageDigest
         .getInstance("SHA-256")
         .digest(toByteArray())
-        .encodeBase64URLSafe()
+        .encodeBase64NonURLSafe()
 }

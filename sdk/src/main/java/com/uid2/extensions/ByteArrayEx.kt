@@ -10,3 +10,8 @@ internal fun ByteArray.encodeBase64URLSafe(): String = Base64.encodeToString(
     this,
     Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP,
 )
+
+internal fun ByteArray.encodeBase64NonURLSafe(): String = Base64.encodeToString(
+    this,
+    Base64.NO_WRAP,
+)
