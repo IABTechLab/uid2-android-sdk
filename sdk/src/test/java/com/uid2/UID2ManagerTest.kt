@@ -122,6 +122,44 @@ class UID2ManagerTest {
     }
 
     @Test
+    fun `reports when has identity`() = runTest(testDispatcher) {
+        // When the default identity is restored, verify that hasIdentity reflects this.
+        assertNotNull(manager.currentIdentity)
+        assertTrue(manager.hasIdentity())
+    }
+
+    @Test
+    fun `reports when no identity available`() = runTest(testDispatcher) {
+        // Reset the Manager's identity
+        manager.resetIdentity()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Verify that no identity is reported.
+        assertNull(manager.currentIdentity)
+        assertFalse(manager.hasIdentity())
+    }
+
+    @Test
+    fun `reports when no identity available after opt-out`() = runTest(testDispatcher) {
+        // Configure the client so that when asked to refresh, it actually reports that the user has now opted out.
+        whenever(client.refreshIdentity(initialIdentity.refreshToken, initialIdentity.refreshResponseKey)).thenReturn(
+            RefreshPackage(
+                null,
+                OPT_OUT,
+                "User opt-ed out",
+            ),
+        )
+
+        // Ask the manager to refresh, allowing the current TestDispatcher to process any jobs.
+        manager.refreshIdentity()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Verify that no identity is reported.
+        assertNull(manager.currentIdentity)
+        assertFalse(manager.hasIdentity())
+    }
+
+    @Test
     fun `refresh no-op when no identity`() = runTest(testDispatcher) {
         // Create a mock StorageManager that doesn't have any previously saved Identity.
         val storageManager: StorageManager = mock()
