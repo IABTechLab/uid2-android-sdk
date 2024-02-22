@@ -123,6 +123,12 @@ public class UID2Manager internal constructor(
         }
 
     /**
+     * Gets whether or not [UID2Manager] has a known [UID2Identity]. If not, a new identity should be generated and set
+     * via [setIdentity].
+     */
+    public fun hasIdentity(): Boolean = currentIdentity != null
+
+    /**
      * Gets the current Identity Status.
      */
     public val currentIdentityStatus: IdentityStatus
