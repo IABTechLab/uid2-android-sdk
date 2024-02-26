@@ -10,10 +10,10 @@ class DevApplication : Application() {
 
         // Initialise the UID2Manager class. We will use it's DefaultNetworkSession rather than providing our own
         // custom implementation. This can be done to allow wrapping something like OkHttp.
-        UID2Manager.init(this.applicationContext)
+        UID2Manager.init(context = this, isLoggingEnabled = true)
 
         // Alternatively, we could initialise the UID2Manager with our own custom NetworkSession...
-        // UID2Manager.init(this.applicationContext, OkNetworkSession())
+        // UID2Manager.init(this.applicationContext, OkNetworkSession(), true)
 
         // For the development app, we will enable a strict thread policy to ensure we have suitable visibility of any
         // issues within the SDK.

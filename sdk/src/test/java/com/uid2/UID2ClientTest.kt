@@ -6,6 +6,7 @@ import com.uid2.data.UID2Identity
 import com.uid2.network.NetworkRequest
 import com.uid2.network.NetworkResponse
 import com.uid2.network.NetworkSession
+import com.uid2.utils.Logger
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -23,6 +24,7 @@ import org.mockito.kotlin.whenever
 @RunWith(MockitoJUnitRunner::class)
 class UID2ClientTest {
     private val networkSession: NetworkSession = mock()
+    private val logger: Logger = mock()
 
     private val url = "https://test.dev"
     private val refreshToken = "RefreshToken"
@@ -33,6 +35,7 @@ class UID2ClientTest {
         val client = UID2Client(
             "this is not a url",
             networkSession,
+            logger,
         )
 
         // Verify that when we have configured the client with an invalid URL, that it throws the appropriate exception
@@ -47,6 +50,7 @@ class UID2ClientTest {
         val client = UID2Client(
             url,
             networkSession,
+            logger,
         )
 
         // Configure the network session to report a failure.
@@ -63,6 +67,7 @@ class UID2ClientTest {
         val client = UID2Client(
             url,
             networkSession,
+            logger,
         )
 
         whenever(networkSession.loadData(any(), any())).thenReturn(
@@ -80,6 +85,7 @@ class UID2ClientTest {
         val client = UID2Client(
             url,
             networkSession,
+            logger,
         )
 
         whenever(networkSession.loadData(any(), any())).thenReturn(
@@ -97,6 +103,7 @@ class UID2ClientTest {
         val client = UID2Client(
             url,
             networkSession,
+            logger,
         )
 
         // Configure the network session to return a valid (encrypted) payload.
@@ -120,6 +127,7 @@ class UID2ClientTest {
         val client = UID2Client(
             url,
             networkSession,
+            logger,
         )
 
         // Configure the network session to return a valid (encrypted) payload.
@@ -138,6 +146,7 @@ class UID2ClientTest {
         val client = UID2Client(
             url,
             networkSession,
+            logger,
         )
 
         // Configure the network session to return a valid (encrypted) payload and allows us to capture the given

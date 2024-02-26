@@ -6,6 +6,7 @@ import com.uid2.network.NetworkRequestType
 import com.uid2.network.NetworkSession
 import com.uid2.network.RefreshPackage
 import com.uid2.network.RefreshResponse
+import com.uid2.utils.Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,6 +22,7 @@ import java.net.URL
 internal class UID2Client(
     private val apiUrl: String,
     private val session: NetworkSession,
+    private val logger: Logger = Logger(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     // The refresh endpoint is built from the given API root, along with our known refresh path appended. If the
@@ -48,8 +50,13 @@ internal class UID2Client(
         refreshToken: String,
         refreshResponseKey: String,
     ): RefreshPackage = withContext(ioDispatcher) {
+        logger.i(TAG) { "Refreshing identity" }
+
         // Check to make sure we have a valid endpoint to hit.
-        val url = apiRefreshUrl ?: throw InvalidApiUrlException()
+        val url = apiRefreshUrl ?: run {
+            logger.e(TAG) { "Error determining identity refresh API" }
+            throw InvalidApiUrlException()
+        }
 
         // Build the request to refresh the token.
         val request = NetworkRequest(
@@ -64,19 +71,27 @@ internal class UID2Client(
         // Attempt to make the request via the provided NetworkSession.
         val response = session.loadData(url, request)
         if (response.code != HttpURLConnection.HTTP_OK) {
+            logger.e(TAG) { "Client details failure: ${response.code}" }
             throw RefreshTokenException(response.code)
         }
 
         // The response should be an encrypted payload. Let's attempt to decrypt it using the key we were provided.
-        val payload = DataEnvelope.decrypt(refreshResponseKey, response.data, true)
-            ?: throw PayloadDecryptException()
+        val payload = DataEnvelope.decrypt(refreshResponseKey, response.data, true) ?: run {
+            logger.e(TAG) { "Error decrypting response from client details" }
+            throw PayloadDecryptException()
+        }
 
         // The decrypted payload should be JSON which we can parse.
         val refreshResponse = RefreshResponse.fromJson(JSONObject(String(payload, Charsets.UTF_8)))
-        return@withContext refreshResponse?.toRefreshPackage() ?: throw InvalidPayloadException()
+        return@withContext refreshResponse?.toRefreshPackage() ?: run {
+            logger.e(TAG) { "Error parsing response from client details" }
+            throw InvalidPayloadException()
+        }
     }
 
     private companion object {
+        const val TAG = "UID2Client"
+
         // The relative path of the API's refresh endpoint
         const val API_REFRESH_PATH = "/v2/token/refresh"
     }
