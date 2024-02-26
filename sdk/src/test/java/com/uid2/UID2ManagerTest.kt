@@ -10,6 +10,7 @@ import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
 import com.uid2.network.RefreshPackage
 import com.uid2.storage.StorageManager
+import com.uid2.utils.Logger
 import com.uid2.utils.TimeUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,6 +51,7 @@ class UID2ManagerTest {
     private val client: UID2Client = mock()
     private val storageManager: StorageManager = mock()
     private val timeUtils: TimeUtils = mock()
+    private val logger: Logger = mock()
 
     private lateinit var manager: UID2Manager
     private val initialIdentity = withRandomIdentity()
@@ -108,7 +110,7 @@ class UID2ManagerTest {
     @Test
     fun `resets identity immediately after initialisation`() = runTest(testDispatcher) {
         // Create a new instance of the manager but *don't* allow it to finish initialising (loading previous identity)
-        val manager = UID2Manager(client, storageManager, timeUtils, testDispatcher, false).apply {
+        val manager = UID2Manager(client, storageManager, timeUtils, testDispatcher, false, logger).apply {
             onIdentityChangedListener = listener
             checkExpiration = false
         }
@@ -428,7 +430,14 @@ class UID2ManagerTest {
         listener: UID2ManagerIdentityChangedListener?,
         initialCheckExpiration: Boolean = false,
     ): UID2Manager {
-        return UID2Manager(client, storageManager, timeUtils, dispatcher, initialAutomaticRefreshEnabled).apply {
+        return UID2Manager(
+            client,
+            storageManager,
+            timeUtils,
+            dispatcher,
+            initialAutomaticRefreshEnabled,
+            logger,
+        ).apply {
             onIdentityChangedListener = listener
             checkExpiration = initialCheckExpiration
 

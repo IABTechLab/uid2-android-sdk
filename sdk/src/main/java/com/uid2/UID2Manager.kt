@@ -22,6 +22,7 @@ import com.uid2.extensions.getMetadata
 import com.uid2.network.DefaultNetworkSession
 import com.uid2.network.NetworkSession
 import com.uid2.storage.StorageManager
+import com.uid2.utils.Logger
 import com.uid2.utils.TimeUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -83,6 +84,7 @@ public class UID2Manager internal constructor(
     private val timeUtils: TimeUtils,
     defaultDispatcher: CoroutineDispatcher,
     initialAutomaticRefreshEnabled: Boolean,
+    private val logger: Logger,
 ) {
     private val scope = CoroutineScope(defaultDispatcher + SupervisorJob())
 
@@ -156,6 +158,10 @@ public class UID2Manager internal constructor(
         initialized = scope.launch {
             // Attempt to load the Identity from storage. If successful, we can notify any observers.
             storageManager.loadIdentity().let {
+                if (it.first != null) {
+                    logger.i(TAG) { "Restoring previously persisted identity" }
+                }
+
                 validateAndSetIdentity(it.first, it.second, false)
             }
         }
@@ -168,6 +174,7 @@ public class UID2Manager internal constructor(
      * This will also be persisted locally, so that when the application re-launches, we reload this Identity.
      */
     public fun setIdentity(identity: UID2Identity): Unit = afterInitialized {
+        logger.i(TAG) { "Setting external identity" }
         validateAndSetIdentity(identity, null)
     }
 
@@ -177,6 +184,7 @@ public class UID2Manager internal constructor(
     public fun resetIdentity(): Unit = afterInitialized {
         currentIdentity ?: return@afterInitialized
 
+        logger.i(TAG) { "Resetting identity" }
         setIdentityInternal(null, NO_IDENTITY, true)
     }
 
@@ -185,7 +193,10 @@ public class UID2Manager internal constructor(
      */
     public fun refreshIdentity(): Unit = afterInitialized {
         // If we have a valid Identity, let's refresh it.
-        currentIdentity?.let { refreshIdentityInternal(it) }
+        currentIdentity?.let {
+            logger.i(TAG) { "Refreshing identity" }
+            refreshIdentityInternal(it)
+        }
     }
 
     /**
@@ -207,6 +218,8 @@ public class UID2Manager internal constructor(
     private fun refreshIdentityInternal(identity: UID2Identity) = scope.launch {
         try {
             refreshToken(identity).retryWhen { _, attempt ->
+                logger.i(TAG) { "Refreshing (Attempt: $attempt)" }
+
                 // The delay between retry attempts is based upon how many attempts we have previously had. After a
                 // number of sequential failures, we will increase the delay.
                 val delayMs = if (attempt < REFRESH_TOKEN_FAILURE_RETRY_THRESHOLD) {
@@ -221,10 +234,12 @@ public class UID2Manager internal constructor(
                 getIdentityPackage(identity, false).valid
             }.single().let {
                     result ->
+                logger.i(TAG) { "Successfully refreshed identity" }
                 validateAndSetIdentity(result.identity, result.status)
             }
-        } catch (_: UID2Exception) {
+        } catch (ex: UID2Exception) {
             // This will happen after we decide to no longer try to update the identity, e.g. it's no longer valid.
+            logger.e(TAG, ex) { "Error when trying to refresh identity" }
         }
     }
 
@@ -313,6 +328,8 @@ public class UID2Manager internal constructor(
                 checkRefreshExpiresJob = scope.launch {
                     val timeToCheck = timeUtils.diffToNow(it.refreshExpires) + EXPIRATION_CHECK_TOLERANCE_MS
                     delay(timeToCheck)
+
+                    logger.i(TAG) { "Detected refresh has expired" }
                     validateAndSetIdentity(it, null, true)
                 }
             }
@@ -323,6 +340,8 @@ public class UID2Manager internal constructor(
                 checkIdentityExpiresJob = scope.launch {
                     val timeToCheck = timeUtils.diffToNow(it.identityExpires) + EXPIRATION_CHECK_TOLERANCE_MS
                     delay(timeToCheck)
+
+                    logger.i(TAG) { "Detected identity has expired" }
                     validateAndSetIdentity(it, null, true)
                 }
             }
@@ -336,12 +355,18 @@ public class UID2Manager internal constructor(
     ) {
         // Process Opt Out.
         if (status == OPT_OUT) {
+            logger.i(TAG) { "User opt-out detected" }
             setIdentityInternal(null, OPT_OUT)
             return
         }
 
         // Check to see the validity of the Identity, updating our internal state.
         val validity = getIdentityPackage(identity, currentIdentity == null)
+
+        logger.i(TAG) {
+            "Updating identity (Identity: ${validity.identity != null}, Status: ${validity.status}, " +
+                "Updating Storage: $updateStorage)"
+        }
         setIdentityInternal(validity.identity, validity.status, updateStorage)
     }
 
@@ -396,6 +421,8 @@ public class UID2Manager internal constructor(
     }
 
     public companion object {
+        private const val TAG = "UID2Manager"
+
         // The default API server.
         private const val UID2_API_URL_KEY = "uid2_api_url"
         private const val UID2_API_URL_DEFAULT = "https://prod.uidapi.com"
@@ -420,14 +447,9 @@ public class UID2Manager internal constructor(
         private var api: String = UID2_API_URL_DEFAULT
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
+        private var isLoggingEnabled: Boolean = false
 
         private var instance: UID2Manager? = null
-
-        /**
-         * Initializes the class with the given [Context].
-         */
-        @JvmStatic
-        public fun init(context: Context): Unit = init(context, DefaultNetworkSession())
 
         /**
          * Initializes the class with the given [Context], along with a [NetworkSession] that will be responsible
@@ -439,8 +461,13 @@ public class UID2Manager internal constructor(
          * The default implementation supported by the SDK can be found as [DefaultNetworkSession].
          */
         @JvmStatic
+        @JvmOverloads
         @Throws(InitializationException::class)
-        public fun init(context: Context, networkSession: NetworkSession) {
+        public fun init(
+            context: Context,
+            networkSession: NetworkSession = DefaultNetworkSession(),
+            isLoggingEnabled: Boolean = false,
+        ) {
             if (instance != null) {
                 throw InitializationException()
             }
@@ -449,7 +476,8 @@ public class UID2Manager internal constructor(
 
             this.api = metadata?.getString(UID2_API_URL_KEY, UID2_API_URL_DEFAULT) ?: UID2_API_URL_DEFAULT
             this.networkSession = networkSession
-            this.storageManager = StorageManager.getInstance(context)
+            this.storageManager = StorageManager.getInstance(context.applicationContext)
+            this.isLoggingEnabled = isLoggingEnabled
         }
 
         /**
@@ -466,16 +494,19 @@ public class UID2Manager internal constructor(
         @JvmStatic
         public fun getInstance(): UID2Manager {
             val storage = storageManager ?: throw InitializationException()
+            val logger = Logger(isLoggingEnabled)
 
             return instance ?: UID2Manager(
                 UID2Client(
                     api,
                     networkSession,
+                    logger,
                 ),
                 storage,
                 TimeUtils(),
                 Dispatchers.Default,
                 true,
+                logger,
             ).apply {
                 instance = this
             }
