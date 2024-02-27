@@ -1,4 +1,5 @@
 name: Release
+run-name: ${{ format('Release version {0}', inputs.version)}} by @${{ github.actor }}  
 
 on:
   workflow_dispatch:
@@ -11,6 +12,7 @@ on:
         description: 'Next SNAPSHOT version (without v). Defaults to current value'
         required: false
         type: string
+  pull_request:
 
 jobs:
   publish:
@@ -42,13 +44,46 @@ jobs:
           # Disable writing to cache. Don't want to spoil the main cache
           cache-read-only: true
 
-      - name: Release
-        run: ./scripts/release.sh ${{ inputs.version }} ${{ inputs.snapshot }}
+      - name: Get Snaptshot versions
+        id: snapshotVersions
+        run: ./scripts/get_next_snapshot_version.sh ${{ inputs.snapshot }}
+
+      - name: Prepare for release metadata
+        shell: bash
+        run: |
+          sed -i.bak "s/${{ steps.snapshotVersions.cur_snapshot_version }}/${{ steps.snapshotVersions.new_snapshot_version }}/g" gradle.properties
+
+      - name: Commit gradle.properties and set tag for v${{ inputs.version }}
+        uses: IABTechLab/uid2-shared-actions/actions/commit_pr_and_merge@v2
+        with:
+          add: 'gradle.properties'
+          message: 'Prepare for release: ${{ inputs.version }}'
+          tag: v${{ inputs.version }}
+
+      - name: Deploy v${{ inputs.version }}
+        run: ./gradlew publish
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_REPO_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_REPO_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Prepare next Snapshot version ${{ steps.snapshotVersions.new_snapshot_version }}
+        shell: bash
+        run: |
+          echo "Setting next snapshot version ${{ steps.snapshotVersions.new_snapshot_version }}"
+          sed -i.bak "s/${{ inputs.version }}/${{ steps.snapshotVersions.new_snapshot_version }}/g" gradle.properties
+
+      - name: Commit gradle.properties for Snapshot version ${{ steps.snapshotVersions.new_snapshot_version }}
+        uses: IABTechLab/uid2-shared-actions/actions/commit_pr_and_merge@v2
+        with:
+          add: 'gradle.properties'
+          message: 'Prepare next development version: ${{ steps.snapshotVersions.new_snapshot_version }}'
+
+      - name: Remove the backup file from sed edits
+        shell: bash
+        run: |
+          rm gradle.properties.bak
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v1
