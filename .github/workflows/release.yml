@@ -12,7 +12,6 @@ on:
         description: 'Next SNAPSHOT version (without v). Defaults to current value'
         required: false
         type: string
-  pull_request:
 
 jobs:
   publish:
