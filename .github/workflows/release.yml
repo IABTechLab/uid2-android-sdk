@@ -48,7 +48,7 @@ jobs:
 
       - name: Get Snaptshot versions
         id: snapshotVersions
-        run: ./scripts/get_next_snapshot_version.sh ${{ inputs.snapshot }}
+        run: ./scripts/get_snapshot_versions.sh ${{ inputs.snapshot }}
 
       - name: Prepare for release metadata
         shell: bash
