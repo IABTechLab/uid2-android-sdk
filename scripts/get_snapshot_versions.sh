@@ -16,6 +16,5 @@ if [ -z "$NEW_SNAPSHOT_VERSION" ]; then
   NEW_SNAPSHOT_VERSION=$CUR_SNAPSHOT_VERSION
 fi
 
-
 echo "new_snapshot_version=$NEW_SNAPSHOT_VERSION" >> $GITHUB_OUTPUT
 echo "cur_snapshot_version=$CUR_SNAPSHOT_VERSION" >> $GITHUB_OUTPUT
