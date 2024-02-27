@@ -19,7 +19,10 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
+      pull-requests: write
       contents: write
+      security-events: write
+      packages: write
 
     steps:
       - name: Checkout
