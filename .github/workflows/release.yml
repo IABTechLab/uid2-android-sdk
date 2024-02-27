@@ -34,9 +34,9 @@ jobs:
           distribution: 'temurin'
 
       - name: Fail if Release and not on Default branch
-      if: ${{ github.event.repository.default_branch != github.ref_name }}
-      uses: actions/github-script@v7
-      with:
+        if: ${{ github.event.repository.default_branch != github.ref_name }}
+        uses: actions/github-script@v7
+        with:
           script: |
             core.setFailed('Releases can not be created on a feature branch. Branch: ${{ github.ref_name }}')
 
