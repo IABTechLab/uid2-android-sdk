@@ -46,4 +46,23 @@ class StringExTest {
         assertNotNull(inputDecoded)
         assertEquals(input, inputDecoded?.toString(Charsets.UTF_8))
     }
+
+    @Test
+    fun `test SHA-256 hashing`() {
+        mapOf(
+            "test.test@test.com" to "dvECjPKZHya0/SIhSGwP0m8SgTv1vzLxPULUOsm880M=",
+            "testtest@gmail.com" to "LkLfFrut8Tc3h/fIvYDiBKSbaMiau/DtaLBPQYszdMw=",
+            "test+test@test.com" to "rQ4yzdOz4uG8N54326QyZD6/JwqrXn4lmy34cVCojB8=",
+            "+test@test.com" to "weFizOVVWKlLfyorbBU8oxYDv4HJtTZCPMyZ4THzUQE=",
+            "test@gmail.com" to "h5JGBrQTGorO7q6IaFMfu5cSqqB6XTp1aybOD11spnQ=",
+            "testtest@test.com" to "d1Lr/s4GLLX3SvQVMoQdIMfbQPMAGZYry+2V+0pZlQg=",
+            "testtest@gmail.com" to "LkLfFrut8Tc3h/fIvYDiBKSbaMiau/DtaLBPQYszdMw=",
+            "\uD83D\uDE0Atesttest@test.com" to "fAFEUqApQ0V/M9mLj/IO54CgKgtQuARKsOMqtFklD4k=",
+            "testtest@\uD83D\uDE0Atest.com" to "tcng5pttf7Y2z4ylZTROvIMw1+IVrMpR4D1KeXSrdiM=",
+            "testtest@test.com\uD83D\uDE0A" to "0qI21FPLkuez/8RswfmircHPYz9Dtf7/Nch1rSWEQf0=",
+        ).forEach {
+            // Hash the given string (with SHA-256) and check that the Base64 encoded output matches what we expect.
+            assertEquals(it.key.toSha256(), it.value)
+        }
+    }
 }
