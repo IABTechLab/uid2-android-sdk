@@ -68,11 +68,46 @@ class UID2ManagerTest {
     }
 
     @Test
+    fun `reports when initialization is complete`() = runTest(testDispatcher) {
+        var isInitialized = false
+        val onInitialized = { isInitialized = true }
+
+        val manager = UID2Manager(client, storageManager, timeUtils, testDispatcher, false, logger).apply {
+            this.checkExpiration = false
+            this.onInitialized = onInitialized
+        }
+
+        // Verify that the manager invokes our callback after it's been able to load the identity from storage.
+        assertFalse(isInitialized)
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(isInitialized)
+
+        // Reset our state and re-assign the manager's callback. Verify that even though initialization is complete, our
+        // callback is invoked immediately.
+        isInitialized = false
+        manager.onInitialized = onInitialized
+        assertTrue(isInitialized)
+    }
+
+    @Test
     fun `restores identity from storage`() = runTest(testDispatcher) {
         // Verify that the initial state of the manager reflects the restored Identity.
         assertNotNull(manager.currentIdentity)
         assertEquals(initialIdentity, manager.currentIdentity)
         assertEquals(initialStatus, manager.currentIdentityStatus)
+    }
+
+    @Test
+    fun `set identity immediately available`() = runTest(testDispatcher) {
+        val identity = withRandomIdentity()
+
+        // By default, the Manager will have restored the previously persisted Identity. Let's reset our state so this
+        // will be a new Identity.
+        manager.resetIdentity()
+
+        // Verify that immediately after setting an identity, it's immediately available via currentIdentity.
+        manager.setIdentity(identity)
+        assertEquals(identity, manager.currentIdentity)
     }
 
     @Test

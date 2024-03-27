@@ -4,6 +4,7 @@ import android.content.Context
 import com.uid2.UID2ManagerState.Established
 import com.uid2.UID2ManagerState.Expired
 import com.uid2.UID2ManagerState.Invalid
+import com.uid2.UID2ManagerState.Loading
 import com.uid2.UID2ManagerState.NoIdentity
 import com.uid2.UID2ManagerState.OptOut
 import com.uid2.UID2ManagerState.RefreshExpired
@@ -58,6 +59,7 @@ public interface UID2ManagerIdentityChangedListener {
  * A interface defining the flow of state communicated by the [UID2Manager].
  */
 public sealed interface UID2ManagerState {
+    public data object Loading : UID2ManagerState
     public data class Established(val identity: UID2Identity) : UID2ManagerState
     public data class Refreshed(val identity: UID2Identity) : UID2ManagerState
     public data object NoIdentity : UID2ManagerState
@@ -93,7 +95,23 @@ public class UID2Manager internal constructor(
      */
     public var onIdentityChangedListener: UID2ManagerIdentityChangedListener? = null
 
-    private val _state = MutableStateFlow<UID2ManagerState>(NoIdentity)
+    /**
+     * Gets or sets a listener which can be used to determine if the [UID2Manager] instance has finished initializing.
+     * Initializing includes any time required to restore a previously persisted [UID2Identity] from storage.
+     *
+     * If this property is set *after* initialization is complete, the callback will be invoked immediately.
+     */
+    public var onInitialized: (() -> Unit)? = null
+        set(value) {
+            field = value
+
+            // If we've already finished initializing, we should immediately invoke the callback.
+            if (initialized.isCompleted) {
+                value?.invoke()
+            }
+        }
+
+    private val _state = MutableStateFlow<UID2ManagerState>(Loading)
 
     /**
      * The flow representing the state of the UID2Manager.
@@ -135,6 +153,7 @@ public class UID2Manager internal constructor(
      */
     public val currentIdentityStatus: IdentityStatus
         get() = when (_state.value) {
+            is Loading -> NO_IDENTITY // Not available yet.
             is Established -> ESTABLISHED
             is Refreshed -> REFRESHED
             is NoIdentity -> NO_IDENTITY
@@ -164,6 +183,9 @@ public class UID2Manager internal constructor(
 
                 validateAndSetIdentity(it.first, it.second, false)
             }
+
+            // If we have a callback provided, invoke it.
+            onInitialized?.invoke()
         }
     }
 

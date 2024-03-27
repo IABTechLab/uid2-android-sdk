@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.uid2.UID2Manager
 import com.uid2.UID2ManagerState.Established
 import com.uid2.UID2ManagerState.Expired
+import com.uid2.UID2ManagerState.Loading
 import com.uid2.UID2ManagerState.NoIdentity
 import com.uid2.UID2ManagerState.OptOut
 import com.uid2.UID2ManagerState.RefreshExpired
@@ -33,12 +34,12 @@ import kotlinx.coroutines.launch
 
 sealed interface MainScreenAction : ViewModelAction {
     data class EmailChanged(val address: String) : MainScreenAction
-    object ResetButtonPressed : MainScreenAction
-    object RefreshButtonPressed : MainScreenAction
+    data object ResetButtonPressed : MainScreenAction
+    data object RefreshButtonPressed : MainScreenAction
 }
 
 sealed interface MainScreenState : ViewState {
-    object LoadingState : MainScreenState
+    data object LoadingState : MainScreenState
     data class UserUpdatedState(val identity: UID2Identity?, val status: IdentityStatus) : MainScreenState
     data class ErrorState(val error: Throwable) : MainScreenState
 }
@@ -59,6 +60,7 @@ class MainScreenViewModel(
                 Log.d(TAG, "State Update: $state")
 
                 when (state) {
+                    is Loading -> Unit
                     is Established -> _viewState.emit(UserUpdatedState(state.identity, ESTABLISHED))
                     is Refreshed -> _viewState.emit(UserUpdatedState(state.identity, REFRESHED))
                     is NoIdentity -> _viewState.emit(UserUpdatedState(null, NO_IDENTITY))
