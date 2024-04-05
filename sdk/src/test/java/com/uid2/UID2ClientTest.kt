@@ -44,14 +44,15 @@ class UID2ClientTest {
     private val logger: Logger = mock()
 
     private val url = "https://test.dev"
-    private val apiPublicKey = "an api key"
-    private val apiSubscriptionId = "subscription id"
     private val refreshToken = "RefreshToken"
     private val refreshKey = "RefreshKey"
 
     private val keyPair: KeyPair = mock()
     private val keyPairPublic: PublicKey = mock()
     private val keyPairPublicEncoded = ByteArray(12)
+
+    private val SUBSCRIPTION_ID = "subscription_id"
+    private val PUBLIC_KEY = "public_key"
 
     @Before
     fun before() {
@@ -77,7 +78,11 @@ class UID2ClientTest {
     @Test
     fun `test generate with invalid api url`() = runTest(testDispatcher) {
         testInvalidClientApi { client ->
-            client.generateIdentity(IdentityRequest.Email("test@test.com"))
+            client.generateIdentity(
+                IdentityRequest.Email("test@test.com"),
+                SUBSCRIPTION_ID,
+                PUBLIC_KEY,
+            )
         }
     }
 
@@ -91,7 +96,11 @@ class UID2ClientTest {
         // Verify the expected CryptoException is thrown.
         assertThrows(CryptoException::class.java) {
             runTest(testDispatcher) {
-                client.generateIdentity(IdentityRequest.Email("test@test.com"))
+                client.generateIdentity(
+                    IdentityRequest.Email("test@test.com"),
+                    SUBSCRIPTION_ID,
+                    PUBLIC_KEY,
+                )
             }
         }
     }
@@ -106,7 +115,11 @@ class UID2ClientTest {
         // Verify the expected CryptoException is thrown.
         assertThrows(CryptoException::class.java) {
             runTest(testDispatcher) {
-                client.generateIdentity(IdentityRequest.Email("test@test.com"))
+                client.generateIdentity(
+                    IdentityRequest.Email("test@test.com"),
+                    SUBSCRIPTION_ID,
+                    PUBLIC_KEY,
+                )
             }
         }
     }
@@ -121,7 +134,11 @@ class UID2ClientTest {
         // Verify the expected CryptoException is thrown.
         assertThrows(CryptoException::class.java) {
             runTest(testDispatcher) {
-                client.generateIdentity(IdentityRequest.Email("test@test.com"))
+                client.generateIdentity(
+                    IdentityRequest.Email("test@test.com"),
+                    SUBSCRIPTION_ID,
+                    PUBLIC_KEY,
+                )
             }
         }
     }
@@ -136,7 +153,11 @@ class UID2ClientTest {
         // Verify the expected CryptoException is thrown.
         assertThrows(CryptoException::class.java) {
             runTest(testDispatcher) {
-                client.generateIdentity(IdentityRequest.Email("test@test.com"))
+                client.generateIdentity(
+                    IdentityRequest.Email("test@test.com"),
+                    SUBSCRIPTION_ID,
+                    PUBLIC_KEY,
+                )
             }
         }
     }
@@ -144,7 +165,11 @@ class UID2ClientTest {
     @Test
     fun `test generate with network failure`() = runTest(testDispatcher) {
         testNetworkFailure { client ->
-            client.generateIdentity(IdentityRequest.Email("test@test.com"))
+            client.generateIdentity(
+                IdentityRequest.Email("test@test.com"),
+                SUBSCRIPTION_ID,
+                PUBLIC_KEY,
+            )
         }
     }
 
@@ -159,7 +184,11 @@ class UID2ClientTest {
         // Verify the expected CryptoException is thrown.
         assertThrows(PayloadDecryptException::class.java) {
             runTest(testDispatcher) {
-                client.generateIdentity(IdentityRequest.Email("test@test.com"))
+                client.generateIdentity(
+                    IdentityRequest.Email("test@test.com"),
+                    SUBSCRIPTION_ID,
+                    PUBLIC_KEY,
+                )
             }
         }
     }
@@ -174,7 +203,11 @@ class UID2ClientTest {
         )
         whenever(networkSession.loadData(any(), any())).thenReturn(NetworkResponse(200, "some data"))
 
-        val response = client.generateIdentity(IdentityRequest.Email("test@test.com"))
+        val response = client.generateIdentity(
+            IdentityRequest.Email("test@test.com"),
+            SUBSCRIPTION_ID,
+            PUBLIC_KEY,
+        )
         assertNotNull(response)
 
         // Verify that the returned package has an identity that matches what we included in the body of the response.
@@ -288,8 +321,6 @@ class UID2ClientTest {
     private fun testInvalidClientApi(callback: suspend (client: UID2Client) -> Unit) {
         val client = UID2Client(
             "this is not a url",
-            apiPublicKey,
-            apiSubscriptionId,
             networkSession,
             packageName,
             dataEnvelope,
@@ -347,8 +378,6 @@ class UID2ClientTest {
 
     private fun withClient() = UID2Client(
         url,
-        apiPublicKey,
-        apiSubscriptionId,
         networkSession,
         packageName,
         dataEnvelope,

@@ -13,7 +13,7 @@ import org.json.JSONObject
  * This class defines the expected response from the Identity API when refreshing. The results could include a new
  * (refreshed) Identity, or represent a failure/error.
  *
- * https://github.com/IABTechLab/uid2docs/blob/main/api/v2/endpoints/post-token-refresh.md#decrypted-json-response-format
+ * https://unifiedid.com/docs/endpoints/post-token-refresh
  */
 internal data class RefreshResponse(
     val body: UID2Identity?,

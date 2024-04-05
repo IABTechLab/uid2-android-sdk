@@ -96,7 +96,12 @@ class MainScreenViewModel(
                     try {
                         if (action.clientSide) {
                             // Generate the identity via Client Side Integration (client side token generation).
-                            manager.generateIdentity(IdentityRequest.Email(action.address), onGenerateResult)
+                            manager.generateIdentity(
+                                IdentityRequest.Email(action.address),
+                                SUBSCRIPTION_ID,
+                                PUBLIC_KEY,
+                                onGenerateResult,
+                            )
                         } else {
                             // We're going to generate the identity as if we've obtained it via a backend service.
                             api.generateIdentity(action.address, EMAIL)?.let {
@@ -113,7 +118,12 @@ class MainScreenViewModel(
                     try {
                         if (action.clientSide) {
                             // Generate the identity via Client Side Integration (client side token generation).
-                            manager.generateIdentity(IdentityRequest.Phone(action.number), onGenerateResult)
+                            manager.generateIdentity(
+                                IdentityRequest.Phone(action.number),
+                                SUBSCRIPTION_ID,
+                                PUBLIC_KEY,
+                                onGenerateResult,
+                            )
                         } else {
                             // We're going to generate the identity as if we've obtained it via a backend service.
                             api.generateIdentity(action.number, PHONE)?.let {
@@ -138,6 +148,10 @@ class MainScreenViewModel(
 
     private companion object {
         const val TAG = "MainScreenViewModel"
+
+        @Suppress("ktlint:standard:max-line-length")
+        const val SUBSCRIPTION_ID = "4WvryDGbR5"
+        const val PUBLIC_KEY = "UID2-X-L-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtXJdTSZAYHvoRDWiehMHoWF1BNPuqLs5w2ZHiAZ1IJc7O4/z0ojPTB0V+KYX/wxQK0hxx6kxCvHj335eI/ZQsQ=="
     }
 }
 

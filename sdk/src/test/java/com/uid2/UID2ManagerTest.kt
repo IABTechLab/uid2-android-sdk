@@ -142,6 +142,9 @@ class UID2ManagerTest {
 
     @Test
     fun `generates identity for different requests`() = runTest(testDispatcher) {
+        val subscriptionId = "sub"
+        val publicKey = "pub"
+
         listOf(
             IdentityRequest.Email("test@test.com"),
             IdentityRequest.EmailHash("a-hash"),
@@ -149,11 +152,13 @@ class UID2ManagerTest {
             IdentityRequest.PhoneHash("another-hash"),
         ).forEach { request ->
             val generated = withRandomIdentity()
-            whenever(client.generateIdentity(request)).thenReturn(ResponsePackage(generated, ESTABLISHED, ""))
+            whenever(client.generateIdentity(request, subscriptionId, publicKey)).thenReturn(
+                ResponsePackage(generated, ESTABLISHED, ""),
+            )
 
             // Request a new identity should be generated.
             var result: GenerateIdentityResult? = null
-            manager.generateIdentity(request) { result = it }
+            manager.generateIdentity(request, subscriptionId, publicKey) { result = it }
             testDispatcher.scheduler.advanceUntilIdle()
 
             // Verify that the identity is updated from the one provided via the Client.
@@ -166,15 +171,20 @@ class UID2ManagerTest {
 
     @Test
     fun `existing identity untouched if generation fails`() = runTest(testDispatcher) {
+        val subscriptionId = "sub"
+        val publicKey = "pub"
+
         val request = IdentityRequest.Email("test@test.com")
-        whenever(client.generateIdentity(request)).thenThrow(PayloadDecryptException::class.java)
+        whenever(client.generateIdentity(request, subscriptionId, publicKey)).thenThrow(
+            PayloadDecryptException::class.java,
+        )
 
         // Verify that the manager has a known (existing) identity.
         assertEquals(manager.currentIdentity, initialIdentity)
 
         // Request a new identity is generated, knowing that this will fail.
         var result: GenerateIdentityResult? = null
-        manager.generateIdentity(request) { result = it }
+        manager.generateIdentity(request, subscriptionId, publicKey) { result = it }
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Verify that after the failure, the existing identity is still present.

@@ -218,6 +218,10 @@ public class UID2Manager internal constructor(
      * Once set, assuming it's valid, it will be monitored so that we automatically refresh the token(s) when required.
      * This will also be persisted locally, so that when the application re-launches, we reload this Identity.
      *
+     * @param identityRequest The identify for which the [UID2Identity] is required for.
+     * @param subscriptionId The subscription id that was obtained when configuring your account.
+     * @param publicKey The public key that was obtained when configuring your account.
+     *
      * @throws InputValidationException Thrown if the given [IdentityRequest] is not valid. For a
      * [IdentityRequest.Phone] we expect the given number to conform to the ITU E.164 Standard
      * (https://en.wikipedia.org/wiki/E.164).
@@ -225,6 +229,8 @@ public class UID2Manager internal constructor(
     @Throws(InputValidationException::class)
     public fun generateIdentity(
         identityRequest: IdentityRequest,
+        subscriptionId: String,
+        publicKey: String,
         onResult: (GenerateIdentityResult) -> Unit,
     ): Unit = afterInitialized {
         // Normalize any given input to validate it.
@@ -237,7 +243,7 @@ public class UID2Manager internal constructor(
         scope.launch {
             try {
                 // Attempt to generate the new identity.
-                val identity = client.generateIdentity(request)
+                val identity = client.generateIdentity(request, subscriptionId, publicKey)
 
                 // Cancel any in-flight refresh job that could be processing a previously set identity.
                 refreshJob?.cancel()
@@ -516,10 +522,6 @@ public class UID2Manager internal constructor(
         private const val UID2_API_URL_KEY = "uid2_api_url"
         private const val UID2_API_URL_DEFAULT = "https://prod.uidapi.com"
 
-        // The metadata keys that are used to provide access to required parameters for Client Side Integration.
-        private const val UID2_API_PUBLIC_KEY = "uid2_api_public_key"
-        private const val UID2_API_SUBSCRIPTION_ID = "uid2_api_subscription_id"
-
         private const val PACKAGE_NAME_DEFAULT = "unknown"
 
         private const val PACKAGE_NOT_AVAILABLE = "Identity not available"
@@ -540,8 +542,6 @@ public class UID2Manager internal constructor(
         private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
 
         private var api: String = UID2_API_URL_DEFAULT
-        private var apiPublicKey: String? = null
-        private var apiSubscriptionId: String? = null
         private var packageName: String = PACKAGE_NAME_DEFAULT
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
@@ -573,8 +573,6 @@ public class UID2Manager internal constructor(
             val metadata = context.getMetadata()
 
             this.api = metadata?.getString(UID2_API_URL_KEY, UID2_API_URL_DEFAULT) ?: UID2_API_URL_DEFAULT
-            this.apiPublicKey = metadata?.getString(UID2_API_PUBLIC_KEY, null)
-            this.apiSubscriptionId = metadata?.getString(UID2_API_SUBSCRIPTION_ID, null)
             this.packageName = context.packageName
             this.networkSession = networkSession
             this.storageManager = StorageManager.getInstance(context.applicationContext)
@@ -600,8 +598,6 @@ public class UID2Manager internal constructor(
             return instance ?: UID2Manager(
                 UID2Client(
                     apiUrl = api,
-                    apiPublicKey = apiPublicKey,
-                    apiSubscriptionId = apiSubscriptionId,
                     session = networkSession,
                     packageName = packageName,
                     logger = logger,

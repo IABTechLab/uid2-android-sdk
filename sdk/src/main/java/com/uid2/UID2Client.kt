@@ -1,7 +1,6 @@
 package com.uid2
 
 import com.uid2.data.IdentityRequest
-import com.uid2.data.IdentityStatus
 import com.uid2.data.toPayload
 import com.uid2.extensions.encodeBase64
 import com.uid2.network.DataEnvelope
@@ -27,8 +26,6 @@ import java.net.URL
  */
 internal class UID2Client(
     private val apiUrl: String,
-    private val apiPublicKey: String?,
-    private val apiSubscriptionId: String?,
     private val session: NetworkSession,
     private val packageName: String,
     private val dataEnvelope: DataEnvelope = DataEnvelope,
@@ -55,15 +52,12 @@ internal class UID2Client(
         PayloadDecryptException::class,
         InvalidPayloadException::class,
     )
-    suspend fun generateIdentity(identityRequest: IdentityRequest): ResponsePackage = withContext(ioDispatcher) {
+    suspend fun generateIdentity(
+        identityRequest: IdentityRequest,
+        subscriptionId: String,
+        publicKey: String,
+    ): ResponsePackage = withContext(ioDispatcher) {
         logger.i(TAG) { "Generating Identity" }
-
-        // If the SDK hasn't been configured with the required client side integration parameters, then it's not
-        // possible for us to generate the requested (new) identity.
-        if (apiPublicKey == null || apiSubscriptionId == null) {
-            logger.e(TAG) { "SDK not configured correctly (Key: $apiPublicKey, SubscriptionID: $apiSubscriptionId)" }
-            return@withContext ResponsePackage(null, IdentityStatus.INVALID, "SDK misconfigured")
-        }
 
         // Check to make sure we have a valid endpoint to hit.
         val url = apiGenerateUrl ?: run {
@@ -72,7 +66,7 @@ internal class UID2Client(
         }
 
         // Generate the required Server and Client keys.
-        val serverPublicKey = keyUtils.generateServerPublicKey(apiPublicKey)
+        val serverPublicKey = keyUtils.generateServerPublicKey(publicKey)
         val clientKeyPair = keyUtils.generateKeyPair()
         if (serverPublicKey == null || clientKeyPair == null) {
             logger.e(TAG) { "Error generating server and client keys" }
@@ -106,7 +100,7 @@ internal class UID2Client(
                     "iv" to iv.encodeBase64(),
                     "public_key" to clientKeyPair.public.encoded.encodeBase64(),
                     "timestamp" to now.toString(),
-                    "subscription_id" to apiSubscriptionId,
+                    "subscription_id" to subscriptionId,
                     "app_name" to packageName,
                 ),
             ),
