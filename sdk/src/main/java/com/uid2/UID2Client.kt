@@ -84,7 +84,7 @@ internal class UID2Client(
         val aad = keyUtils.generateAad(now)
 
         // Build and encrypt the payload containing the identity generation request.
-        val payload = identityRequest.toPayload()
+        val payload = identityRequest.toPayload(packageName)
         val encryptedPayload = dataEnvelope.encrypt(sharedSecret, payload, iv, aad.toByteArray()) ?: run {
             logger.e(TAG) { "Error encrypting payload" }
             throw CryptoException()
@@ -101,7 +101,6 @@ internal class UID2Client(
                     "public_key" to clientKeyPair.public.encoded.encodeBase64(),
                     "timestamp" to now.toString(),
                     "subscription_id" to subscriptionId,
-                    "app_name" to packageName,
                 ),
             ),
         )

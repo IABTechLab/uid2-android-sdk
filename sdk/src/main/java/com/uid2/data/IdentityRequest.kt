@@ -39,7 +39,7 @@ public sealed class IdentityRequest(internal val data: String) {
  * The payload should only contained a SHA-256 hashed representation of the data. If a raw email or telephone number has
  * been provided, then we will has it ourselves when building the payload.
  */
-internal fun IdentityRequest.toPayload(): String {
+internal fun IdentityRequest.toPayload(packageName: String): String {
     val payloadKey = when (this) {
         is Email, is EmailHash -> PARAM_EMAIL_HASH
         is Phone, is PhoneHash -> PARAM_PHONE_HASH
@@ -56,6 +56,7 @@ internal fun IdentityRequest.toPayload(): String {
 
         // If the identity has opted out, we will get an opt-out response.
         put(PARAM_OPT_OUT_CHECK, 1)
+        put("app_name", packageName)
     }.toString()
 }
 
