@@ -81,7 +81,7 @@ internal class UID2Client(
 
         val iv = keyUtils.generateIv(IV_LENGTH_BYTES)
         val now = timeUtils.now()
-        val aad = keyUtils.generateAad(now)
+        val aad = keyUtils.generateAad(now, packageName)
 
         // Build and encrypt the payload containing the identity generation request.
         val payload = identityRequest.toPayload()

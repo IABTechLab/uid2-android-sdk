@@ -65,7 +65,7 @@ class UID2ClientTest {
         whenever(keyUtils.generateKeyPair()).thenReturn(keyPair)
         whenever(keyUtils.generateSharedSecret(any(), any())).thenReturn(mock())
         whenever(keyUtils.generateIv(any())).thenAnswer { ByteArray(it.arguments[0] as Int) }
-        whenever(keyUtils.generateAad(any())).thenReturn("")
+        whenever(keyUtils.generateAad(any(), any())).thenReturn("")
 
         whenever(keyPairPublic.encoded).thenReturn(keyPairPublicEncoded)
         whenever(keyPair.public).thenReturn(keyPairPublic)

@@ -20,7 +20,7 @@ internal interface KeyUtils {
     /**
      * Generates the additional authentication data required when generating an identity.
      */
-    fun generateAad(now: Long): String
+    fun generateAad(now: Long, appName: String): String
 
     /**
      * Generates a new IV of the given length.
@@ -44,9 +44,10 @@ internal interface KeyUtils {
 
     companion object Default : KeyUtils {
 
-        override fun generateAad(now: Long): String {
+        override fun generateAad(now: Long, appName: String): String {
             return JSONArray().apply {
                 put(now)
+                put(appName)
             }.toString()
         }
 
