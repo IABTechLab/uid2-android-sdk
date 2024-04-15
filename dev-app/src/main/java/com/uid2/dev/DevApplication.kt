@@ -10,10 +10,10 @@ class DevApplication : Application() {
 
         // Initialise the UID2Manager class. We will use it's DefaultNetworkSession rather than providing our own
         // custom implementation. This can be done to allow wrapping something like OkHttp.
-        UID2Manager.init(context = this, isLoggingEnabled = true)
+        UID2Manager.init(context = this, serverUrl = INTEG_SERVER_URL, isLoggingEnabled = true)
 
         // Alternatively, we could initialise the UID2Manager with our own custom NetworkSession...
-        // UID2Manager.init(this.applicationContext, OkNetworkSession(), true)
+        // UID2Manager.init(this, INTEG_SERVER_URL, OkNetworkSession(), true)
 
         // For the development app, we will enable a strict thread policy to ensure we have suitable visibility of any
         // issues within the SDK.
@@ -29,5 +29,9 @@ class DevApplication : Application() {
                 penaltyLog()
             }.build(),
         )
+    }
+
+    private companion object {
+        const val INTEG_SERVER_URL = "https://operator-integ.uidapi.com"
     }
 }
