@@ -19,7 +19,6 @@ import com.uid2.data.IdentityStatus.OPT_OUT
 import com.uid2.data.IdentityStatus.REFRESHED
 import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
-import com.uid2.extensions.getMetadata
 import com.uid2.network.DefaultNetworkSession
 import com.uid2.network.NetworkSession
 import com.uid2.storage.StorageManager
@@ -446,7 +445,6 @@ public class UID2Manager internal constructor(
         private const val TAG = "UID2Manager"
 
         // The default API server.
-        private const val UID2_API_URL_KEY = "uid2_api_url"
         private const val UID2_API_URL_DEFAULT = "https://prod.uidapi.com"
 
         private const val PACKAGE_NOT_AVAILABLE = "Identity not available"
@@ -466,7 +464,7 @@ public class UID2Manager internal constructor(
         // The additional time we will allow to pass before checking the expiration of the Identity.
         private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
 
-        private var api: String = UID2_API_URL_DEFAULT
+        private var serverUrl: String = UID2_API_URL_DEFAULT
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
         private var isLoggingEnabled: Boolean = false
@@ -487,6 +485,7 @@ public class UID2Manager internal constructor(
         @Throws(InitializationException::class)
         public fun init(
             context: Context,
+            serverUrl: String = UID2_API_URL_DEFAULT,
             networkSession: NetworkSession = DefaultNetworkSession(),
             isLoggingEnabled: Boolean = false,
         ) {
@@ -494,9 +493,7 @@ public class UID2Manager internal constructor(
                 throw InitializationException()
             }
 
-            val metadata = context.getMetadata()
-
-            this.api = metadata?.getString(UID2_API_URL_KEY, UID2_API_URL_DEFAULT) ?: UID2_API_URL_DEFAULT
+            this.serverUrl = serverUrl
             this.networkSession = networkSession
             this.storageManager = StorageManager.getInstance(context.applicationContext)
             this.isLoggingEnabled = isLoggingEnabled
@@ -520,7 +517,7 @@ public class UID2Manager internal constructor(
 
             return instance ?: UID2Manager(
                 UID2Client(
-                    api,
+                    serverUrl,
                     networkSession,
                     logger,
                 ),
