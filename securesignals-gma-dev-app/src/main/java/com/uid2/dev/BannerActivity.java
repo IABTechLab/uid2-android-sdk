@@ -1,7 +1,5 @@
 package com.uid2.dev;
 
-import static com.google.ads.AdRequest.LOGTAG;
-
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
@@ -105,7 +103,7 @@ public class BannerActivity extends AppCompatActivity {
                 fromJsonIdentity.getRefreshResponseKey());
             UID2Manager.getInstance().setIdentity(identity);
         } catch (Exception e) {
-            Log.e(LOGTAG, "Error loading Identity: " + e);
+            Log.e(TAG, "Error loading Identity: " + e);
         }
 
     }

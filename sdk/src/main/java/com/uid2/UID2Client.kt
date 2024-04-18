@@ -46,48 +46,46 @@ internal class UID2Client(
         PayloadDecryptException::class,
         InvalidPayloadException::class,
     )
-    suspend fun refreshIdentity(
-        refreshToken: String,
-        refreshResponseKey: String,
-    ): RefreshPackage = withContext(ioDispatcher) {
-        logger.i(TAG) { "Refreshing identity" }
+    suspend fun refreshIdentity(refreshToken: String, refreshResponseKey: String): RefreshPackage =
+        withContext(ioDispatcher) {
+            logger.i(TAG) { "Refreshing identity" }
 
-        // Check to make sure we have a valid endpoint to hit.
-        val url = apiRefreshUrl ?: run {
-            logger.e(TAG) { "Error determining identity refresh API" }
-            throw InvalidApiUrlException()
+            // Check to make sure we have a valid endpoint to hit.
+            val url = apiRefreshUrl ?: run {
+                logger.e(TAG) { "Error determining identity refresh API" }
+                throw InvalidApiUrlException()
+            }
+
+            // Build the request to refresh the token.
+            val request = NetworkRequest(
+                NetworkRequestType.POST,
+                mapOf(
+                    "X-UID2-Client-Version" to clientVersion,
+                    "Content-Type" to "application/x-www-form-urlencoded",
+                ),
+                refreshToken,
+            )
+
+            // Attempt to make the request via the provided NetworkSession.
+            val response = session.loadData(url, request)
+            if (response.code != HttpURLConnection.HTTP_OK) {
+                logger.e(TAG) { "Client details failure: ${response.code}" }
+                throw RefreshTokenException(response.code)
+            }
+
+            // The response should be an encrypted payload. Let's attempt to decrypt it using the key we were provided.
+            val payload = DataEnvelope.decrypt(refreshResponseKey, response.data, true) ?: run {
+                logger.e(TAG) { "Error decrypting response from client details" }
+                throw PayloadDecryptException()
+            }
+
+            // The decrypted payload should be JSON which we can parse.
+            val refreshResponse = RefreshResponse.fromJson(JSONObject(String(payload, Charsets.UTF_8)))
+            return@withContext refreshResponse?.toRefreshPackage() ?: run {
+                logger.e(TAG) { "Error parsing response from client details" }
+                throw InvalidPayloadException()
+            }
         }
-
-        // Build the request to refresh the token.
-        val request = NetworkRequest(
-            NetworkRequestType.POST,
-            mapOf(
-                "X-UID2-Client-Version" to clientVersion,
-                "Content-Type" to "application/x-www-form-urlencoded",
-            ),
-            refreshToken,
-        )
-
-        // Attempt to make the request via the provided NetworkSession.
-        val response = session.loadData(url, request)
-        if (response.code != HttpURLConnection.HTTP_OK) {
-            logger.e(TAG) { "Client details failure: ${response.code}" }
-            throw RefreshTokenException(response.code)
-        }
-
-        // The response should be an encrypted payload. Let's attempt to decrypt it using the key we were provided.
-        val payload = DataEnvelope.decrypt(refreshResponseKey, response.data, true) ?: run {
-            logger.e(TAG) { "Error decrypting response from client details" }
-            throw PayloadDecryptException()
-        }
-
-        // The decrypted payload should be JSON which we can parse.
-        val refreshResponse = RefreshResponse.fromJson(JSONObject(String(payload, Charsets.UTF_8)))
-        return@withContext refreshResponse?.toRefreshPackage() ?: run {
-            logger.e(TAG) { "Error parsing response from client details" }
-            throw InvalidPayloadException()
-        }
-    }
 
     private companion object {
         const val TAG = "UID2Client"

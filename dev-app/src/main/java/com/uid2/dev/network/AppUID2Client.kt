@@ -50,56 +50,54 @@ class AppUID2Client(
      * address, or telephone number.
      */
     @Throws(AppUID2ClientException::class)
-    suspend fun generateIdentity(
-        requestString: String,
-        type: RequestType,
-    ): UID2Identity? = withContext(Dispatchers.IO) {
-        // Check to make sure we have a valid endpoint to hit.
-        val url = apiGenerateUrl ?: throw AppUID2ClientException(ERROR_UNKNOWN_API)
+    suspend fun generateIdentity(requestString: String, type: RequestType): UID2Identity? =
+        withContext(Dispatchers.IO) {
+            // Check to make sure we have a valid endpoint to hit.
+            val url = apiGenerateUrl ?: throw AppUID2ClientException(ERROR_UNKNOWN_API)
 
-        // Check that the key and secret were provided.
-        if (key.isEmpty() || secret.isEmpty()) {
-            throw AppUID2ClientException(ERROR_NO_SECRET_OR_KEY)
+            // Check that the key and secret were provided.
+            if (key.isEmpty() || secret.isEmpty()) {
+                throw AppUID2ClientException(ERROR_NO_SECRET_OR_KEY)
+            }
+
+            // The secret should be Base64 encoded. Let's decode it and verify that what we have appears valid.
+            val secretBytes = runCatching { Base64.decode(secret, Base64.DEFAULT) }.getOrNull()
+                ?: throw AppUID2ClientException(ERROR_UNABLE_TO_DECODE_SECRET)
+
+            // The request will contain an encrypted payload which contains the verified identity of the user.
+            val requestBody = encryptRequest(
+                secretBytes,
+                mapOf(type.parameter to requestString),
+            ) ?: throw AppUID2ClientException(ERROR_UNABLE_TO_ENCRYPT_REQUEST)
+
+            val request = Request.Builder()
+                .url(url)
+                .addHeader(REQUEST_HEADER_AUTHORIZATION, REQUEST_HEADER_BEARER + key)
+                .addHeader(REQUEST_HEADER_CONTENT_TYPE, REQUEST_HEADER_TEXT_PLAIN)
+                .post(requestBody.toRequestBody())
+                .build()
+
+            // Make the request and verify that it was successful.
+            val response = client.newCall(request).execute()
+            if (!response.isSuccessful) {
+                throw AppUID2ClientException(ERROR_REQUEST_FAILED + response.code)
+            }
+
+            // If we have a valid response, we can try to decrypt it.
+            val responseBody = decryptResponse(
+                secret,
+                response.body?.string()
+                    ?: throw AppUID2ClientException(ERROR_RESPONSE_NO_BODY),
+            ) ?: throw AppUID2ClientException(ERROR_UNABLE_TO_DECRYPT_RESPONSE)
+
+            // Now try to parse the decrypted response (as JSON).
+            val responseToken = runCatching {
+                GenerateTokenResponse.fromJson(JSONObject(responseBody))
+            }.getOrNull() ?: throw AppUID2ClientException(ERROR_UNABLE_TO_PARSE_RESPONSE)
+
+            // After all that, we should finally have a valid UID2Identity!
+            return@withContext responseToken.body
         }
-
-        // The secret should be Base64 encoded. Let's decode it and verify that what we have appears valid.
-        val secretBytes = runCatching { Base64.decode(secret, Base64.DEFAULT) }.getOrNull()
-            ?: throw AppUID2ClientException(ERROR_UNABLE_TO_DECODE_SECRET)
-
-        // The request will contain an encrypted payload which contains the verified identity of the user.
-        val requestBody = encryptRequest(
-            secretBytes,
-            mapOf(type.parameter to requestString),
-        ) ?: throw AppUID2ClientException(ERROR_UNABLE_TO_ENCRYPT_REQUEST)
-
-        val request = Request.Builder()
-            .url(url)
-            .addHeader(REQUEST_HEADER_AUTHORIZATION, REQUEST_HEADER_BEARER + key)
-            .addHeader(REQUEST_HEADER_CONTENT_TYPE, REQUEST_HEADER_TEXT_PLAIN)
-            .post(requestBody.toRequestBody())
-            .build()
-
-        // Make the request and verify that it was successful.
-        val response = client.newCall(request).execute()
-        if (!response.isSuccessful) {
-            throw AppUID2ClientException(ERROR_REQUEST_FAILED + response.code)
-        }
-
-        // If we have a valid response, we can try to decrypt it.
-        val responseBody = decryptResponse(
-            secret,
-            response.body?.string()
-                ?: throw AppUID2ClientException(ERROR_RESPONSE_NO_BODY),
-        ) ?: throw AppUID2ClientException(ERROR_UNABLE_TO_DECRYPT_RESPONSE)
-
-        // Now try to parse the decrypted response (as JSON).
-        val responseToken = runCatching {
-            GenerateTokenResponse.fromJson(JSONObject(responseBody))
-        }.getOrNull() ?: throw AppUID2ClientException(ERROR_UNABLE_TO_PARSE_RESPONSE)
-
-        // After all that, we should finally have a valid UID2Identity!
-        return@withContext responseToken.body
-    }
 
     private fun encryptRequest(key: ByteArray, params: Map<String, String>): ByteArray? {
         // The body of the payload is expected to be the following:

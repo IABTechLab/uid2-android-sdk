@@ -10,7 +10,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.Icons.AutoMirrored.Filled
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -50,7 +51,7 @@ fun EmailInputView(modifier: Modifier, onEmailEntered: (String) -> Unit) {
             backgroundColor = MaterialTheme.colors.primary,
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowForward,
+                imageVector = Filled.ArrowForward,
                 contentDescription = stringResource(R.string.email_submit_content_description),
                 tint = Color.White,
             )
