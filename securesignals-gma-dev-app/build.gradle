@@ -1,6 +1,6 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    alias libs.plugins.androidApplication
+    alias libs.plugins.kotlinAndroid
 }
 
 apply from:  rootProject.file("$rootDir/common.gradle")
@@ -29,11 +29,11 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':sdk')
     implementation project(path: ':securesignals-gma')
-    compileOnly 'com.uid2:uid2-android-sdk:0.5.0'
-    compileOnly 'com.google.android.gms:play-services-ads:22.2.0'
+    implementation(libs.gma.ads)
 
-    implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation(libs.androidx.multidex)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
 }

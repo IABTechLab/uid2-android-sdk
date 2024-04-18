@@ -1,7 +1,7 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'com.vanniktech.maven.publish'
+    alias libs.plugins.androidLibrary
+    alias libs.plugins.kotlinAndroid
+    alias libs.plugins.mavenPublish
 }
 
 apply from:  rootProject.file("$rootDir/common.gradle")
@@ -26,8 +26,7 @@ android {
 
 dependencies {
     implementation project(':sdk')
-    implementation 'com.google.android.gms:play-services-ads:22.2.0'
+    api(libs.gma.ads)
 
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.google.android.gms:play-services-ads:22.2.0'
+    testImplementation(libs.junit)
 }

@@ -1,8 +1,8 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.dokka'
-    id 'com.vanniktech.maven.publish'
+    alias libs.plugins.androidLibrary
+    alias libs.plugins.kotlinAndroid
+    alias libs.plugins.dokka
+    alias libs.plugins.mavenPublish
 }
 
 apply from:  rootProject.file("$rootDir/common.gradle")
@@ -33,12 +33,10 @@ android {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation(libs.junit)
 
-    testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'
-    testImplementation 'org.mockito:mockito-inline:4.8.0'
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.inline)
 
-    testImplementation 'org.json:json:20180813'
-
-    dokkaPlugin 'org.jetbrains.dokka:android-documentation-plugin:1.9.10'
+    testImplementation(libs.json)
 }
