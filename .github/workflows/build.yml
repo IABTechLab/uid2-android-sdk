@@ -29,6 +29,13 @@ jobs:
       - name: Build and run tests
         run: ./gradlew build
 
+      - name: Vulnerability Scan
+        uses: IABTechLab/uid2-shared-actions/actions/vulnerability_scan_filesystem@v2
+        with:
+            scan_severity: HIGH,CRITICAL
+            failure_severity: CRITICAL,HIGH
+            publish_vulnerabilities: true
+
       - name: Deploy SNAPSHOT to Maven Central
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: ./gradlew publish --stacktrace
