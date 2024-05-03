@@ -56,6 +56,13 @@ internal interface KeyUtils {
         }
 
         override fun generateServerPublicKey(publicKey: String): PublicKey? {
+            // Check to make sure the given public key is longer than the expected prefix.
+            if (publicKey.length <= SERVER_PUBLIC_KEY_PREFIX_LENGTH) {
+                return null
+            }
+
+            // Attempt to decode the given public key. If the key is malformed, or not in the expected Base64 format,
+            // null we be returned.
             val serverPublicKeyBytes =
                 publicKey.substring(SERVER_PUBLIC_KEY_PREFIX_LENGTH).decodeBase64() ?: return null
 
