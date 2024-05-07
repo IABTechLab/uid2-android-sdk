@@ -111,8 +111,8 @@ internal class UID2Client(
         // Attempt to make the request via the provided NetworkSession.
         val response = session.loadData(url, request)
         if (response.code != HttpURLConnection.HTTP_OK) {
-            logger.e(TAG) { "Client details failure: ${response.code}" }
-            throw RequestFailureException(response.code)
+            logger.e(TAG) { "Client details failure: ${response.code} ${response.data}" }
+            throw RequestFailureException(response.code, response.data)
         }
 
         // The response should be an encrypted payload. Let's attempt to decrypt it using the key we were provided.
