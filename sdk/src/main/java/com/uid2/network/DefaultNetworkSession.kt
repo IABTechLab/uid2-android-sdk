@@ -1,5 +1,6 @@
 package com.uid2.network
 
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -16,35 +17,46 @@ public open class DefaultNetworkSession : NetworkSession {
      * Loads the given [URL] and [NetworkRequest] using [HttpURLConnection].
      */
     override fun loadData(url: URL, request: NetworkRequest): NetworkResponse {
-        val connection = openConnection(url).apply {
-            requestMethod = request.type.toRequestMethod()
+        try {
+            val connection = openConnection(url).apply {
+                requestMethod = request.type.toRequestMethod()
 
-            setRequestProperty("Accept", "application/json")
+                setRequestProperty("Accept", "application/json")
 
-            // If we've been given any request headers, add them to the request.
-            request.headers.forEach {
-                addRequestProperty(it.key, it.value)
-            }
+                // If we've been given any request headers, add them to the request.
+                request.headers.forEach {
+                    addRequestProperty(it.key, it.value)
+                }
 
-            // If data was provided, this will require us to write it to the output stream.
-            request.data?.let { data ->
-                doOutput = true
+                // If data was provided, this will require us to write it to the output stream.
+                request.data?.let { data ->
+                    doOutput = true
 
-                outputStream.use { outputStream ->
-                    outputStream.write(data.toByteArray(Charsets.UTF_8))
+                    outputStream.use { outputStream ->
+                        outputStream.write(data.toByteArray(Charsets.UTF_8))
+                    }
                 }
             }
-        }
 
-        // A successful response code should be in the [200-299] range.
-        val responseCode = connection.responseCode
-        if (responseCode !in SUCCESS_CODE_RANGE_MIN..SUCCESS_CODE_RANGE_MAX) {
-            return NetworkResponse(responseCode)
-        }
+            // A successful response code should be in the [200-299] range. If we receive something outside that range, then
+            // we should be reading from the errorStream rather than the standard inputStream.
+            val responseCode = connection.responseCode
+            val responseStream = if (NetworkSession.isSuccess(responseCode)) {
+                connection.inputStream
+            } else {
+                connection.errorStream
+            }
 
-        // We expect the response to be a String.
-        val responseText = connection.inputStream.bufferedReader().use { it.readText() }
-        return NetworkResponse(responseCode, responseText)
+            // We expect the response to be a String.
+            val responseText = runCatching {
+                responseStream.bufferedReader().use { it.readText() }
+            }.getOrDefault("")
+            return NetworkResponse(responseCode, responseText)
+        } catch (ex: IOException) {
+            // If we're unable to make a request, e.g. due to lack of connection, we will simply report an internal
+            // error.
+            return NetworkResponse(HttpURLConnection.HTTP_INTERNAL_ERROR)
+        }
     }
 
     /**
@@ -61,10 +73,5 @@ public open class DefaultNetworkSession : NetworkSession {
     private fun NetworkRequestType.toRequestMethod() = when (this) {
         NetworkRequestType.GET -> "GET"
         NetworkRequestType.POST -> "POST"
-    }
-
-    private companion object {
-        const val SUCCESS_CODE_RANGE_MIN = HttpURLConnection.HTTP_OK
-        const val SUCCESS_CODE_RANGE_MAX = 299
     }
 }

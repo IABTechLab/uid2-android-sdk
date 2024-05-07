@@ -28,7 +28,7 @@ public class InputValidationException(description: String?) : UID2Exception(desc
 /**
  * An attempt was made to the API that resulted in a failure.
  */
-internal class RequestFailureException(val statusCode: Int) : UID2Exception()
+internal class RequestFailureException(val statusCode: Int, message: String? = null) : UID2Exception(message)
 
 /**
  * The encrypted payload could not be decrypted successfully.

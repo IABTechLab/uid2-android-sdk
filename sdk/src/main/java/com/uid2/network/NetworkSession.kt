@@ -57,4 +57,16 @@ public interface NetworkSession {
      * @return The [NetworkResponse] which contains the outcome of the attempted request.
      */
     public fun loadData(url: URL, request: NetworkRequest): NetworkResponse
+
+    public companion object {
+        private const val SUCCESS_CODE_RANGE_MIN = 200
+        private const val SUCCESS_CODE_RANGE_MAX = 299
+
+        /**
+         * Function to determine if a given response code is considered a "success".
+         */
+        @JvmStatic
+        public fun isSuccess(responseCode: Int): Boolean =
+            responseCode in SUCCESS_CODE_RANGE_MIN..SUCCESS_CODE_RANGE_MAX
+    }
 }
