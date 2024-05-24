@@ -24,15 +24,7 @@ The UID 2 Project is subject to the IAB Tech Lab Intellectual Property Rights (I
 ├── README.md
 ```
 
-## Requirements
-
-* Android Studio (2022.1.1 Patch 2+)
-
-| Platform | Minimum target                                |
-|----------|-----------------------------------------------|
-| Android  | 4.4+ / API 19+ (SDK) 5.0+ / API 21+ (Dev-App) |
-
-## Install and Usage
+## Requirements, Installation and Usage
 
 For the latest instructions on how to use the SDK and plugins in this repository, refer to the following:
 
