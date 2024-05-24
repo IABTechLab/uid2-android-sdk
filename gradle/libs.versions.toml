@@ -1,21 +1,21 @@
 [versions]
-agp = "8.4.0"
+agp = "8.4.1"
 kotlin = "1.9.23"
-core-ktx = "1.13.0"
+core-ktx = "1.13.1"
 junit = "4.13.2"
 appcompat = "1.6.1"
-coroutines-version = "1.8.0"
+coroutines-version = "1.8.1"
 compose = "1.9.0"
-compose-bom = "2024.04.01"
-compose-tooling = "1.6.6"
-gma = "23.0.0"
+compose-bom = "2024.05.00"
+compose-tooling = "1.6.7"
+gma = "23.1.0"
 ima = "3.33.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
-kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.0" }
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.1" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.7.0" }
+androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.8.0" }
 
 # Compose
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
@@ -23,7 +23,7 @@ compose-activity = { group = "androidx.activity", name = "activity-compose", ver
 compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose-tooling" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose-tooling" }
 compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-tooling"}
-compose-material = { group = "androidx.compose.material", name = "material", version = "1.6.6" }
+compose-material = { group = "androidx.compose.material", name = "material", version = "1.6.7" }
 
 # OkHttp
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.12.0" }
