@@ -34,13 +34,6 @@ For the latest instructions on how to use the SDK and plugins in this repository
 | UID2 Google Mobile Ads (GMA) Plugin | [UID2 GMA Plugin for Android Integration Guide](https://unifiedid.com/docs/guides/mobile-plugin-gma-android) |
 | UID2 Interactive Media Ads (IMA) Plugin | [UID2 IMA Plugin for Android Integration Guide](https://unifiedid.com/docs/guides/mobile-plugin-ima-android) |
 
-R8 / ProGuard
--------------
-If you are using R8 the shrinking and obfuscation rules are included automatically.
-
-ProGuard users must manually add the options from
-[uid2-gma.pro](https://github.com/IABTechLab/uid2-android-sdk/blob/main/securesignals-gma/uid2-gma.pro) and [uid2-ima.pro](https://github.com/IABTechLab/uid2-android-sdk/blob/main/securesignals-ima/uid2-ima.pro).
-
 ## Development
 
 The UID2 SDK is a standalone headless library defined and published via Maven Central.  As such the `dev-app` is the primary way for developing the SDK.  Use Android Studio to open the root folder to begin development.
