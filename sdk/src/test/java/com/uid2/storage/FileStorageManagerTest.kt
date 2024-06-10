@@ -5,29 +5,19 @@ import com.uid2.data.IdentityStatus.NO_IDENTITY
 import com.uid2.data.UID2Identity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
 import java.io.File
 
 @ExperimentalCoroutinesApi
-@RunWith(MockitoJUnitRunner::class)
 class FileStorageManagerTest {
-    private lateinit var testDispatcher: TestDispatcher
+    private val testDispatcher = StandardTestDispatcher()
 
     private val identityFile: File = File("test_identity.json")
-
-    @Before
-    fun before() {
-        testDispatcher = StandardTestDispatcher()
-    }
 
     @After
     fun after() {

@@ -3,29 +3,31 @@ package com.uid2.network
 import com.uid2.extensions.decodeJsonToMap
 import com.uid2.network.NetworkRequestType.GET
 import com.uid2.network.NetworkRequestType.POST
+import io.mockk.every
+import io.mockk.junit4.MockKRule
+import io.mockk.mockk
+import io.mockk.verify
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import java.io.ByteArrayInputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
-@RunWith(MockitoJUnitRunner::class)
 class DefaultNetworkSessionTest {
+    @get:Rule
+    val mockkRule = MockKRule(this)
+
     private val url = URL("https://test.com/path")
-    private val connection: HttpURLConnection = mock()
-    private val outputStream: OutputStream = mock()
+    private val connection = mockk<HttpURLConnection>(relaxed = true)
+    private val outputStream = mockk<OutputStream>(relaxed = true)
 
     @Before
     fun before() {
-        whenever(connection.outputStream).thenReturn(outputStream)
+        every { connection.outputStream } returns outputStream
     }
 
     @Test
@@ -33,10 +35,10 @@ class DefaultNetworkSessionTest {
         val session = buildNetworkSession()
 
         session.loadData(url, NetworkRequest(GET))
-        verify(connection).requestMethod = "GET"
+        verify { connection.requestMethod = "GET" }
 
         session.loadData(url, NetworkRequest(POST))
-        verify(connection).requestMethod = "POST"
+        verify { connection.requestMethod = "POST" }
     }
 
     @Test
@@ -54,7 +56,7 @@ class DefaultNetworkSessionTest {
         // Verify that for each of the request headers we provided, they were correctly added to the
         // connection.
         headers.forEach {
-            verify(connection).addRequestProperty(it.key, it.value)
+            verify { connection.addRequestProperty(it.key, it.value) }
         }
     }
 
@@ -69,13 +71,15 @@ class DefaultNetworkSessionTest {
         // expected bytes have been written to the output stream. We also want to make sure that
         // the output stream was correctly closed afterwards.
         val expectedData = data.toByteArray(Charsets.UTF_8)
-        verify(outputStream).write(expectedData)
-        verify(outputStream).close()
+        verify {
+            outputStream.write(expectedData)
+            outputStream.close()
+        }
     }
 
     @Test
     fun `test request failure`() {
-        whenever(connection.responseCode).thenReturn(HttpURLConnection.HTTP_UNAUTHORIZED)
+        every { connection.responseCode }.returns(HttpURLConnection.HTTP_UNAUTHORIZED)
 
         val session = buildNetworkSession()
         val response = session.loadData(url, NetworkRequest(GET))
@@ -87,7 +91,7 @@ class DefaultNetworkSessionTest {
 
     @Test
     fun `test request success`() {
-        whenever(connection.responseCode).thenReturn(HttpURLConnection.HTTP_OK)
+        every { connection.responseCode }.returns(HttpURLConnection.HTTP_OK)
 
         val map = mapOf(
             "Key1" to "Value1",
@@ -99,7 +103,7 @@ class DefaultNetworkSessionTest {
 
         // Build a fake input stream that will return our pre-created JSON string.
         val inputStream = ByteArrayInputStream(jsonString.toByteArray(Charsets.UTF_8))
-        whenever(connection.inputStream).thenReturn(inputStream)
+        every { connection.inputStream } returns inputStream
 
         val session = buildNetworkSession()
         val response = session.loadData(url, NetworkRequest(GET))

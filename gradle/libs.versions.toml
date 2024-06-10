@@ -1,5 +1,5 @@
 [versions]
-agp = "8.4.1"
+agp = "8.4.2"
 kotlin = "2.0.0"
 core-ktx = "1.13.1"
 junit = "4.13.2"
@@ -10,6 +10,7 @@ compose-bom = "2024.05.00"
 compose-tooling = "1.6.7"
 gma = "23.1.0"
 ima = "3.33.0"
+mockkVersion = "1.13.11"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -41,8 +42,8 @@ androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", ve
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-version" }
 json = { group = "org.json", name = "json", version = "20240303" }
-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version = "4.1.0" }
-mockito-inline = { group = "org.mockito", name = "mockito-inline", version = "4.8.0" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockkVersion" }
+mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockkVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
