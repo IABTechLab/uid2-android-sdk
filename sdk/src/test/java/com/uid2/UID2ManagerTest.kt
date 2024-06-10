@@ -76,6 +76,10 @@ class UID2ManagerTest {
             it.arguments[0] as IdentityRequest.Phone
         }
 
+        whenever(storageManager.clear()).thenReturn(true)
+        whenever(
+            storageManager.saveIdentity(any(UID2Identity::class.java), any(IdentityStatus::class.java)),
+        ).thenReturn(true)
         whenever(storageManager.loadIdentity()).thenReturn(Pair(initialIdentity, initialStatus))
         manager = withManager(client, storageManager, timeUtils, inputUtils, testDispatcher, false, listener)
     }
