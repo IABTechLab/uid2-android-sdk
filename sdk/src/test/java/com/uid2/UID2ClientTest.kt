@@ -11,6 +11,9 @@ import com.uid2.network.NetworkSession
 import com.uid2.utils.KeyUtils
 import com.uid2.utils.Logger
 import com.uid2.utils.TimeUtils
+import io.mockk.every
+import io.mockk.junit4.MockKRule
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
@@ -22,33 +25,31 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import java.security.KeyPair
 import java.security.PublicKey
+import javax.crypto.SecretKey
 
-@RunWith(MockitoJUnitRunner::class)
 class UID2ClientTest {
+    @get:Rule
+    val mockkRule = MockKRule(this)
+
     private val testDispatcher: TestDispatcher = StandardTestDispatcher()
 
-    private val networkSession: NetworkSession = mock()
+    private val networkSession = mockk<NetworkSession>()
     private val packageName = "com.uid2.devapp"
-    private val dataEnvelope: DataEnvelope = mock()
-    private val keyUtils: KeyUtils = mock()
-    private val timeUtils: TimeUtils = mock()
-    private val logger: Logger = mock()
+    private val dataEnvelope = mockk<DataEnvelope>(relaxed = true)
+    private val keyUtils = mockk<KeyUtils>()
+    private val timeUtils = mockk<TimeUtils>()
+    private val logger = mockk<Logger>(relaxed = true)
 
     private val url = "https://test.dev"
     private val refreshToken = "RefreshToken"
     private val refreshKey = "RefreshKey"
 
-    private val keyPair: KeyPair = mock()
-    private val keyPairPublic: PublicKey = mock()
+    private val keyPair = mockk<KeyPair>()
+    private val keyPairPublic = mockk<PublicKey>()
     private val keyPairPublicEncoded = ByteArray(12)
 
     private val SUBSCRIPTION_ID = "subscription_id"
@@ -57,20 +58,22 @@ class UID2ClientTest {
     @Before
     fun before() {
         // By default, don't encrypt the data. Just convert it directly to a ByteArray.
-        whenever(dataEnvelope.encrypt(any(), any(), any(), any())).thenAnswer {
-            return@thenAnswer (it.arguments[1] as String).toByteArray()
+        every { dataEnvelope.encrypt(any(), any(), any(), any()) }.answers {
+            (secondArg() as String).toByteArray()
         }
 
-        whenever(keyUtils.generateServerPublicKey(any())).thenReturn(mock())
-        whenever(keyUtils.generateKeyPair()).thenReturn(keyPair)
-        whenever(keyUtils.generateSharedSecret(any(), any())).thenReturn(mock())
-        whenever(keyUtils.generateIv(any())).thenAnswer { ByteArray(it.arguments[0] as Int) }
-        whenever(keyUtils.generateAad(any(), any())).thenReturn("")
+        every { dataEnvelope.decrypt(any<String>(), any<String>(), any<Boolean>()) }.returns(null)
 
-        whenever(keyPairPublic.encoded).thenReturn(keyPairPublicEncoded)
-        whenever(keyPair.public).thenReturn(keyPairPublic)
+        every { keyUtils.generateServerPublicKey(any()) }.returns(mockk<PublicKey>())
+        every { keyUtils.generateKeyPair() }.returns(keyPair)
+        every { keyUtils.generateSharedSecret(any(), any()) }.returns(mockk<SecretKey>(relaxed = true))
+        every { keyUtils.generateIv(any()) }.answers { ByteArray(firstArg() as Int) }
+        every { keyUtils.generateAad(any(), any()) }.returns("")
 
-        whenever(timeUtils.now()).thenReturn(0)
+        every { keyPairPublic.encoded }.returns(keyPairPublicEncoded)
+        every { keyPair.public }.returns(keyPairPublic)
+
+        every { timeUtils.now() }.returns(0)
     }
 
     //region generateIdentity
@@ -91,7 +94,7 @@ class UID2ClientTest {
         val client = withClient()
 
         // Mock the KeyUtils to fail to generate the required PublicKey.
-        whenever(keyUtils.generateServerPublicKey(any())).thenReturn(null)
+        every { keyUtils.generateServerPublicKey(any()) }.returns(null)
 
         // Verify the expected CryptoException is thrown.
         assertThrows(CryptoException::class.java) {
@@ -110,7 +113,7 @@ class UID2ClientTest {
         val client = withClient()
 
         // Mock the KeyUtils to fail to generate the required KeyPair.
-        whenever(keyUtils.generateKeyPair()).thenReturn(null)
+        every { keyUtils.generateKeyPair() }.returns(null)
 
         // Verify the expected CryptoException is thrown.
         assertThrows(CryptoException::class.java) {
@@ -129,7 +132,7 @@ class UID2ClientTest {
         val client = withClient()
 
         // Mock the KeyUtils to fail to generate the required SharedSecret.
-        whenever(keyUtils.generateSharedSecret(any(), any())).thenReturn(null)
+        every { keyUtils.generateSharedSecret(any(), any()) }.returns(null)
 
         // Verify the expected CryptoException is thrown.
         assertThrows(CryptoException::class.java) {
@@ -148,7 +151,7 @@ class UID2ClientTest {
         val client = withClient()
 
         // Mock the DataEnvelope to fail to encrypt the given payload.
-        whenever(dataEnvelope.encrypt(any(), any(), any(), any())).thenReturn(null)
+        every { dataEnvelope.encrypt(any(), any(), any(), any()) }.returns(null)
 
         // Verify the expected CryptoException is thrown.
         assertThrows(CryptoException::class.java) {
@@ -178,8 +181,8 @@ class UID2ClientTest {
         val client = withClient()
 
         // Mock the DataEnvelope to fail to decrypt the given payload.
-        whenever(networkSession.loadData(any(), any())).thenReturn(NetworkResponse(200, "somedata"))
-        whenever(dataEnvelope.decrypt(anyOrNull<ByteArray>(), any(), any())).thenReturn(null)
+        every { networkSession.loadData(any(), any()) }.returns(NetworkResponse(200, "somedata"))
+        every { dataEnvelope.decrypt(any<ByteArray>(), any<String>(), any<Boolean>()) }.returns(null)
 
         // Verify the expected CryptoException is thrown.
         assertThrows(PayloadDecryptException::class.java) {
@@ -198,10 +201,10 @@ class UID2ClientTest {
         val client = withClient()
 
         val unencrypted = JSONObject(TestData.REFRESH_TOKEN_SUCCESS_DECRYPTED)
-        whenever(dataEnvelope.decrypt(anyOrNull<ByteArray>(), any(), any())).thenReturn(
+        every { dataEnvelope.decrypt(any<ByteArray>(), any<String>(), any<Boolean>()) }.returns(
             unencrypted.toString().toByteArray(),
         )
-        whenever(networkSession.loadData(any(), any())).thenReturn(NetworkResponse(200, "some data"))
+        every { networkSession.loadData(any(), any()) }.returns(NetworkResponse(200, "some data"))
 
         val response = client.generateIdentity(
             IdentityRequest.Email("test@test.com"),
@@ -246,8 +249,8 @@ class UID2ClientTest {
     fun `test refresh with invalid data key`() = runTest(testDispatcher) {
         val client = withClient()
 
-        whenever(dataEnvelope.decrypt(any<String>(), any(), any())).thenReturn(null)
-        whenever(networkSession.loadData(any(), any())).thenReturn(NetworkResponse(200, "some data"))
+        every { dataEnvelope.decrypt(any<String>(), any(), any()) }.returns(null)
+        every { networkSession.loadData(any(), any()) }.returns(NetworkResponse(200, "some data"))
 
         // Verify that when an unexpected response is returned, the appropriate exception is thrown.
         assertThrows(PayloadDecryptException::class.java) {
@@ -260,8 +263,8 @@ class UID2ClientTest {
         val client = withClient()
 
         val unencrypted = JSONObject(TestData.REFRESH_TOKEN_SUCCESS_DECRYPTED)
-        whenever(dataEnvelope.decrypt(any<String>(), any(), any())).thenReturn(unencrypted.toString().toByteArray())
-        whenever(networkSession.loadData(any(), any())).thenReturn(NetworkResponse(200, "some data"))
+        every { dataEnvelope.decrypt(any<String>(), any(), any()) }.returns(unencrypted.toString().toByteArray())
+        every { networkSession.loadData(any(), any()) }.returns(NetworkResponse(200, "some data"))
 
         // Verify that the payload was successfully decrypted, and parsed.
         val identity = client.refreshIdentity(refreshToken, TestData.REFRESH_TOKEN_ENCRYPTED_SUCCESS_KEY)
@@ -282,8 +285,8 @@ class UID2ClientTest {
 
         // Configure the network session to return a valid payload.
         val unencrypted = JSONObject(TestData.REFRESH_TOKEN_OPT_OUT_DECRYPTED)
-        whenever(dataEnvelope.decrypt(any<String>(), any(), any())).thenReturn(unencrypted.toString().toByteArray())
-        whenever(networkSession.loadData(any(), any())).thenReturn(NetworkResponse(200, "some data"))
+        every { dataEnvelope.decrypt(any<String>(), any(), any()) }.returns(unencrypted.toString().toByteArray())
+        every { networkSession.loadData(any(), any()) }.returns(NetworkResponse(200, "some data"))
 
         // Verify that the payload was successfully decrypted, and parsed.
         val identity = client.refreshIdentity(refreshToken, TestData.REFRESH_TOKEN_ENCRYPTED_OPT_OUT_KEY)
@@ -295,7 +298,7 @@ class UID2ClientTest {
     fun `test version info - generate identity`() {
         testVersionInfo { client ->
             val unencrypted = JSONObject(TestData.REFRESH_TOKEN_SUCCESS_DECRYPTED)
-            whenever(dataEnvelope.decrypt(anyOrNull<ByteArray>(), any(), any())).thenReturn(
+            every { dataEnvelope.decrypt(any<ByteArray>(), any(), any()) }.returns(
                 unencrypted.toString().toByteArray(),
             )
 
@@ -310,7 +313,7 @@ class UID2ClientTest {
 
     @Test
     fun `test version info - refresh identity`() {
-        whenever(dataEnvelope.decrypt(any<String>(), any(), any())).thenReturn(
+        every { dataEnvelope.decrypt(any<String>(), any(), any()) }.returns(
             TestData.REFRESH_TOKEN_SUCCESS_DECRYPTED.toByteArray(),
         )
 
@@ -352,7 +355,7 @@ class UID2ClientTest {
         val client = withClient()
 
         // Configure the network session to report a failure.
-        whenever(networkSession.loadData(any(), any())).thenReturn(NetworkResponse(400))
+        every { networkSession.loadData(any(), any()) }.returns(NetworkResponse(400))
 
         // Verify that when a network failure occurs, the appropriate exception is thrown.
         assertThrows(RequestFailureException::class.java) {
@@ -370,7 +373,7 @@ class UID2ClientTest {
         val client = withClient()
 
         // Configure the network session to return an invalid response.
-        whenever(networkSession.loadData(any(), any())).thenReturn(
+        every { networkSession.loadData(any(), any()) }.returns(
             NetworkResponse(200, "This is not encrypted"),
         )
 
@@ -392,9 +395,9 @@ class UID2ClientTest {
         // Configure the network session to return a valid (encrypted) payload and allows us to capture the given
         // NetworkRequest.
         var networkRequest: NetworkRequest? = null
-        whenever(networkSession.loadData(any(), any())).thenAnswer {
-            networkRequest = it.arguments[1] as NetworkRequest?
-            return@thenAnswer NetworkResponse(200, "some data")
+        every { networkSession.loadData(any(), any()) }.answers {
+            networkRequest = secondArg() as NetworkRequest?
+            NetworkResponse(200, "some data")
         }
 
         callback(client)

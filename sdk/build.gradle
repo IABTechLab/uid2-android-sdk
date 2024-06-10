@@ -35,8 +35,8 @@ android {
 dependencies {
     testImplementation(libs.junit)
 
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
 
     testImplementation(libs.json)
 }

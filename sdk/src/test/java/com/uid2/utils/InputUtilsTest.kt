@@ -5,10 +5,7 @@ import com.uid2.data.IdentityRequest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
 class InputUtilsTest {
 
     @Test
