@@ -45,7 +45,10 @@ public class UID2MediationAdapter : RtbAdapter() {
             UID2Manager.init(context)
         }
 
-        initializationCompleteCallback.onInitializationSucceeded()
+        // After we've asked to initialize the manager, we should wait until it's complete before reporting success.
+        // This will potentially allow any previously persisted identity to be fully restored before we allow any
+        // signals to be collected.
+        UID2Manager.getInstance().onInitialized = initializationCompleteCallback::onInitializationSucceeded
     }
 
     /**
