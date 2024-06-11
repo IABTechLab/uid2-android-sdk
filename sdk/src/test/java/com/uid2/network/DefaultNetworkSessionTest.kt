@@ -16,13 +16,14 @@ import java.io.ByteArrayInputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class DefaultNetworkSessionTest {
     @get:Rule
     val mockkRule = MockKRule(this)
 
     private val url = URL("https://test.com/path")
-    private val connection = mockk<HttpURLConnection>(relaxed = true)
+    private val connection = mockk<HttpsURLConnection>(relaxed = true)
     private val outputStream = mockk<OutputStream>(relaxed = true)
 
     @Before
