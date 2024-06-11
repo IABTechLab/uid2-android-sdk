@@ -18,6 +18,13 @@ internal class FileStorageManager(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : StorageManager {
 
+    // For storage, we use the parent filesDir which is part of the Application's internal storage. This internal
+    // storage is sandboxed to prevent any other app, or even the user, from accessing it directly. We rely on Android
+    // keeping this file secure.
+    //
+    // On Android 10+, this location is also likely encrypted.
+    //
+    // https://developer.android.com/training/data-storage/app-specific#internal-access-files
     constructor(context: Context) : this({ File(context.filesDir, FILE_IDENTITY) })
 
     // This lazy value *should* only be requested on the ioDispatcher.
