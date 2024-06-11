@@ -44,7 +44,7 @@ public class UID2SecureSignalsAdapter : SecureSignalsAdapter {
         // After we've asked to initialize the manager, we should wait until it's complete before reporting success.
         // This will potentially allow any previously persisted identity to be fully restored before we allow any
         // signals to be collected.
-        UID2Manager.getInstance().onInitialized = callback::onSuccess
+        UID2Manager.getInstance().addOnInitializedListener(callback::onSuccess)
     }
 
     /**

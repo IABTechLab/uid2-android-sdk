@@ -80,23 +80,30 @@ class UID2ManagerTest {
 
     @Test
     fun `reports when initialization is complete`() = runTest(testDispatcher) {
-        var isInitialized = false
-        val onInitialized = { isInitialized = true }
+        val listenerCount = 5
+        val listenerResults = ArrayList<Boolean>().apply {
+            for (i in 0..listenerCount) {
+                add(false)
+            }
+        }
 
         val manager = UID2Manager(client, storageManager, timeUtils, inputUtils, testDispatcher, false, logger).apply {
             this.checkExpiration = false
-            this.onInitialized = onInitialized
+
+            // Add the required listeners.
+            for (i in 0..listenerCount) {
+                addOnInitializedListener { listenerResults[i] = true }
+            }
         }
 
         // Verify that the manager invokes our callback after it's been able to load the identity from storage.
-        assertFalse(isInitialized)
+        assertTrue(listenerResults.all { !it })
         testDispatcher.scheduler.advanceUntilIdle()
-        assertTrue(isInitialized)
+        assertTrue(listenerResults.all { it })
 
-        // Reset our state and re-assign the manager's callback. Verify that even though initialization is complete, our
-        // callback is invoked immediately.
-        isInitialized = false
-        manager.onInitialized = onInitialized
+        // Create a new listener that we add after initialization is complete. Verify that it's called immediately.
+        var isInitialized = false
+        manager.addOnInitializedListener { isInitialized = true }
         assertTrue(isInitialized)
     }
 
