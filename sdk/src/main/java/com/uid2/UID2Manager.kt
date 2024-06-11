@@ -41,6 +41,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * A listener interface allowing the consumer to be notified when either the identity or status of the identity changes
@@ -99,22 +102,6 @@ public class UID2Manager internal constructor(
      */
     public var onIdentityChangedListener: UID2ManagerIdentityChangedListener? = null
 
-    /**
-     * Gets or sets a listener which can be used to determine if the [UID2Manager] instance has finished initializing.
-     * Initializing includes any time required to restore a previously persisted [UID2Identity] from storage.
-     *
-     * If this property is set *after* initialization is complete, the callback will be invoked immediately.
-     */
-    public var onInitialized: (() -> Unit)? = null
-        set(value) {
-            field = value
-
-            // If we've already finished initializing, we should immediately invoke the callback.
-            if (initialized.isCompleted) {
-                value?.invoke()
-            }
-        }
-
     private val _state = MutableStateFlow<UID2ManagerState>(Loading)
 
     /**
@@ -123,8 +110,10 @@ public class UID2Manager internal constructor(
     public val state: Flow<UID2ManagerState> = _state.asStateFlow()
 
     // The Job responsible for initialising the manager. This will include de-serialising our initial state from
-    // storage.
+    // storage. We allow consumers to attach a listener to detect when this Job is complete.
     private var initialized: Job
+    private val onInitializedListeners = mutableListOf<() -> Unit>()
+    private val initializedLock = Mutex()
 
     // An active Job that is scheduled to refresh the current identity
     private var refreshJob: Job? = null
@@ -177,6 +166,25 @@ public class UID2Manager internal constructor(
             checkIdentityRefresh()
         }
 
+    /**
+     * Adds a listener which can be used to determine if the [UID2Manager] instance has finished initializing.
+     * Initializing includes any time required to restore a previously persisted [UID2Identity] from storage.
+     *
+     * If a listener is added *after* initialization is complete, the callback will be invoked immediately.
+     */
+    public fun addOnInitializedListener(listener: () -> Unit): UID2Manager = apply {
+        runBlocking {
+            initializedLock.withLock {
+                // If we've already finished initializing, we should immediately invoke the callback.
+                if (initialized.isCompleted) {
+                    listener()
+                } else {
+                    onInitializedListeners += listener
+                }
+            }
+        }
+    }
+
     init {
         initialized = scope.launch {
             // Attempt to load the Identity from storage. If successful, we can notify any observers.
@@ -188,8 +196,7 @@ public class UID2Manager internal constructor(
                 validateAndSetIdentity(it.first, it.second, false)
             }
 
-            // If we have a callback provided, invoke it.
-            onInitialized?.invoke()
+            onInitialized()
         }
     }
 
@@ -306,6 +313,17 @@ public class UID2Manager internal constructor(
         scope.launch {
             initialized.join()
             run()
+        }
+    }
+
+    /**
+     * After initialization is complete, all the attached listeners will be invoked.
+     */
+    private suspend fun onInitialized() {
+        initializedLock.withLock {
+            while (onInitializedListeners.isNotEmpty()) {
+                onInitializedListeners.removeFirst().invoke()
+            }
         }
     }
 
