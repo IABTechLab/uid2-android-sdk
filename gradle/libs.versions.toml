@@ -11,6 +11,7 @@ compose-tooling = "1.6.7"
 gma = "23.1.0"
 ima = "3.33.0"
 mockkVersion = "1.13.11"
+prebid = "2.2.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -37,6 +38,9 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-media = { group = "androidx.media", name = "media", version = "1.7.0" }
 androidx-browser = { group = "androidx.browser", name = "browser", version = "1.8.0" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version = "1.9.0" }
+
+# Prebid
+prebid = { group = "org.prebid", name = "prebid-mobile-sdk", version.ref = "prebid" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

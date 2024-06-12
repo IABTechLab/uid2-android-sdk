@@ -42,7 +42,8 @@ composeCompiler {
 }
 
 dependencies {
-    implementation project(path: ':sdk')
+    implementation project(":sdk")
+    implementation project(":prebid")
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle)
@@ -54,6 +55,8 @@ dependencies {
     implementation(libs.compose.material)
 
     implementation(libs.okhttp.core)
+
+    implementation(libs.prebid)
 
     debugImplementation(libs.compose.tooling)
     debugImplementation(libs.compose.test.manifest)
