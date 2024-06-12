@@ -93,7 +93,7 @@ public class UID2Manager internal constructor(
     private val inputUtils: InputUtils,
     defaultDispatcher: CoroutineDispatcher,
     initialAutomaticRefreshEnabled: Boolean,
-    private val logger: Logger,
+    @property:InternalUID2Api public val logger: Logger,
 ) {
     private val scope = CoroutineScope(defaultDispatcher + SupervisorJob())
 
