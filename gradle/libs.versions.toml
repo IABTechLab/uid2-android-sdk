@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.0"
+agp = "8.5.1"
 kotlin = "2.0.0"
 core-ktx = "1.13.1"
 junit = "4.13.2"
@@ -8,7 +8,7 @@ coroutines-version = "1.8.1"
 compose = "1.9.0"
 compose-bom = "2024.06.00"
 compose-tooling = "1.6.8"
-gma = "23.1.0"
+gma = "23.2.0"
 ima = "3.34.0"
 mockkVersion = "1.13.11"
 prebid = "2.2.1"
@@ -17,7 +17,7 @@ prebid = "2.2.1"
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.1" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.8.0" }
+androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.8.3" }
 
 # Compose
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
@@ -25,7 +25,7 @@ compose-activity = { group = "androidx.activity", name = "activity-compose", ver
 compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose-tooling" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose-tooling" }
 compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-tooling"}
-compose-material = { group = "androidx.compose.material", name = "material", version = "1.6.7" }
+compose-material = { group = "androidx.compose.material", name = "material", version = "1.6.8" }
 
 # OkHttp
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.12.0" }
@@ -56,4 +56,4 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
 dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.28.0" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.29.0" }
