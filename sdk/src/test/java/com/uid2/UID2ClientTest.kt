@@ -220,6 +220,29 @@ class UID2ClientTest {
         assertEquals(expectedIdentity, response.identity)
     }
 
+    @Test
+    fun `test generate opt-out`() = runTest(testDispatcher) {
+        val client = withClient()
+
+        // Configure the network request to return a status which indicates the user has opted-out.
+        val unencrypted = JSONObject(TestData.REFRESH_TOKEN_OPT_OUT_DECRYPTED)
+        every { dataEnvelope.decrypt(any<ByteArray>(), any<String>(), any<Boolean>()) }.returns(
+            unencrypted.toString().toByteArray(),
+        )
+        every { networkSession.loadData(any(), any()) }.returns(NetworkResponse(200, "some data"))
+
+        val response = client.generateIdentity(
+            IdentityRequest.Email("test@test.com"),
+            SUBSCRIPTION_ID,
+            PUBLIC_KEY,
+        )
+        assertNotNull(response)
+
+        // Verify that we don't receive any identity but the status explicitly tells us that they have opted-out.
+        assertNull(response.identity)
+        assertEquals(IdentityStatus.OPT_OUT, response.status)
+    }
+
     //endregion
 
     //region refreshIdentity

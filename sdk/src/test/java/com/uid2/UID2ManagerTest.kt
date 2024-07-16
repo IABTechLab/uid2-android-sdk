@@ -198,6 +198,29 @@ class UID2ManagerTest {
     }
 
     @Test
+    fun `generates for opt-out identity`() = runTest(testDispatcher) {
+        val subscriptionId = "sub"
+        val publicKey = "pub"
+
+        val request = IdentityRequest.Email("test@test.com")
+        coEvery { client.generateIdentity(request, subscriptionId, publicKey) }.returns(
+            ResponsePackage(null, OPT_OUT, ""),
+        )
+
+        // Request a new identity should be generated.
+        var result: GenerateIdentityResult? = null
+        manager.generateIdentity(request, subscriptionId, publicKey) { result = it }
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Verify that after generating the identity, there is no current identity but the expected OPT_OUT status.
+        assertNull(manager.currentIdentity)
+        assertEquals(OPT_OUT, manager.currentIdentityStatus)
+
+        // Verify that the result callback was invoked.
+        assertTrue(result is GenerateIdentityResult.Success)
+    }
+
+    @Test
     fun `resets identity`() = runTest(testDispatcher) {
         // Verify that the initial state of the manager reflects the restored Identity.
         assertNotNull(manager.currentIdentity)
