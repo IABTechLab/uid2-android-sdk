@@ -5,19 +5,18 @@ import com.google.ads.interactivemedia.v3.api.VersionInfo
 import com.google.ads.interactivemedia.v3.api.signals.SecureSignalsAdapter
 import com.google.ads.interactivemedia.v3.api.signals.SecureSignalsCollectSignalsCallback
 import com.google.ads.interactivemedia.v3.api.signals.SecureSignalsInitializeCallback
+import com.uid2.EUIDManager
 import com.uid2.UID2
-import com.uid2.UID2Manager
-import com.uid2.UID2Manager.Environment.Production
 
 /**
- * A custom exception type that is used to report failures from the UID2SecureSignalsAdapter when an error has occurred.
+ * A custom exception type that is used to report failures from the EUIDSecureSignalsAdapter when an error has occurred.
  */
-public class UID2SecureSignalsException(message: String? = null, cause: Throwable? = null) : Exception(message, cause)
+public class EUIDSecureSignalsException(message: String? = null, cause: Throwable? = null) : Exception(message, cause)
 
 /**
  * An implementation of Google's IMA SecureSignalsAdapter that integrates UID2 tokens, accessed via the UID2Manager.
  */
-public class UID2SecureSignalsAdapter : SecureSignalsAdapter {
+public class EUIDSecureSignalsAdapter : SecureSignalsAdapter {
 
     /**
      * Gets the version of the UID2 SDK.
@@ -37,22 +36,22 @@ public class UID2SecureSignalsAdapter : SecureSignalsAdapter {
      * Initialises the UID2 SDK with the given Context.
      */
     public override fun initialize(context: Context, callback: SecureSignalsInitializeCallback) {
-        // It's possible that the UID2Manager is already initialised. If so, it's a no-op.
-        if (!UID2Manager.isInitialized()) {
-            UID2Manager.init(context, environment = Production)
+        // It's possible that the EUIDManager is already initialised. If so, it's a no-op.
+        if (!EUIDManager.isInitialized()) {
+            EUIDManager.init(context)
         }
 
         // After we've asked to initialize the manager, we should wait until it's complete before reporting success.
         // This will potentially allow any previously persisted identity to be fully restored before we allow any
         // signals to be collected.
-        UID2Manager.getInstance().addOnInitializedListener(callback::onSuccess)
+        EUIDManager.getInstance().addOnInitializedListener(callback::onSuccess)
     }
 
     /**
      * Collects the UID2 advertising token, if available.
      */
     public override fun collectSignals(context: Context, callback: SecureSignalsCollectSignalsCallback) {
-        UID2Manager.getInstance().let { manager ->
+        EUIDManager.getInstance().let { manager ->
             val token = manager.getAdvertisingToken()
             if (token != null) {
                 callback.onSuccess(token)
@@ -61,7 +60,7 @@ public class UID2SecureSignalsAdapter : SecureSignalsAdapter {
                 // was not present. There are a number of valid reasons why we don't have a token, but we are still
                 // required to report these as "failures".
                 callback.onFailure(
-                    UID2SecureSignalsException(
+                    EUIDSecureSignalsException(
                         "No Advertising Token available (Status: ${manager.currentIdentityStatus.value})",
                     ),
                 )

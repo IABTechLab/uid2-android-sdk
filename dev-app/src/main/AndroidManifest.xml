@@ -18,6 +18,9 @@
         <meta-data android:name="uid2_api_key" android:value=""/>
         <meta-data android:name="uid2_api_secret" android:value=""/>
 
+        <!-- Metadata for toggling UID2 and EUID environments. If true, EUID is used. -->
+        <meta-data android:name="uid2_environment_euid" android:value="false"/>
+
         <activity android:name="com.uid2.dev.MainActivity"
             android:exported="true">
             <intent-filter>
