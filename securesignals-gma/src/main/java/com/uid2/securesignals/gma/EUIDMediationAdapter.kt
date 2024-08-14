@@ -7,15 +7,14 @@ import com.google.android.gms.ads.mediation.MediationConfiguration
 import com.google.android.gms.ads.mediation.rtb.RtbAdapter
 import com.google.android.gms.ads.mediation.rtb.RtbSignalData
 import com.google.android.gms.ads.mediation.rtb.SignalCallbacks
+import com.uid2.EUIDManager
 import com.uid2.UID2
-import com.uid2.UID2Manager
-import com.uid2.UID2Manager.Environment.Production
 import com.google.android.gms.ads.mediation.VersionInfo as GmaVersionInfo
 
 /**
  * An implementation of Google's GMS RtbAdapter that integrates UID2 tokens, accessed via the UID2Manager.
  */
-public class UID2MediationAdapter : RtbAdapter() {
+public class EUIDMediationAdapter : RtbAdapter() {
 
     /**
      * Gets the version of the UID2 SDK.
@@ -42,21 +41,21 @@ public class UID2MediationAdapter : RtbAdapter() {
         mediationConfigurations: MutableList<MediationConfiguration>,
     ) {
         // It's possible that the UID2Manager is already initialised. If so, it's a no-op.
-        if (!UID2Manager.isInitialized()) {
-            UID2Manager.init(context, Production)
+        if (!EUIDManager.isInitialized()) {
+            EUIDManager.init(context)
         }
 
         // After we've asked to initialize the manager, we should wait until it's complete before reporting success.
         // This will potentially allow any previously persisted identity to be fully restored before we allow any
         // signals to be collected.
-        UID2Manager.getInstance().addOnInitializedListener(initializationCompleteCallback::onInitializationSucceeded)
+        EUIDManager.getInstance().addOnInitializedListener(initializationCompleteCallback::onInitializationSucceeded)
     }
 
     /**
      * Collects the UID2 advertising token, if available.
      */
     override fun collectSignals(rtbSignalData: RtbSignalData, signalCallbacks: SignalCallbacks) {
-        UID2Manager.getInstance().let { manager ->
+        EUIDManager.getInstance().let { manager ->
             val token = manager.getAdvertisingToken()
             if (token != null) {
                 signalCallbacks.onSuccess(token)

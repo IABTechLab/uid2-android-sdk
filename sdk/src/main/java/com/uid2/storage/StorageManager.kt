@@ -1,6 +1,5 @@
 package com.uid2.storage
 
-import android.content.Context
 import com.uid2.data.IdentityStatus
 import com.uid2.data.UID2Identity
 
@@ -22,15 +21,4 @@ internal interface StorageManager {
      * Clears any previously stored data.
      */
     suspend fun clear(): Boolean
-
-    companion object {
-        private var instance: StorageManager? = null
-
-        /**
-         * Gets the single instance of the FileStorageManager.
-         */
-        fun getInstance(context: Context) = instance ?: FileStorageManager(context).apply {
-            instance = this
-        }
-    }
 }

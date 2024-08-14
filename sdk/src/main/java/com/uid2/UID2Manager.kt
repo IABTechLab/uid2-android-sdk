@@ -24,6 +24,8 @@ import com.uid2.data.IdentityStatus.REFRESH_EXPIRED
 import com.uid2.data.UID2Identity
 import com.uid2.network.DefaultNetworkSession
 import com.uid2.network.NetworkSession
+import com.uid2.storage.FileStorageManager
+import com.uid2.storage.FileStorageManager.Store.UID2
 import com.uid2.storage.StorageManager
 import com.uid2.utils.InputUtils
 import com.uid2.utils.Logger
@@ -532,13 +534,67 @@ public class UID2Manager internal constructor(
         }
     }
 
+    public sealed interface Environment {
+        public val serverUrl: String
+
+        /**
+         * AWS US East (Ohio).
+         */
+        public data object Ohio : Environment {
+            override val serverUrl: String = "https://prod.uidapi.com"
+        }
+
+        /**
+         * AWS US West (Oregon).
+         */
+        public data object Oregon : Environment {
+            override val serverUrl: String = "https://usw.prod.uidapi.com"
+        }
+
+        /**
+         * AWS Asia Pacific (Singapore).
+         */
+        public data object Singapore : Environment {
+            override val serverUrl: String = "https://sg.prod.uidapi.com"
+        }
+
+        /**
+         * AWS Asia Pacific (Sydney).
+         */
+        public data object Sydney : Environment {
+            override val serverUrl: String = "https://au.prod.uidapi.com"
+        }
+
+        /**
+         * AWS Asia Pacific (Tokyo).
+         */
+        public data object Tokyo : Environment {
+            override val serverUrl: String = "https://jp.prod.uidapi.com"
+        }
+
+        /**
+         * The default Environment, equivalent to [Ohio].
+         */
+        public data object Production : Environment {
+            override val serverUrl: String = UID2_API_URL_PRODUCTION
+        }
+
+        /**
+         * An Environment with its own API endpoint, such as for integration testing.
+         */
+        public data class Custom(
+            override val serverUrl: String,
+        ) : Environment
+    }
+
     public companion object {
+
         private const val TAG = "UID2Manager"
 
         // The default API server.
-        private const val UID2_API_URL_DEFAULT = "https://prod.uidapi.com"
+        internal const val UID2_API_URL_PRODUCTION = "https://prod.uidapi.com"
 
-        private const val APPLICATION_ID_DEFAULT = "unknown"
+        internal const val APPLICATION_ID_DEFAULT = "unknown"
 
         private const val PACKAGE_NOT_AVAILABLE = "Identity not available"
         private const val PACKAGE_AD_TOKEN_NOT_AVAILABLE = "advertising_token is not available or is not valid"
@@ -557,7 +613,7 @@ public class UID2Manager internal constructor(
         // The additional time we will allow to pass before checking the expiration of the Identity.
         private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
 
-        private var serverUrl: String = UID2_API_URL_DEFAULT
+        private var serverUrl: String = UID2_API_URL_PRODUCTION
         private var applicationId: String = APPLICATION_ID_DEFAULT
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
@@ -576,10 +632,37 @@ public class UID2Manager internal constructor(
          */
         @JvmStatic
         @JvmOverloads
+        @JvmName("initWithEnvironment")
+        @Throws(InitializationException::class)
+        @Deprecated(
+            message = "Initialize with a custom Environment rather than a serverUrl String",
+            replaceWith = ReplaceWith("initWithEnvironment(context, environment, networkSession, isLoggingEnabled)"),
+            level = DeprecationLevel.WARNING,
+        )
+        public fun init(
+            context: Context,
+            serverUrl: String = UID2_API_URL_PRODUCTION,
+            networkSession: NetworkSession = DefaultNetworkSession(),
+            isLoggingEnabled: Boolean = false,
+        ) {
+            init(context, Environment.Custom(serverUrl), networkSession, isLoggingEnabled)
+        }
+
+        /**
+         * Initializes the class with the given [Context], along with a [NetworkSession] that will be responsible
+         * for making any required network calls.
+         *
+         * @param context The context to initialise from. This will be used to obtain the package's metadata to extract
+         * the API URL.
+         * @param networkSession A custom [NetworkSession] which can be used for making any required network calls.
+         * The default implementation supported by the SDK can be found as [DefaultNetworkSession].
+         */
+        @JvmStatic
+        @JvmOverloads
         @Throws(InitializationException::class)
         public fun init(
             context: Context,
-            serverUrl: String = UID2_API_URL_DEFAULT,
+            environment: Environment = Environment.Production,
             networkSession: NetworkSession = DefaultNetworkSession(),
             isLoggingEnabled: Boolean = false,
         ) {
@@ -587,10 +670,10 @@ public class UID2Manager internal constructor(
                 throw InitializationException()
             }
 
-            this.serverUrl = serverUrl
+            this.serverUrl = environment.serverUrl
             this.applicationId = context.packageName
             this.networkSession = networkSession
-            this.storageManager = StorageManager.getInstance(context.applicationContext)
+            this.storageManager = FileStorageManager(context.applicationContext, UID2)
             this.isLoggingEnabled = isLoggingEnabled
         }
 
