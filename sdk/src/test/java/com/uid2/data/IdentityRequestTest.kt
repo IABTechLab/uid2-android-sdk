@@ -29,8 +29,6 @@ class IdentityRequestTest {
         assertNotNull(jsonPayload)
         assertTrue(jsonPayload.has(FIELD_EMAIL_HASH))
         assertEquals(hash, jsonPayload[FIELD_EMAIL_HASH])
-        assertTrue(jsonPayload.has(FIELD_OPT_OUT_CHECK))
-        assertEquals(1, jsonPayload[FIELD_OPT_OUT_CHECK])
     }
 
     @Test
@@ -54,13 +52,10 @@ class IdentityRequestTest {
         assertNotNull(jsonPayload)
         assertTrue(jsonPayload.has(FIELD_PHONE_HASH))
         assertEquals(hash, jsonPayload[FIELD_PHONE_HASH])
-        assertTrue(jsonPayload.has(FIELD_OPT_OUT_CHECK))
-        assertEquals(1, jsonPayload[FIELD_OPT_OUT_CHECK])
     }
 
     private companion object {
         const val FIELD_EMAIL_HASH = "email_hash"
         const val FIELD_PHONE_HASH = "phone_hash"
-        const val FIELD_OPT_OUT_CHECK = "optout_check"
     }
 }
