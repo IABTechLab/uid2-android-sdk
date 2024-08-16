@@ -53,12 +53,8 @@ internal fun IdentityRequest.toPayload(): String {
 
     return JSONObject().apply {
         put(payloadKey, payloadValue)
-
-        // If the identity has opted out, we will get an opt-out response.
-        put(PARAM_OPT_OUT_CHECK, 1)
     }.toString()
 }
 
 private const val PARAM_EMAIL_HASH = "email_hash"
 private const val PARAM_PHONE_HASH = "phone_hash"
-private const val PARAM_OPT_OUT_CHECK = "optout_check"
