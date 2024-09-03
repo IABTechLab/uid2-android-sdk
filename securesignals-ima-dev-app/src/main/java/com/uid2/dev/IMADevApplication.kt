@@ -17,14 +17,14 @@ class IMADevApplication : Application() {
         // custom implementation. This can be done to allow wrapping something like OkHttp.
         try {
             if (baseContext.getMetadata().isEnvironmentEUID()) {
-                UID2Manager.init(
+                EUIDManager.init(
                     context = this,
-                    environment = Production,
                     isLoggingEnabled = true,
                 )
             } else {
-                EUIDManager.init(
+                UID2Manager.init(
                     context = this,
+                    environment = Production,
                     isLoggingEnabled = true,
                 )
             }
