@@ -29,7 +29,7 @@ class GMADevApplication : Application() {
                 )
             }
         } catch (ex: Exception) {
-            Log.e("IMADevApplication", "Error initialising UID2Manager", ex)
+            Log.e("GMADevApplication", "Error initialising UID2Manager", ex)
         }
     }
 }
