@@ -23,7 +23,6 @@ android {
     }
 
     lint {
-        baseline = file("lint-baseline.xml")
         disable 'GradleDependency', 'IconDipSize', 'IconDensities', 'RtlEnabled'
     }
 
