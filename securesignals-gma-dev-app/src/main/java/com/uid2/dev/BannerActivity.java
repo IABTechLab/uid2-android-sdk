@@ -1,8 +1,5 @@
 package com.uid2.dev;
 
-import static com.uid2.dev.utils.BundleExKt.isEnvironmentEUID;
-import static com.uid2.dev.utils.ContextExKt.getMetadata;
-
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
@@ -14,9 +11,9 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.uid2.EUIDManager;
 import com.uid2.UID2Manager;
 import com.uid2.data.UID2Identity;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -104,11 +101,7 @@ public class BannerActivity extends AppCompatActivity {
                 refreshFrom,
                 refreshExpires,
                 fromJsonIdentity.getRefreshResponseKey());
-            if (isEnvironmentEUID(getMetadata(this))) {
-                EUIDManager.getInstance().setIdentity(identity);
-            } else {
-                UID2Manager.getInstance().setIdentity(identity);
-            }
+            UID2Manager.getInstance().setIdentity(identity);
         } catch (Exception e) {
             Log.e(TAG, "Error loading Identity: " + e);
         }

@@ -1,8 +1,5 @@
 package com.uid2.dev;
 
-import static com.uid2.dev.utils.BundleExKt.isEnvironmentEUID;
-import static com.uid2.dev.utils.ContextExKt.getMetadata;
-
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -25,7 +22,6 @@ import com.google.ads.interactivemedia.v3.api.AdsRequest;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
-import com.uid2.EUIDManager;
 import com.uid2.UID2Manager;
 import com.uid2.data.UID2Identity;
 
@@ -231,11 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 refreshExpires,
                 fromJsonIdentity.getRefreshResponseKey());
 
-            if (isEnvironmentEUID(getMetadata(getBaseContext()))) {
-                EUIDManager.getInstance().setIdentity(identity);
-            } else {
-                UID2Manager.getInstance().setIdentity(identity);
-            }
+            UID2Manager.getInstance().setIdentity(identity);
         } catch (Exception e) {
             Log.e(LOGTAG, "Error loading Identity: " + e);
         }

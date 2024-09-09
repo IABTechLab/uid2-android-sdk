@@ -14,9 +14,6 @@
         android:networkSecurityConfig="@xml/network_security_config"
         tools:ignore="UnusedAttribute">
 
-        <!-- Metadata for toggling UID2 and EUID environments. If true, EUID is used. -->
-        <meta-data android:name="uid2_environment_euid" android:value="false"/>
-
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
