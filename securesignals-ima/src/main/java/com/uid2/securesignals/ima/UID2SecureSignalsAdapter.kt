@@ -7,6 +7,7 @@ import com.google.ads.interactivemedia.v3.api.signals.SecureSignalsCollectSignal
 import com.google.ads.interactivemedia.v3.api.signals.SecureSignalsInitializeCallback
 import com.uid2.UID2
 import com.uid2.UID2Manager
+import com.uid2.UID2Manager.Environment.Production
 
 /**
  * A custom exception type that is used to report failures from the UID2SecureSignalsAdapter when an error has occurred.
@@ -38,7 +39,7 @@ public class UID2SecureSignalsAdapter : SecureSignalsAdapter {
     public override fun initialize(context: Context, callback: SecureSignalsInitializeCallback) {
         // It's possible that the UID2Manager is already initialised. If so, it's a no-op.
         if (!UID2Manager.isInitialized()) {
-            UID2Manager.init(context)
+            UID2Manager.init(context, environment = Production)
         }
 
         // After we've asked to initialize the manager, we should wait until it's complete before reporting success.

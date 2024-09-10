@@ -9,6 +9,7 @@ import com.google.android.gms.ads.mediation.rtb.RtbSignalData
 import com.google.android.gms.ads.mediation.rtb.SignalCallbacks
 import com.uid2.UID2
 import com.uid2.UID2Manager
+import com.uid2.UID2Manager.Environment.Production
 import com.google.android.gms.ads.mediation.VersionInfo as GmaVersionInfo
 
 /**
@@ -42,7 +43,7 @@ public class UID2MediationAdapter : RtbAdapter() {
     ) {
         // It's possible that the UID2Manager is already initialised. If so, it's a no-op.
         if (!UID2Manager.isInitialized()) {
-            UID2Manager.init(context)
+            UID2Manager.init(context, Production)
         }
 
         // After we've asked to initialize the manager, we should wait until it's complete before reporting success.

@@ -18,6 +18,11 @@ internal class FileStorageManager(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : StorageManager {
 
+    enum class Store(val filename: String) {
+        UID2(UID2_FILE_IDENTITY),
+        EUID(EUID_FILE_IDENTITY),
+    }
+
     // For storage, we use the parent filesDir which is part of the Application's internal storage. This internal
     // storage is sandboxed to prevent any other app, or even the user, from accessing it directly. We rely on Android
     // keeping this file secure.
@@ -25,7 +30,7 @@ internal class FileStorageManager(
     // On Android 10+, this location is also likely encrypted.
     //
     // https://developer.android.com/training/data-storage/app-specific#internal-access-files
-    constructor(context: Context) : this({ File(context.filesDir, FILE_IDENTITY) })
+    constructor(context: Context, store: Store) : this({ File(context.filesDir, store.filename) })
 
     // This lazy value *should* only be requested on the ioDispatcher.
     private val identityFile: File by lazy { identityFileFactory() }
@@ -59,7 +64,8 @@ internal class FileStorageManager(
     }
 
     private companion object {
-        const val FILE_IDENTITY = "uid2_identity.json"
+        const val UID2_FILE_IDENTITY = "uid2_identity.json"
+        const val EUID_FILE_IDENTITY = "euid_identity.json"
         const val KEY_STATUS = "identity_status"
 
         // The character set used for both reading and writing to the file.

@@ -51,10 +51,14 @@ sealed interface MainScreenState : ViewState {
 class MainScreenViewModel(
     private val api: AppUID2Client,
     private val manager: UID2Manager,
+    isEUID: Boolean,
 ) : BasicViewModel<MainScreenAction, MainScreenState>() {
 
     private val _viewState = MutableStateFlow<MainScreenState>(UserUpdatedState(null, NO_IDENTITY))
     override val viewState: StateFlow<MainScreenState> = _viewState.asStateFlow()
+
+    private val subscriptionId: String = if (isEUID) SUBSCRIPTION_ID_EUID else SUBSCRIPTION_ID_UID2
+    private val publicKey: String = if (isEUID) PUBLIC_KEY_EUID else PUBLIC_KEY_UID2
 
     init {
         // Observe the state of the UID2Manager and translate those into our own ViewState. This will happen when the
@@ -98,8 +102,8 @@ class MainScreenViewModel(
                             // Generate the identity via Client Side Integration (client side token generation).
                             manager.generateIdentity(
                                 IdentityRequest.Email(action.address),
-                                SUBSCRIPTION_ID,
-                                PUBLIC_KEY,
+                                subscriptionId,
+                                publicKey,
                                 onGenerateResult,
                             )
                         } else {
@@ -120,8 +124,8 @@ class MainScreenViewModel(
                             // Generate the identity via Client Side Integration (client side token generation).
                             manager.generateIdentity(
                                 IdentityRequest.Phone(action.number),
-                                SUBSCRIPTION_ID,
-                                PUBLIC_KEY,
+                                subscriptionId,
+                                publicKey,
                                 onGenerateResult,
                             )
                         } else {
@@ -149,19 +153,24 @@ class MainScreenViewModel(
     private companion object {
         const val TAG = "MainScreenViewModel"
 
-        const val SUBSCRIPTION_ID = "toPh8vgJgt"
+        const val SUBSCRIPTION_ID_UID2 = "toPh8vgJgt"
+        const val SUBSCRIPTION_ID_EUID = "w6yPQzN4dA"
 
         @Suppress("ktlint:standard:max-line-length")
-        const val PUBLIC_KEY = "UID2-X-I-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKAbPfOz7u25g1fL6riU7p2eeqhjmpALPeYoyjvZmZ1xM2NM8UeOmDZmCIBnKyRZ97pz5bMCjrs38WM22O7LJuw=="
+        const val PUBLIC_KEY_UID2 = "UID2-X-I-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKAbPfOz7u25g1fL6riU7p2eeqhjmpALPeYoyjvZmZ1xM2NM8UeOmDZmCIBnKyRZ97pz5bMCjrs38WM22O7LJuw=="
+
+        @Suppress("ktlint:standard:max-line-length")
+        const val PUBLIC_KEY_EUID = "EUID-X-I-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEH/k7HYGuWhjhCo8nXgj/ypClo5kek7uRKvzCGwj04Y1eXOWmHDOLAQVCPquZdfVVezIpABNAl9zvsSEC7g+ZGg=="
     }
 }
 
 class MainScreenViewModelFactory(
     private val api: AppUID2Client,
     private val manager: UID2Manager,
+    private val isEUID: Boolean,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainScreenViewModel(api, manager) as T
+        return MainScreenViewModel(api, manager, isEUID) as T
     }
 }

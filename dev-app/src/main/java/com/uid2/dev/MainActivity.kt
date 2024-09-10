@@ -5,23 +5,34 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material.MaterialTheme
+import com.uid2.EUIDManager
 import com.uid2.UID2Manager
 import com.uid2.dev.network.AppUID2Client
 import com.uid2.dev.ui.MainScreen
 import com.uid2.dev.ui.MainScreenViewModel
 import com.uid2.dev.ui.MainScreenViewModelFactory
+import com.uid2.dev.utils.getMetadata
+import com.uid2.dev.utils.isEnvironmentEUID
+import com.uid2.devapp.R
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainScreenViewModel by viewModels {
+        val isEUID = getMetadata().isEnvironmentEUID()
         MainScreenViewModelFactory(
             AppUID2Client.fromContext(baseContext),
-            UID2Manager.getInstance(),
+            if (isEUID) EUIDManager.getInstance() else UID2Manager.getInstance(),
+            isEUID,
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (getMetadata().isEnvironmentEUID()) {
+            setTitle(R.string.app_name_euid)
+        }
+
         setContent {
             MaterialTheme {
                 MainScreen(viewModel)

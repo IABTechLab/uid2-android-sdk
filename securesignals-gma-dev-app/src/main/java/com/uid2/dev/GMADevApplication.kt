@@ -3,6 +3,7 @@ package com.uid2.dev
 import android.app.Application
 import android.util.Log
 import com.uid2.UID2Manager
+import com.uid2.UID2Manager.Environment.Production
 
 class GMADevApplication : Application() {
 
@@ -14,10 +15,11 @@ class GMADevApplication : Application() {
         try {
             UID2Manager.init(
                 context = this,
+                environment = Production,
                 isLoggingEnabled = true,
             )
         } catch (ex: Exception) {
-            Log.e("IMADevApplication", "Error initialising UID2Manager", ex)
+            Log.e("GMADevApplication", "Error initialising UID2Manager", ex)
         }
     }
 }
