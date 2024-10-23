@@ -14,7 +14,10 @@
         <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-9939518381636264~1092563270"/>
+
+        <!-- Metadata for toggling UID2 and EUID environments. If true, EUID is used. -->
+        <meta-data android:name="uid2_environment_euid" android:value="false"/>
 
         <activity
             android:exported="true"
