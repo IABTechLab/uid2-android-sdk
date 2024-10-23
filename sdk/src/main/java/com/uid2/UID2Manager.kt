@@ -324,7 +324,7 @@ public class UID2Manager internal constructor(
     private suspend fun onInitialized() {
         initializedLock.withLock {
             while (onInitializedListeners.isNotEmpty()) {
-                onInitializedListeners.removeFirst().invoke()
+                onInitializedListeners.removeAt(0).invoke()
             }
         }
     }
