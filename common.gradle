@@ -1,9 +1,9 @@
 
 android {
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
-        targetSdk 34
+        targetSdk 35
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -14,7 +14,7 @@ android {
     }
 
     buildTypes {
-        all {
+        configureEach {
             buildConfigField "String", "VERSION", "\"${property("VERSION_NAME")}\""
         }
     }
