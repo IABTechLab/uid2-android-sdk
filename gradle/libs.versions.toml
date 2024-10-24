@@ -1,23 +1,23 @@
 [versions]
 agp = "8.7.1"
-kotlin = "2.0.0"
+kotlin = "2.0.21"
 core-ktx = "1.13.1"
 junit = "4.13.2"
 appcompat = "1.7.0"
-coroutines-version = "1.8.1"
-compose = "1.9.0"
-compose-bom = "2024.06.00"
-compose-tooling = "1.6.8"
-gma = "23.2.0"
-ima = "3.34.0"
-mockkVersion = "1.13.11"
+coroutines-version = "1.9.0"
+compose = "1.9.3"
+compose-bom = "2024.10.00"
+compose-tooling = "1.7.4"
+gma = "23.4.0"
+ima = "3.35.1"
+mockkVersion = "1.13.13"
 prebid = "2.2.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
-kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.1" }
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.9.0" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.8.3" }
+androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.8.6" }
 
 # Compose
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
@@ -25,7 +25,8 @@ compose-activity = { group = "androidx.activity", name = "activity-compose", ver
 compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose-tooling" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose-tooling" }
 compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-tooling"}
-compose-material = { group = "androidx.compose.material", name = "material", version = "1.6.8" }
+compose-material = { group = "androidx.compose.material", name = "material", version = "1.7.4" }
+compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core", version = "1.7.4" }
 
 # OkHttp
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.12.0" }
@@ -37,7 +38,7 @@ androidx-multidex = { group = "androidx.multidex", name = "multidex", version = 
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.1.4" }
 androidx-media = { group = "androidx.media", name = "media", version = "1.7.0" }
 androidx-browser = { group = "androidx.browser", name = "browser", version = "1.8.0" }
-androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version = "1.9.0" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version = "1.9.3" }
 
 # Prebid
 prebid = { group = "org.prebid", name = "prebid-mobile-sdk", version.ref = "prebid" }

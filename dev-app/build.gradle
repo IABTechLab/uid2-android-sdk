@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.tooling)
     implementation(libs.compose.material)
+    implementation(libs.compose.material.icons)
 
     implementation(libs.okhttp.core)
 
