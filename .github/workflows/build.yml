@@ -31,7 +31,7 @@ jobs:
         run: ./gradlew build
 
       - name: Vulnerability Scan
-        uses: IABTechLab/uid2-shared-actions/actions/vulnerability_scan_filesystem@v2
+        uses: IABTechLab/uid2-shared-actions/actions/vulnerability_scan_filesystem@v3
 
       - name: Deploy SNAPSHOT to Maven Central
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
