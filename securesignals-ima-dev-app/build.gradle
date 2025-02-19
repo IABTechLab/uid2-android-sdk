@@ -6,19 +6,19 @@ plugins {
 apply from:  rootProject.file("$rootDir/common.gradle")
 
 android {
-    namespace 'com.uid2.dev'
+    namespace = 'com.uid2.dev'
 
     defaultConfig {
-        applicationId "com.uid2.securesignals.ima.devapp"
-        minSdk 21
-        versionCode 1
-        versionName "1.0"
+        applicationId = "com.uid2.securesignals.ima.devapp"
+        minSdk = 21
+        versionCode = 1
+        versionName = "1.0"
     }
 
     buildTypes {
         release {
-            shrinkResources true
-            minifyEnabled true
+            shrinkResources = true
+            minifyEnabled = true
         }
     }
 

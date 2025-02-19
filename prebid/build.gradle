@@ -8,9 +8,9 @@ plugins {
 apply from:  rootProject.file("$rootDir/common.gradle")
 
 android {
-    namespace 'com.uid2.prebid'
+    namespace = 'com.uid2.prebid'
     defaultConfig {
-        minSdk 19
+        minSdk = 19
     }
 
     kotlin {

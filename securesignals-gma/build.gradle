@@ -7,15 +7,15 @@ plugins {
 apply from:  rootProject.file("$rootDir/common.gradle")
 
 android {
-    namespace 'com.uid2.securesignals.gma'
+    namespace = 'com.uid2.securesignals.gma'
     defaultConfig {
-        minSdk 19
+        minSdk = 19
     }
 
     buildTypes {
         release {
             consumerProguardFiles 'uid2-gma.pro'
-            minifyEnabled false
+            minifyEnabled = false
         }
     }
 

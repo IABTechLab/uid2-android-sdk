@@ -7,29 +7,29 @@ plugins {
 apply from:  rootProject.file("$rootDir/common.gradle")
 
 android {
-    namespace 'com.uid2.devapp'
+    namespace = 'com.uid2.devapp'
 
     defaultConfig {
-        applicationId "com.uid2.devapp"
-        minSdk 21
-        versionCode 1
-        versionName "1.0"
+        applicationId = "com.uid2.devapp"
+        minSdk = 21
+        versionCode = 1
+        versionName = "1.0"
     }
 
     buildTypes {
         release {
-            shrinkResources true
-            minifyEnabled true
+            shrinkResources = true
+            minifyEnabled = true
             proguardFiles = [
                 "okhttp3-proguard-rules.txt",
                 getDefaultProguardFile('proguard-android.txt')
             ]
-            signingConfig signingConfigs.debug
+            signingConfig = signingConfigs.debug
         }
     }
 
     buildFeatures {
-        compose true
+        compose = true
     }
 
     lint {
