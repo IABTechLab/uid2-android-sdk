@@ -8,9 +8,9 @@ plugins {
 apply from:  rootProject.file("$rootDir/common.gradle")
 
 android {
-    namespace 'com.uid2'
+    namespace = 'com.uid2'
     defaultConfig {
-        minSdk 19
+        minSdk = 19
     }
 
     sourceSets {

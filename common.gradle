@@ -1,11 +1,11 @@
 
 android {
-    compileSdk 35
+    compileSdk = 35
 
     defaultConfig {
-        targetSdk 35
+        targetSdk = 35
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -24,8 +24,8 @@ android {
     }
 
     lint {
-        abortOnError true
-        warningsAsErrors true
+        abortOnError = true
+        warningsAsErrors = true
 
         disable 'GradleDependency' // Updated dependencies should not fail the build
         disable 'DataExtractionRules' // We don't want the dev apps to use backup
@@ -33,7 +33,7 @@ android {
     }
 
     buildFeatures {
-        buildConfig true
+        buildConfig = true
     }
 }
 
