@@ -1,21 +1,22 @@
 [versions]
-agp = "8.7.3"
-kotlin = "2.1.0"
+agp = "8.8.1"
+kotlin = "2.1.10"
 core-ktx = "1.15.0"
 junit = "4.13.2"
 appcompat = "1.7.0"
-coroutines-version = "1.9.0"
-compose = "1.9.3"
-compose-bom = "2024.12.01"
-compose-tooling = "1.7.6"
+coroutines-version = "1.10.1"
+compose = "1.10.0"
+compose-bom = "2025.02.00"
+compose-tooling = "1.7.8"
 gma = "23.6.0"
 ima = "3.36.0"
-mockkVersion = "1.13.13"
+mockkVersion = "1.13.16"
 prebid = "2.2.1"
+ktlint = "1.0.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
-kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.9.0" }
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines-version" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.8.7" }
 
@@ -25,8 +26,8 @@ compose-activity = { group = "androidx.activity", name = "activity-compose", ver
 compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose-tooling" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose-tooling" }
 compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-tooling"}
-compose-material = { group = "androidx.compose.material", name = "material", version = "1.7.6" }
-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core", version = "1.7.6" }
+compose-material = { group = "androidx.compose.material", name = "material", version = "1.7.8" }
+compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core", version = "1.7.8" }
 
 # OkHttp
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.12.0" }
@@ -38,7 +39,7 @@ androidx-multidex = { group = "androidx.multidex", name = "multidex", version = 
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.2.0" }
 androidx-media = { group = "androidx.media", name = "media", version = "1.7.0" }
 androidx-browser = { group = "androidx.browser", name = "browser", version = "1.8.0" }
-androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version = "1.9.3" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version = "1.10.0" }
 
 # Prebid
 prebid = { group = "org.prebid", name = "prebid-mobile-sdk", version.ref = "prebid" }
@@ -46,7 +47,7 @@ prebid = { group = "org.prebid", name = "prebid-mobile-sdk", version.ref = "preb
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-version" }
-json = { group = "org.json", name = "json", version = "20240303" }
+json = { group = "org.json", name = "json", version = "20250107" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockkVersion" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockkVersion" }
 
@@ -55,6 +56,6 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
-dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.29.0" }
+spotless = { id = "com.diffplug.spotless", version = "7.0.2" }
+dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.30.0" }
