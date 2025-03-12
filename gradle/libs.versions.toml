@@ -5,12 +5,12 @@ core-ktx = "1.15.0"
 junit = "4.13.2"
 appcompat = "1.7.0"
 coroutines-version = "1.10.1"
-compose = "1.10.0"
+compose = "1.10.1"
 compose-bom = "2025.02.00"
 compose-tooling = "1.7.8"
 gma = "23.6.0"
 ima = "3.36.0"
-mockkVersion = "1.13.16"
+mockkVersion = "1.13.17"
 prebid = "2.2.1"
 ktlint = "1.0.1"
 
@@ -36,10 +36,10 @@ okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.12
 gma-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "gma" }
 ima-ads = { group = "com.google.ads.interactivemedia.v3", name = "interactivemedia", version.ref = "ima" }
 androidx-multidex = { group = "androidx.multidex", name = "multidex", version = "2.0.1" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.2.0" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.2.1" }
 androidx-media = { group = "androidx.media", name = "media", version = "1.7.0" }
 androidx-browser = { group = "androidx.browser", name = "browser", version = "1.8.0" }
-androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version = "1.10.0" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version = "1.10.1" }
 
 # Prebid
 prebid = { group = "org.prebid", name = "prebid-mobile-sdk", version.ref = "prebid" }
