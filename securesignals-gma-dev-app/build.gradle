@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.uid2.securesignals.gma.devapp"
-        minSdk = 21
+        minSdk = 23
         versionCode = 1
         versionName = "1.0"
     }
