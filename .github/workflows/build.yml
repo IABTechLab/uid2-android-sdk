@@ -31,7 +31,6 @@ jobs:
         uses: IABTechLab/uid2-shared-actions/actions/vulnerability_scan_filesystem@v3
 
       - name: Deploy SNAPSHOT to Maven Central
-        if: github.event_name == 'push'
         run: ./gradlew publish --stacktrace
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_SONATYPE_REPO_USERNAME }}
