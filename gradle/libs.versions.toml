@@ -1,16 +1,16 @@
 [versions]
 agp = "8.10.1"
-kotlin = "2.1.10"
-core-ktx = "1.15.0"
+kotlin = "2.1.21"
+core-ktx = "1.16.0"
 junit = "4.13.2"
-appcompat = "1.7.0"
-coroutines-version = "1.10.1"
+appcompat = "1.7.1"
+coroutines-version = "1.10.2"
 compose = "1.10.1"
-compose-bom = "2025.03.00"
-compose-tooling = "1.7.8"
-gma = "24.1.0"
+compose-bom = "2025.06.00"
+compose-tooling = "1.8.2"
+gma = "24.4.0"
 ima = "3.36.0"
-mockkVersion = "1.13.17"
+mockkVersion = "1.14.2"
 prebid = "2.2.1"
 ktlint = "1.0.1"
 
@@ -18,15 +18,15 @@ ktlint = "1.0.1"
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines-version" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.8.7" }
+androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version = "2.9.1" }
 
 # Compose
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "compose" }
 compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose-tooling" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose-tooling" }
-compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-tooling"}
-compose-material = { group = "androidx.compose.material", name = "material", version = "1.7.8" }
+compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-tooling" }
+compose-material = { group = "androidx.compose.material", name = "material", version = "1.8.2" }
 compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core", version = "1.7.8" }
 
 # OkHttp
@@ -47,7 +47,7 @@ prebid = { group = "org.prebid", name = "prebid-mobile-sdk", version.ref = "preb
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-version" }
-json = { group = "org.json", name = "json", version = "20250107" }
+json = { group = "org.json", name = "json", version = "20250517" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockkVersion" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockkVersion" }
 
@@ -56,6 +56,6 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-spotless = { id = "com.diffplug.spotless", version = "7.0.2" }
+spotless = { id = "com.diffplug.spotless", version = "7.0.4" }
 dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.31.0" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.32.0" }
