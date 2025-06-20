@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.Modifier
 import com.uid2.EUIDManager
 import com.uid2.UID2Manager
 import com.uid2.dev.network.AppUID2Client
@@ -34,8 +37,11 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MaterialTheme {
-                MainScreen(viewModel)
+            Box(Modifier.safeDrawingPadding()) {
+                // the rest of the app
+                MaterialTheme {
+                    MainScreen(viewModel)
+                }
             }
         }
     }
