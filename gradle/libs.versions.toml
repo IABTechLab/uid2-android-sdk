@@ -10,7 +10,7 @@ compose-bom = "2025.06.00"
 compose-tooling = "1.8.2"
 gma = "24.4.0"
 ima = "3.36.0"
-mockkVersion = "1.14.2"
+mockkVersion = "1.14.4"
 prebid = "2.2.1"
 ktlint = "1.0.1"
 
