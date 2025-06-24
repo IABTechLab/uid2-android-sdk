@@ -20,11 +20,6 @@ android {
     kotlinOptions {
         freeCompilerArgs += [ "-opt-in=com.uid2.InternalUID2Api" ]
     }
-
-    lint {
-        warningsAsErrors = false
-        warning += 'Aligned16KB'
-    }
 }
 
 dependencies {
