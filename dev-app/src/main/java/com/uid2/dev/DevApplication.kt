@@ -38,7 +38,7 @@ class DevApplication : Application() {
         // UID2Manager.init(this, INTEG_SERVER_URL, OkNetworkSession(), true)
 
         // Create the Prebid integration and allow it to start observing the UID2Manager instance.
-        PrebidMobile.initializeSdk(this) { Log.i(TAG, "Prebid: $it") }
+        PrebidMobile.initializeSdk(this, "") { Log.i(TAG, "Prebid: $it") }
         prebid = UID2Prebid(
             if (isEnvironmentEUID) EUIDManager.getInstance() else UID2Manager.getInstance(),
         ).apply {

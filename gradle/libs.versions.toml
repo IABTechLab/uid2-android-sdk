@@ -1,5 +1,5 @@
 [versions]
-agp = "8.11.0"
+agp = "8.11.1"
 kotlin = "2.1.21"
 core-ktx = "1.16.0"
 junit = "4.13.2"
@@ -11,7 +11,7 @@ compose-tooling = "1.8.2"
 gma = "24.4.0"
 ima = "3.36.0"
 mockkVersion = "1.14.4"
-prebid = "2.2.1"
+prebid = "3.0.2"
 ktlint = "1.0.1"
 
 [libraries]
