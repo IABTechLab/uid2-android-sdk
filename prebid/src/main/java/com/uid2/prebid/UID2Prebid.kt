@@ -12,6 +12,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.prebid.mobile.ExternalUserId
 import org.prebid.mobile.PrebidMobile
+import org.prebid.mobile.TargetingParams
 
 /**
  * Interface to wrap access to [PrebidMobile]. This is used to improve testability, rather than having the [UID2Prebid]
@@ -50,7 +51,7 @@ public class UID2Prebid internal constructor(
     ) : this(
         manager,
         externalUserIdFactory,
-        PrebidExternalUserIdInteractor { ids -> PrebidMobile.setExternalUserIds(ids) },
+        PrebidExternalUserIdInteractor { ids -> TargetingParams.setExternalUserIds(ids) },
         Dispatchers.Default,
     )
 
@@ -121,12 +122,18 @@ public class UID2Prebid internal constructor(
      */
     private fun String.toExternalUserIdList(): List<ExternalUserId> {
         return listOf(
-            ExternalUserId(USER_ID_SOURCE, this, null, null),
+            ExternalUserId(USER_ID_SOURCE, listOf(ExternalUserId.UniqueId(this, AGENT_TYPE_PERSON_ID))),
         )
     }
 
     private companion object {
         const val TAG = "UID2Prebid"
         const val USER_ID_SOURCE = "uidapi.com"
+
+        /**
+         * "A person-based ID, i.e., that is the same across devices."
+         * https://github.com/InteractiveAdvertisingBureau/AdCOM/blob/main/AdCOM%20v1.0%20FINAL.md#list_agenttypes
+         */
+        const val AGENT_TYPE_PERSON_ID = 3
     }
 }

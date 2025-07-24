@@ -58,7 +58,7 @@ class UID2PrebidTest {
 
         // Verify that immediately after being initialized, the available advertising token is set on Prebid.
         assertEquals(1, prebidExternalUserIdInteractor.lastIds.size)
-        assertEquals(currentAdvertisingToken, prebidExternalUserIdInteractor.lastIds[0].identifier)
+        assertEquals(currentAdvertisingToken, prebidExternalUserIdInteractor.lastIds[0].uniqueIds[0].id)
     }
 
     @Test
@@ -151,9 +151,11 @@ class UID2PrebidTest {
     private fun FakePrebidExternalUserIdInteractor.assertLastToken(advertisingToken: String) {
         assertTrue(lastIds.isNotEmpty())
         lastIds.last().let {
-            assertEquals(advertisingToken, it.identifier)
             assertEquals("uidapi.com", it.source)
-            assertNull(it.atype)
+            assertEquals(1, it.uniqueIds.size)
+            val id = it.uniqueIds[0]
+            assertEquals(advertisingToken, id.id)
+            assertEquals(3, id.atype)
             assertNull(it.ext)
         }
     }
