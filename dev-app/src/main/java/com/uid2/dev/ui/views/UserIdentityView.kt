@@ -75,7 +75,6 @@ private fun IdentityStatus.toUserString(): String {
             INVALID -> R.string.status_invalid
             REFRESH_EXPIRED -> R.string.status_refresh_expired
             OPT_OUT -> R.string.status_opt_out
-            else -> R.string.status_invalid
         },
     )
 }
