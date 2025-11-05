@@ -24,6 +24,25 @@ jobs:
       packages: write
 
     steps:
+      - name: Validate version input
+        id: validation
+        env:
+          INPUT_RELEASE_VERSION: ${{ inputs.version }}
+          INPUT_SNAPSHOT_VERSION: ${{ inputs.snapshot }}
+        run: |
+          if ! [[ "$INPUT_RELEASE_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "Invalid version";
+            exit 1;
+          fi
+
+          if ! [[ "$INPUT_SNAPSHOT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)?$ ]]; then
+            echo "Invalid snapshot version";
+            exit 1;
+          fi
+
+          echo "release_version=$INPUT_RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "snapshot_version=$INPUT_SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -53,21 +72,21 @@ jobs:
 
       - name: Get Snapshot versions
         id: snapshotVersions
-        run: ./scripts/get_snapshot_versions.sh ${{ inputs.snapshot }}
+        run: ./scripts/get_snapshot_versions.sh ${{ steps.validation.outputs.snapshot_version }}
 
       - name: Prepare for release metadata
         shell: bash
         run: |
-          sed -i.bak "s/${{ steps.snapshotVersions.outputs.cur_snapshot_version }}/${{ inputs.version }}/g" gradle.properties
+          sed -i.bak "s/${{ steps.snapshotVersions.outputs.cur_snapshot_version }}/${{ steps.validation.outputs.release_version }}/g" gradle.properties
 
-      - name: Commit gradle.properties and set tag for v${{ inputs.version }}
+      - name: Commit gradle.properties and set tag for v${{ steps.validation.outputs.release_version }}
         uses: IABTechLab/uid2-shared-actions/actions/commit_pr_and_merge@v2
         with:
           add: 'gradle.properties'
-          message: 'Prepare for release: ${{ inputs.version }}'
-          tag: v${{ inputs.version }}
+          message: 'Prepare for release: ${{ steps.validation.outputs.release_version }}'
+          tag: v${{ steps.validation.outputs.release_version }}
 
-      - name: Deploy v${{ inputs.version }}
+      - name: Deploy v${{ steps.validation.outputs.release_version }}
         run: ./gradlew publish
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_SONATYPE_REPO_USERNAME }}
@@ -79,7 +98,7 @@ jobs:
         shell: bash
         run: |
           echo "Setting next snapshot version ${{ steps.snapshotVersions.outputs.new_snapshot_version }}"
-          sed -i.bak "s/${{ inputs.version }}/${{ steps.snapshotVersions.outputs.new_snapshot_version }}/g" gradle.properties
+          sed -i.bak "s/${{ steps.validation.outputs.release_version }}/${{ steps.snapshotVersions.outputs.new_snapshot_version }}/g" gradle.properties
 
       - name: Commit gradle.properties for Snapshot version ${{ steps.snapshotVersions.outputs.new_snapshot_version }}
         uses: IABTechLab/uid2-shared-actions/actions/commit_pr_and_merge@v2
@@ -96,4 +115,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          tag_name: v${{ inputs.version }}
+          tag_name: v${{ steps.validation.outputs.release_version }}
