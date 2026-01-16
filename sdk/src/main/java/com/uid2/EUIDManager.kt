@@ -100,18 +100,19 @@ public object EUIDManager {
         val logger = Logger(isLoggingEnabled)
 
         return instance ?: UID2Manager(
-            UID2Client(
+            client = UID2Client(
                 apiUrl = serverUrl,
                 session = networkSession,
                 applicationId = applicationId,
                 logger = logger,
             ),
-            storage,
-            TimeUtils,
-            InputUtils(),
-            Dispatchers.Default,
-            true,
-            logger,
+            storageManager = storage,
+            timeUtils = TimeUtils,
+            inputUtils = InputUtils(),
+            defaultDispatcher = Dispatchers.Default,
+            initialAutomaticRefreshEnabled = true,
+            isEuid = true,
+            logger = logger,
         ).apply {
             instance = this
         }

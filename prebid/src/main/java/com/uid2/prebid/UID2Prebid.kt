@@ -121,14 +121,20 @@ public class UID2Prebid internal constructor(
      * Extension function to build a list containing the single [ExternalUserId] that is associated with UID2.
      */
     private fun String.toExternalUserIdList(): List<ExternalUserId> {
+        val source = if (manager.isEuid) {
+            USER_ID_SOURCE_EUID
+        } else {
+            USER_ID_SOURCE_UID2
+        }
         return listOf(
-            ExternalUserId(USER_ID_SOURCE, listOf(ExternalUserId.UniqueId(this, AGENT_TYPE_PERSON_ID))),
+            ExternalUserId(source, listOf(ExternalUserId.UniqueId(this, AGENT_TYPE_PERSON_ID))),
         )
     }
 
     private companion object {
         const val TAG = "UID2Prebid"
-        const val USER_ID_SOURCE = "uidapi.com"
+        const val USER_ID_SOURCE_UID2 = "uidapi.com"
+        const val USER_ID_SOURCE_EUID = "euid.eu"
 
         /**
          * "A person-based ID, i.e., that is the same across devices."
