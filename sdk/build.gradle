@@ -1,6 +1,7 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias libs.plugins.androidLibrary
-    alias libs.plugins.kotlinAndroid
     alias libs.plugins.dokka
     alias libs.plugins.mavenPublish
 }
@@ -29,10 +30,10 @@ android {
 
     kotlin {
         explicitApi()
-    }
-
-    kotlinOptions {
-        freeCompilerArgs += [ "-opt-in=com.uid2.InternalUID2Api" ]
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_1_8
+            optIn.add("com.uid2.InternalUID2Api")
+        }
     }
 }
 

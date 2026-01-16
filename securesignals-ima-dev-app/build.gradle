@@ -1,6 +1,7 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias libs.plugins.androidApplication
-    alias libs.plugins.kotlinAndroid
 }
 
 apply from:  rootProject.file("$rootDir/common.gradle")
@@ -22,6 +23,12 @@ android {
         }
     }
 
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_1_8
+        }
+    }
+
     lint {
         disable 'GradleDependency', 'IconDipSize', 'IconDensities', 'RtlEnabled'
     }
@@ -38,7 +45,6 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.constraintlayout)
 
-    implementation(libs.androidx.multidex)
     implementation(libs.androidx.browser)
     implementation(libs.androidx.media)
 }
