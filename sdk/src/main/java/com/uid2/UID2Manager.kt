@@ -95,6 +95,7 @@ public class UID2Manager internal constructor(
     private val inputUtils: InputUtils,
     defaultDispatcher: CoroutineDispatcher,
     initialAutomaticRefreshEnabled: Boolean,
+    @property:InternalUID2Api public val isEuid: Boolean,
     @property:InternalUID2Api public val logger: Logger,
 ) {
     private val scope = CoroutineScope(defaultDispatcher + SupervisorJob())
@@ -614,6 +615,7 @@ public class UID2Manager internal constructor(
         private const val EXPIRATION_CHECK_TOLERANCE_MS = 50
 
         private var serverUrl: String = UID2_API_URL_PRODUCTION
+        private var isEuid: Boolean = true
         private var applicationId: String = APPLICATION_ID_DEFAULT
         private var networkSession: NetworkSession = DefaultNetworkSession()
         private var storageManager: StorageManager? = null
@@ -694,18 +696,19 @@ public class UID2Manager internal constructor(
             val logger = Logger(isLoggingEnabled)
 
             return instance ?: UID2Manager(
-                UID2Client(
+                client = UID2Client(
                     apiUrl = serverUrl,
                     session = networkSession,
                     applicationId = applicationId,
                     logger = logger,
                 ),
-                storage,
-                TimeUtils,
-                InputUtils(),
-                Dispatchers.Default,
-                true,
-                logger,
+                storageManager = storage,
+                timeUtils = TimeUtils,
+                inputUtils = InputUtils(),
+                defaultDispatcher = Dispatchers.Default,
+                initialAutomaticRefreshEnabled = true,
+                isEuid = false,
+                logger = logger,
             ).apply {
                 instance = this
             }

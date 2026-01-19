@@ -87,7 +87,16 @@ class UID2ManagerTest {
             }
         }
 
-        val manager = UID2Manager(client, storageManager, timeUtils, inputUtils, testDispatcher, false, logger).apply {
+        val manager = UID2Manager(
+            client = client,
+            storageManager = storageManager,
+            timeUtils = timeUtils,
+            inputUtils = inputUtils,
+            defaultDispatcher = testDispatcher,
+            initialAutomaticRefreshEnabled = false,
+            isEuid = false,
+            logger = logger,
+        ).apply {
             this.checkExpiration = false
 
             // Add the required listeners.
@@ -238,7 +247,16 @@ class UID2ManagerTest {
     @Test
     fun `resets identity immediately after initialisation`() = runTest(testDispatcher) {
         // Create a new instance of the manager but *don't* allow it to finish initialising (loading previous identity)
-        val manager = UID2Manager(client, storageManager, timeUtils, inputUtils, testDispatcher, false, logger).apply {
+        val manager = UID2Manager(
+            client = client,
+            storageManager = storageManager,
+            timeUtils = timeUtils,
+            inputUtils = inputUtils,
+            defaultDispatcher = testDispatcher,
+            initialAutomaticRefreshEnabled = false,
+            isEuid = false,
+            logger = logger,
+        ).apply {
             onIdentityChangedListener = listener
             checkExpiration = false
         }
@@ -556,13 +574,14 @@ class UID2ManagerTest {
         initialCheckExpiration: Boolean = false,
     ): UID2Manager {
         return UID2Manager(
-            client,
-            storageManager,
-            timeUtils,
-            inputUtils,
-            dispatcher,
-            initialAutomaticRefreshEnabled,
-            logger,
+            client = client,
+            storageManager = storageManager,
+            timeUtils = timeUtils,
+            inputUtils = inputUtils,
+            defaultDispatcher = dispatcher,
+            initialAutomaticRefreshEnabled = initialAutomaticRefreshEnabled,
+            isEuid = false,
+            logger = logger,
         ).apply {
             onIdentityChangedListener = listener
             checkExpiration = initialCheckExpiration

@@ -48,6 +48,7 @@ class UID2PrebidTest {
         every { manager.getAdvertisingToken() }.returns(currentAdvertisingToken)
         every { manager.state }.returns(state)
         every { manager.logger }.returns(logger)
+        every { manager.isEuid }.returns(false)
     }
 
     @Test
@@ -73,7 +74,7 @@ class UID2PrebidTest {
         advanceUntilIdle()
 
         // Verify it was set on Prebid.
-        prebidExternalUserIdInteractor.assertLastToken(newToken1)
+        prebidExternalUserIdInteractor.assertLastToken(newToken1, "uidapi.com")
 
         // Refresh the token.
         val newToken2 = "refreshed-token-1"
@@ -81,7 +82,7 @@ class UID2PrebidTest {
         advanceUntilIdle()
 
         // Verify it was set on Prebid.
-        prebidExternalUserIdInteractor.assertLastToken(newToken2)
+        prebidExternalUserIdInteractor.assertLastToken(newToken2, "uidapi.com")
 
         // Refresh the token again.
         val newToken3 = "refreshed-token-2"
@@ -89,7 +90,40 @@ class UID2PrebidTest {
         advanceUntilIdle()
 
         // Verify it was set on Prebid.
-        prebidExternalUserIdInteractor.assertLastToken(newToken3)
+        prebidExternalUserIdInteractor.assertLastToken(newToken3, "uidapi.com")
+    }
+
+    @Test
+    fun `sets the source for EUID`() = runTest(testDispatcher) {
+        every { manager.isEuid }.returns(true)
+
+        val prebid = withPrebid().apply {
+            initialize()
+        }
+
+        // Start with an established token.
+        val newToken1 = "established-token"
+        state.emit(withEstablished(newToken1))
+        advanceUntilIdle()
+
+        // Verify it was set on Prebid.
+        prebidExternalUserIdInteractor.assertLastToken(newToken1, "euid.eu")
+
+        // Refresh the token.
+        val newToken2 = "refreshed-token-1"
+        state.emit(withRefreshed(newToken2))
+        advanceUntilIdle()
+
+        // Verify it was set on Prebid.
+        prebidExternalUserIdInteractor.assertLastToken(newToken2, "euid.eu")
+
+        // Refresh the token again.
+        val newToken3 = "refreshed-token-2"
+        state.emit(withRefreshed(newToken3))
+        advanceUntilIdle()
+
+        // Verify it was set on Prebid.
+        prebidExternalUserIdInteractor.assertLastToken(newToken3, "euid.eu")
     }
 
     @Test
@@ -111,7 +145,7 @@ class UID2PrebidTest {
             advanceUntilIdle()
 
             // Verify that it's been set on Prebid.
-            prebidExternalUserIdInteractor.assertLastToken(token)
+            prebidExternalUserIdInteractor.assertLastToken(token, "uidapi.com")
 
             // Emit the new state.
             state.emit(managerState)
@@ -148,10 +182,10 @@ class UID2PrebidTest {
         refreshResponseKey = "",
     )
 
-    private fun FakePrebidExternalUserIdInteractor.assertLastToken(advertisingToken: String) {
+    private fun FakePrebidExternalUserIdInteractor.assertLastToken(advertisingToken: String, source: String) {
         assertTrue(lastIds.isNotEmpty())
         lastIds.last().let {
-            assertEquals("uidapi.com", it.source)
+            assertEquals(source, it.source)
             assertEquals(1, it.uniqueIds.size)
             val id = it.uniqueIds[0]
             assertEquals(advertisingToken, id.id)
