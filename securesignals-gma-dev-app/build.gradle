@@ -1,6 +1,7 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias libs.plugins.androidApplication
-    alias libs.plugins.kotlinAndroid
 }
 
 apply from:  rootProject.file("$rootDir/common.gradle")
@@ -22,6 +23,12 @@ android {
         }
     }
 
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_1_8
+        }
+    }
+
     lint {
         disable 'GradleDependency'
     }
@@ -33,7 +40,6 @@ dependencies {
     implementation project(path: ':securesignals-gma')
     implementation(libs.gma.ads)
 
-    implementation(libs.androidx.multidex)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
 }

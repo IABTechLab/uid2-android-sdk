@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.0"
+agp = "9.0.0"
 kotlin = "2.1.21"
 core-ktx = "1.16.0"
 junit = "4.13.2"
@@ -35,7 +35,6 @@ okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.12
 # GMA / IMA
 gma-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "gma" }
 ima-ads = { group = "com.google.ads.interactivemedia.v3", name = "interactivemedia", version.ref = "ima" }
-androidx-multidex = { group = "androidx.multidex", name = "multidex", version = "2.0.1" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.2.1" }
 androidx-media = { group = "androidx.media", name = "media", version = "1.7.0" }
 androidx-browser = { group = "androidx.browser", name = "browser", version = "1.8.0" }
@@ -54,7 +53,6 @@ mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockkVe
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 spotless = { id = "com.diffplug.spotless", version = "7.0.4" }
 dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
