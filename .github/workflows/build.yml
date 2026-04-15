@@ -22,7 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@cca926ef8d60d59c0bc5b36cfe99255048accd88 # v4
 
       - name: Build and run tests
         run: ./gradlew build

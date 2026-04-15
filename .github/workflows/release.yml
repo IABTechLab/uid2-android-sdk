@@ -65,10 +65,10 @@ jobs:
           git config --local user.email IABTechLab@users.noreply.github.com
 
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@cca926ef8d60d59c0bc5b36cfe99255048accd88 # v4
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@cca926ef8d60d59c0bc5b36cfe99255048accd88 # v4
 
       - name: Get Snapshot versions
         id: snapshotVersions
@@ -112,7 +112,7 @@ jobs:
           rm gradle.properties.bak
 
       - name: GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2
         with:
           generate_release_notes: true
           tag_name: v${{ steps.validation.outputs.release_version }}
