@@ -14,7 +14,15 @@ on:
         type: string
 
 jobs:
+  approve-publish:
+    name: Approve publish
+    runs-on: ubuntu-latest
+    environment: sdk-publish-approval
+    steps:
+      - run: echo "Publish approved"
+
   publish:
+    needs: approve-publish
     runs-on: ubuntu-latest
 
     permissions:
