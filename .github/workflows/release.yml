@@ -88,7 +88,7 @@ jobs:
           sed -i.bak "s/${{ steps.snapshotVersions.outputs.cur_snapshot_version }}/${{ steps.validation.outputs.release_version }}/g" gradle.properties
 
       - name: Commit gradle.properties and set tag for v${{ steps.validation.outputs.release_version }}
-        uses: IABTechLab/uid2-shared-actions/actions/commit_pr_and_merge@v2
+        uses: IABTechLab/uid2-shared-actions/actions/commit_pr_and_merge@v3
         with:
           add: 'gradle.properties'
           message: 'Prepare for release: ${{ steps.validation.outputs.release_version }}'
@@ -109,7 +109,7 @@ jobs:
           sed -i.bak "s/${{ steps.validation.outputs.release_version }}/${{ steps.snapshotVersions.outputs.new_snapshot_version }}/g" gradle.properties
 
       - name: Commit gradle.properties for Snapshot version ${{ steps.snapshotVersions.outputs.new_snapshot_version }}
-        uses: IABTechLab/uid2-shared-actions/actions/commit_pr_and_merge@v2
+        uses: IABTechLab/uid2-shared-actions/actions/commit_pr_and_merge@v3
         with:
           add: 'gradle.properties'
           message: 'Prepare next development version: ${{ steps.snapshotVersions.outputs.new_snapshot_version }}'
