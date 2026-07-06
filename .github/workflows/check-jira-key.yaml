@@ -1,0 +1,13 @@
+name: Check Jira Key
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check_jira_key:
+    uses: IABTechLab/uid2-shared-actions/.github/workflows/shared-check-jira-key.yaml@jon-UID2-7426-check-jira-key
+    secrets: inherit
