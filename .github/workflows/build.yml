@@ -32,8 +32,14 @@ jobs:
         with:
             scan_type: 'fs'
 
-      - name: Deploy SNAPSHOT to Maven Central
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Read version name
+        id: version
+        run: echo "name=$(grep '^VERSION_NAME=' gradle.properties | cut -d'=' -f2)" >> "$GITHUB_OUTPUT"
+
+      # The Sonatype Central Portal (SONATYPE_HOST=CENTRAL_PORTAL) does not support
+      # SNAPSHOT publishing, so skip this step for -SNAPSHOT versions to avoid a 403.
+      - name: Deploy to Maven Central
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !endsWith(steps.version.outputs.name, '-SNAPSHOT')
         run: ./gradlew publish --stacktrace
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_SONATYPE_REPO_USERNAME }}
