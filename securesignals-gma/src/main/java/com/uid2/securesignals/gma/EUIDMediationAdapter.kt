@@ -2,6 +2,7 @@ package com.uid2.securesignals.gma
 
 import android.content.Context
 import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.VersionInfo
 import com.google.android.gms.ads.mediation.InitializationCompleteCallback
 import com.google.android.gms.ads.mediation.MediationConfiguration
 import com.google.android.gms.ads.mediation.rtb.RtbAdapter
@@ -9,7 +10,6 @@ import com.google.android.gms.ads.mediation.rtb.RtbSignalData
 import com.google.android.gms.ads.mediation.rtb.SignalCallbacks
 import com.uid2.EUIDManager
 import com.uid2.UID2
-import com.google.android.gms.ads.mediation.VersionInfo as GmaVersionInfo
 
 /**
  * An implementation of Google's GMS RtbAdapter that integrates UID2 tokens, accessed via the UID2Manager.
@@ -19,17 +19,15 @@ public class EUIDMediationAdapter : RtbAdapter() {
     /**
      * Gets the version of the UID2 SDK.
      */
-    @Suppress("DEPRECATION")
-    public override fun getSDKVersionInfo(): GmaVersionInfo = UID2.getVersionInfo().let {
-        GmaVersionInfo(it.major, it.minor, it.patch)
+    public override fun getSDKVersionInfo(): VersionInfo = UID2.getVersionInfo().let {
+        VersionInfo(it.major, it.minor, it.patch)
     }
 
     /**
      * Gets the version of the UID2 Secure Signals plugin.
      */
-    @Suppress("DEPRECATION")
-    public override fun getVersionInfo(): GmaVersionInfo = PluginVersion.getVersionInfo().let {
-        GmaVersionInfo(it.major, it.minor, it.patch)
+    public override fun getVersionInfo(): VersionInfo = PluginVersion.getVersionInfo().let {
+        VersionInfo(it.major, it.minor, it.patch)
     }
 
     /**
