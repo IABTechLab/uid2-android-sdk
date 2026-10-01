@@ -8,7 +8,7 @@ class UID2MediationAdapterTest {
     @Test
     fun `test SDK version`() {
         val adapter = UID2MediationAdapter()
-        val version = adapter.versionInfo
+        val version = adapter.sdkVersionInfo
         val expectedVersion = UID2.getVersionInfo()
 
         Assert.assertEquals(expectedVersion.major, version.majorVersion)
@@ -19,7 +19,7 @@ class UID2MediationAdapterTest {
     @Test
     fun `test plugin version`() {
         val adapter = UID2MediationAdapter()
-        val version = adapter.sdkVersionInfo
+        val version = adapter.versionInfo
         val expectedVersion = PluginVersion.getVersionInfo()
 
         Assert.assertEquals(expectedVersion.major, version.majorVersion)
