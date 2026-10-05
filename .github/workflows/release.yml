@@ -24,6 +24,7 @@ jobs:
   publish:
     needs: approve-publish
     runs-on: ubuntu-latest
+    environment: ci-auto-merge
 
     permissions:
       pull-requests: write
@@ -93,6 +94,7 @@ jobs:
           add: 'gradle.properties'
           message: 'Prepare for release: ${{ steps.validation.outputs.release_version }}'
           tag: v${{ steps.validation.outputs.release_version }}
+          github_token: ${{ secrets.GH_MERGE_TOKEN }}
 
       - name: Deploy v${{ steps.validation.outputs.release_version }}
         run: ./gradlew publish
@@ -113,6 +115,7 @@ jobs:
         with:
           add: 'gradle.properties'
           message: 'Prepare next development version: ${{ steps.snapshotVersions.outputs.new_snapshot_version }}'
+          github_token: ${{ secrets.GH_MERGE_TOKEN }}
 
       - name: Remove the backup file from sed edits
         shell: bash
