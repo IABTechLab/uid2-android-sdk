@@ -44,7 +44,8 @@ jobs:
             exit 1;
           fi
 
-          if ! [[ "$INPUT_SNAPSHOT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)?$ ]]; then
+          # snapshot is optional; when empty, get_snapshot_versions.sh defaults to the current value
+          if [[ -n "$INPUT_SNAPSHOT_VERSION" ]] && ! [[ "$INPUT_SNAPSHOT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)?$ ]]; then
             echo "Invalid snapshot version";
             exit 1;
           fi
